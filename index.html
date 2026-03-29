@@ -400,7 +400,14 @@ textarea.form-control { min-height:90px; resize:vertical; }
 
 <!-- ══ SERVIÇOS ══ -->
 <div class="page" id="page-servicos">
-  <p class="page-title">Serviços</p>
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+    <p class="page-title" style="margin:0">Serviços - <span id="servicos-mes-titulo">Março</span></p>
+    <div class="month-nav">
+      <button class="month-btn" onclick="mudarMesServicos(-1)" title="Mês anterior">‹</button>
+      <button class="month-btn" onclick="mudarMesServicos(1)" title="Próximo mês">›</button>
+    </div>
+  </div>
+  
   <button class="btn btn-primary btn-block" style="margin-bottom:16px" onclick="abrirServico()">＋ Novo Serviço</button>
   
   <div class="search-box">
@@ -571,6 +578,7 @@ let clientes = [], servicos = [], tipos = []
 let tipoSelecionado = ''
 let filtroAtivo = null
 let mesExibicao = 0
+let mesServicos = 0  // NOVO: filtro de mês para serviços
 let conectado = false
 
 // ── NAV ──
@@ -747,6 +755,7 @@ function renderPagamentos() {
   el.innerHTML = ord.map(s => {
     const cl = clientes.find(c => c.id === s.cliente_id)
     const nome = s.cliente_nome || cl?.nome_dentista || cl?.nome_lab || 'Cliente'
+    const numero = cl?.numero_sequencial || '—'
     const saida = s.data_saida ? new Date(s.data_saida+'T12:00:00') : null
     const venc  = !s.pago && saida && saida < hoje
     const valor = (s.valor||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})
@@ -758,7 +767,7 @@ function renderPagamentos() {
     return `<div class="pag-item">
       <button class="${btnClass}" onclick="abrirPagamento(${s.id})">${btnText}</button>
       <div class="pag-info">
-        <div class="pag-nome">${nome}</div>
+        <div class="pag-nome"><span class="seq-num">#${numero}</span> ${nome}</div>
         <div class="pag-det">${s.tipo_servico||'—'} · Saída: ${dataSaida}${venc?' · <strong style="color:var(--red)">VENCIDO</strong>':''}${s.pago&&s.data_pagamento?' · Pago em '+new Date(s.data_pagamento).toLocaleDateString('pt-BR'):''}</div>
       </div>
       <div class="pag-valor">${valor}</div>
@@ -966,24 +975,57 @@ async function apagarCliente(id, nome) {
 // ── SERVIÇOS ──
 function filtrarServicos() {
   const termo = document.getElementById('search-servicos').value.toLowerCase()
-  const lista = document.getElementById('lista-servicos')
+  const periodo = obterMesOffsetDatas(mesServicos)
   
   const servicosFiltrados = servicos.filter(s => {
+    // Filtrar por mês
+    if (!s.data_entrada || s.data_entrada < periodo.inicio || s.data_entrada > periodo.fim) {
+      return false
+    }
+    // Filtrar por termo de busca
     const cliente = s.cliente_nome.toLowerCase()
     const tipo = (s.tipo_servico || '').toLowerCase()
     return cliente.includes(termo) || tipo.includes(termo)
   })
   
   if (!servicosFiltrados.length) {
-    lista.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><p>Nenhum serviço encontrado</p></div>'
+    document.getElementById('lista-servicos').innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><p>Nenhum serviço encontrado</p></div>'
     return
   }
   
   renderServicosList(servicosFiltrados)
 }
 
+function mudarMesServicos(delta) {
+  mesServicos += delta
+  if (mesServicos > 5) mesServicos = 5
+  if (mesServicos < -5) mesServicos = -5
+  
+  const periodo = obterMesOffsetDatas(mesServicos)
+  const display = periodo.display.charAt(0).toUpperCase() + periodo.display.slice(1)
+  document.getElementById('servicos-mes-titulo').textContent = display
+  
+  // Limpar busca ao mudar mês
+  document.getElementById('search-servicos').value = ''
+  
+  // Renderizar serviços do mês
+  const servicosMes = servicos.filter(s =>
+    s.data_entrada && s.data_entrada >= periodo.inicio && s.data_entrada <= periodo.fim
+  )
+  renderServicosList(servicosMes)
+}
+
 function renderServicos() {
-  renderServicosList(servicos)
+  // Detectar mês atual automaticamente
+  const periodo = obterMesOffsetDatas(mesServicos)
+  const display = periodo.display.charAt(0).toUpperCase() + periodo.display.slice(1)
+  document.getElementById('servicos-mes-titulo').textContent = display
+  
+  // Renderizar apenas serviços do mês atual
+  const servicosMes = servicos.filter(s =>
+    s.data_entrada && s.data_entrada >= periodo.inicio && s.data_entrada <= periodo.fim
+  )
+  renderServicosList(servicosMes)
 }
 
 function renderServicosList(lista) {
@@ -996,6 +1038,7 @@ function renderServicosList(lista) {
   el.innerHTML = lista.map(s => {
     const cl    = clientes.find(c => c.id === s.cliente_id)
     const nome  = s.cliente_nome || cl?.nome_dentista || cl?.nome_lab || 'Cliente'
+    const numero = cl?.numero_sequencial || '—'
     const saida = s.data_saida ? new Date(s.data_saida+'T12:00:00') : null
     const venc  = !s.pago && saida && saida < hoje
     const valor = (s.valor||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})
@@ -1008,7 +1051,7 @@ function renderServicosList(lista) {
     return `<div class="list-item ${iCls}">
       <div class="item-header">
         <div style="flex:1;min-width:0">
-          <div class="item-name">${nome}</div>
+          <div class="item-name"><span class="seq-num">#${numero}</span> ${nome}</div>
           <div class="item-sub">${s.tipo_servico||'—'} · ${valor}</div>
           <div class="item-sub">📅 Entrada: ${dEnt} · Saída: ${dSai}</div>
           ${s.descricao?`<div class="item-sub" style="color:var(--gray-600);margin-top:4px">${s.descricao}</div>`:''}
