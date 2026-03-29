@@ -101,7 +101,6 @@ body {
 .stat-card.green  { border-top-color:var(--green); }
 .stat-card.red    { border-top-color:var(--red); }
 .stat-card.orange { border-top-color:var(--orange); }
-.stat-card.active { background:var(--blue-light); }
 .stat-label { font-size:12px; font-weight:700; color:var(--gray-400); text-transform:uppercase; letter-spacing:.3px; margin-bottom:6px; }
 .stat-num   { font-size:38px; font-weight:800; color:var(--gray-800); line-height:1; }
 
@@ -172,6 +171,7 @@ textarea.form-control { min-height:90px; resize:vertical; }
 .btn-primary { background:var(--blue); color:white; }
 .btn-primary:hover  { background:var(--blue-dark); }
 .btn-primary:active { transform:scale(.98); }
+.btn-primary:disabled { background:var(--gray-400); cursor:not-allowed; }
 .btn-ghost   { background:var(--gray-100); color:var(--gray-600); }
 .btn-danger  { background:var(--red); color:white; }
 .btn-row { display:flex; gap:10px; margin-top:6px; }
@@ -458,7 +458,7 @@ textarea.form-control { min-height:90px; resize:vertical; }
     </div>
     <div class="btn-row">
       <button class="btn btn-ghost" onclick="fechar('ov-cliente')">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarCliente()">Salvar</button>
+      <button class="btn btn-primary" id="btn-salvar-cliente" onclick="salvarCliente()">Salvar</button>
     </div>
   </div>
 </div>
@@ -497,7 +497,7 @@ textarea.form-control { min-height:90px; resize:vertical; }
     </div>
     <div class="btn-row">
       <button class="btn btn-ghost" onclick="fechar('ov-servico')">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarServico()">Salvar</button>
+      <button class="btn btn-primary" id="btn-salvar-servico" onclick="salvarServico()">Salvar</button>
     </div>
   </div>
 </div>
@@ -526,60 +526,16 @@ textarea.form-control { min-height:90px; resize:vertical; }
 </div>
 
 <script>
+const URL_SB = 'https://ywvffejfbdxuapdrpsvl.supabase.co'
+const KEY_SB = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3dmZmZWpmYmR4dWFwZHJwc3ZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MzAyNTgsImV4cCI6MjA5MDMwNjI1OH0.nESBambdLeHvAWzayvqPVUaJZzKqo00AOqbeTEMLE9I'
+
 let clientes = [], servicos = [], tipos = []
 let tipoSelecionado = ''
 let filtroAtivo = null
 let mesExibicao = 0
 
-// ── LOCAL STORAGE (Principal) ──
-const STORAGE_KEYS = {
-  clientes: 'camini_clientes',
-  servicos: 'camini_servicos',
-  tipos: 'camini_tipos',
-  lastSync: 'camini_lastSync'
-}
-
-function salvarLocalmente() {
-  try {
-    localStorage.setItem(STORAGE_KEYS.clientes, JSON.stringify(clientes))
-    localStorage.setItem(STORAGE_KEYS.servicos, JSON.stringify(servicos))
-    localStorage.setItem(STORAGE_KEYS.tipos, JSON.stringify(tipos))
-    localStorage.setItem(STORAGE_KEYS.lastSync, new Date().toISOString())
-  } catch(e) {
-    console.error('Erro ao salvar localmente:', e)
-  }
-}
-
-function carregarLocalmente() {
-  try {
-    const cli = localStorage.getItem(STORAGE_KEYS.clientes)
-    const srv = localStorage.getItem(STORAGE_KEYS.servicos)
-    const tip = localStorage.getItem(STORAGE_KEYS.tipos)
-    
-    if (cli) clientes = JSON.parse(cli)
-    if (srv) servicos = JSON.parse(srv)
-    if (tip) tipos = JSON.parse(tip)
-    
-    return clientes.length > 0 || servicos.length > 0 || tipos.length > 0
-  } catch(e) {
-    console.error('Erro ao carregar dados locais:', e)
-    return false
-  }
-}
-
-// ── INICIALIZAR ──
-function inicializar() {
-  document.getElementById('syncDot').className = 'dot'
-  document.getElementById('syncText').textContent = '✅ Pronto'
-  
-  const temDados = carregarLocalmente()
-  if (temDados) {
-    renderTudo()
-    alerta('✅ Dados carregados do navegador', 'success')
-  } else {
-    alerta('👋 Bem-vindo! Comece a adicionar clientes e serviços.', 'warning')
-  }
-}
+// ── VALIDAR CONEXÃO (OBRIGATÓRIO) ──
+let conectado = false
 
 // ── NAV ──
 function irPara(p) {
@@ -603,7 +559,58 @@ function alerta(msg, tipo='success') {
   setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 300) }, 3200)
 }
 
-// ── RENDERIZAÇÃO ──
+function setSync(s) {
+  const dot = document.getElementById('syncDot')
+  const txt = document.getElementById('syncText')
+  dot.className = 'dot'
+  if (s === 'loading') { dot.classList.add('loading'); txt.textContent = 'Sincronizando...' }
+  else if (s === 'error') { dot.classList.add('error'); txt.textContent = 'Sem conexão'; conectado = false }
+  else { txt.textContent = '✅ Online'; conectado = true }
+}
+
+// ── API SUPABASE ──
+async function api(metodo, tabela, dados=null, params='') {
+  let r
+  try {
+    r = await fetch(`${URL_SB}/rest/v1/${tabela}${params}`, {
+      method: metodo,
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': KEY_SB,
+        'Authorization': `Bearer ${KEY_SB}`,
+        'Prefer': metodo === 'POST' ? 'return=representation' : ''
+      },
+      body: dados ? JSON.stringify(dados) : undefined
+    })
+  } catch(netErr) {
+    throw new Error('Sem conexão com Supabase')
+  }
+  if (!r.ok) {
+    let msg = `HTTP ${r.status}`
+    try { const e = await r.json(); msg += ': ' + (e.message || e.error || JSON.stringify(e)) } catch {}
+    throw new Error(msg)
+  }
+  if (r.status === 204) return []
+  return r.json()
+}
+
+// ── CARREGAR ──
+async function carregar() {
+  setSync('loading')
+  try {
+    [clientes, servicos, tipos] = await Promise.all([
+      api('GET','clientes',null,'?select=*&order=numero_sequencial.asc'),
+      api('GET','servicos',null,'?select=*&order=id.desc'),
+      api('GET','tipos_servico',null,'?select=*&order=nome.asc')
+    ])
+    renderTudo()
+    setSync('ok')
+  } catch(e) {
+    setSync('error')
+    alerta('❌ Sem conexão com Supabase. Use apenas online.', 'danger')
+  }
+}
+
 function renderTudo() {
   renderStats()
   renderMensal()
@@ -614,6 +621,7 @@ function renderTudo() {
   popularSelects()
 }
 
+// ── STATS ──
 function renderStats() {
   const hoje = new Date(); hoje.setHours(0,0,0,0)
   document.getElementById('st-clientes').textContent  = clientes.length
@@ -721,16 +729,34 @@ function renderPagamentos() {
   }).join('')
 }
 
-function togglePago(id, pagoAtual) {
-  const servico = servicos.find(s => s.id === id)
-  if (!servico) return
-  servico.pago = !pagoAtual
-  if (servico.pago) servico.data_pagamento = new Date().toISOString().split('T')[0]
-  salvarLocalmente()
-  renderTudo()
-  alerta(servico.pago ? '✓ Marcado como pago!' : 'Marcado como pendente', servico.pago?'success':'warning')
+async function togglePago(id, pagoAtual) {
+  if (!conectado) { alerta('Sem conexão com Supabase', 'danger'); return }
+  setSync('loading')
+  try {
+    const novoPago = !pagoAtual
+    await api('PATCH','servicos',{
+      pago: novoPago,
+      data_pagamento: novoPago ? new Date().toISOString().split('T')[0] : null
+    }, `?id=eq.${id}`)
+    await carregar()
+    alerta(novoPago ? '✓ Marcado como pago!' : 'Marcado como pendente', novoPago?'success':'warning')
+  } catch(e) { setSync('error'); alerta('Erro: '+e.message,'danger') }
 }
 
+// ── NUMERAÇÃO SEQUENCIAL ÚNICA ──
+async function obterProximoNumero() {
+  try {
+    const result = await api('GET','clientes',null,'?select=numero_sequencial&order=numero_sequencial.desc&limit=1')
+    if (!result || result.length === 0) return '001'
+    const ultimo = parseInt(result[0].numero_sequencial)
+    return String(ultimo + 1).padStart(3, '0')
+  } catch(e) {
+    console.error('Erro ao obter próximo número:', e)
+    return '001'
+  }
+}
+
+// ── CLIENTES ──
 function renderClientes() {
   const el = document.getElementById('lista-clientes')
   if (!clientes.length) {
@@ -789,12 +815,10 @@ function abrirCliente(id=null) {
 
 function editarCliente(id) { abrirCliente(id) }
 
-function proximoSeq(tipo) {
-  return String(clientes.filter(c => c.tipo_cliente === tipo).length + 1).padStart(3,'0')
-}
-
-function salvarCliente() {
+async function salvarCliente() {
+  if (!conectado) { alerta('Sem conexão com Supabase', 'danger'); return }
   if (!tipoSelecionado) { alerta('Selecione o tipo de cliente','warning'); return }
+  
   const isDent     = tipoSelecionado === 'Dentista'
   const nomeDent   = document.getElementById('cli-dentista').value.trim()
   const nomeLab    = document.getElementById('cli-lab').value.trim()
@@ -804,42 +828,47 @@ function salvarCliente() {
   if (isDent && !nomeDent) { alerta('Informe o nome do dentista','warning'); return }
   if (!isDent && !nomeLab) { alerta('Informe o nome do laboratório','warning'); return }
 
-  if (editId) {
-    const c = clientes.find(x => x.id == editId)
-    if (c) {
-      c.tipo_cliente = tipoSelecionado
-      c.nome_dentista = isDent ? nomeDent : null
-      c.nome_lab = isDent ? null : nomeLab
-      c.observacoes = obs || null
-      alerta('Cliente atualizado!','success')
-    }
-  } else {
-    const novoId = Math.max(...clientes.map(c => c.id || 0), 0) + 1
-    clientes.push({
-      id: novoId,
-      tipo_cliente: tipoSelecionado,
-      nome_dentista: isDent ? nomeDent : null,
-      nome_lab: isDent ? null : nomeLab,
-      numero_sequencial: proximoSeq(tipoSelecionado),
-      observacoes: obs || null
-    })
-    alerta('Cliente salvo!','success')
+  const dados = {
+    tipo_cliente:  tipoSelecionado,
+    nome_dentista: isDent ? nomeDent : null,
+    nome_lab:      isDent ? null : nomeLab,
+    observacoes:   obs || null
   }
+
+  document.getElementById('btn-salvar-cliente').disabled = true
+  setSync('loading')
   
-  fechar('ov-cliente')
-  salvarLocalmente()
-  renderTudo()
+  try {
+    if (editId) {
+      await api('PATCH','clientes',dados,`?id=eq.${editId}`)
+      alerta('Cliente atualizado!','success')
+    } else {
+      dados.numero_sequencial = await obterProximoNumero()
+      const result = await api('POST','clientes',dados)
+      if (!result || !Array.isArray(result)) throw new Error('Erro ao salvar cliente')
+      alerta(`Cliente ${dados.numero_sequencial} criado!`,'success')
+    }
+    fechar('ov-cliente')
+    await carregar()
+  } catch(e) { 
+    setSync('error')
+    alerta('Erro: '+e.message,'danger') 
+  } finally {
+    document.getElementById('btn-salvar-cliente').disabled = false
+  }
 }
 
-function apagarCliente(id, nome) {
+async function apagarCliente(id, nome) {
   if (!confirm(`Apagar "${nome}"?`)) return
-  clientes = clientes.filter(c => c.id !== id)
-  servicos = servicos.filter(s => s.cliente_id !== id)
-  salvarLocalmente()
-  renderTudo()
-  alerta('Cliente apagado.','warning')
+  setSync('loading')
+  try {
+    await api('DELETE','clientes',null,`?id=eq.${id}`)
+    alerta('Cliente apagado.','warning')
+    await carregar()
+  } catch(e) { setSync('error'); alerta('Erro: '+e.message,'danger') }
 }
 
+// ── SERVIÇOS ──
 function renderServicos() {
   const el = document.getElementById('lista-servicos')
   const hoje = new Date(); hoje.setHours(0,0,0,0)
@@ -922,7 +951,9 @@ function calcularSaida() {
   document.getElementById('srv-saida').value = d.toISOString().split('T')[0]
 }
 
-function salvarServico() {
+async function salvarServico() {
+  if (!conectado) { alerta('Sem conexão com Supabase', 'danger'); return }
+  
   const editId  = document.getElementById('srv-id').value
   const cliId   = document.getElementById('srv-cliente').value
   const tipo    = document.getElementById('srv-tipo').value
@@ -936,50 +967,51 @@ function salvarServico() {
   if (!entrada) { alerta('Informe a data de entrada','warning');  return }
 
   const cl = clientes.find(c => c.id == cliId)
-  
-  if (editId) {
-    const s = servicos.find(x => x.id == editId)
-    if (s) {
-      s.cliente_id = parseInt(cliId)
-      s.cliente_nome = cl ? (cl.nome_dentista || cl.nome_lab) : ''
-      s.tipo_servico = tipo
-      s.valor = isNaN(valor) ? 0 : valor
-      s.data_entrada = entrada
-      s.data_saida = saida || null
-      s.descricao = desc || null
-      alerta('Serviço atualizado!','success')
-    }
-  } else {
-    const novoId = Math.max(...servicos.map(s => s.id || 0), 0) + 1
-    servicos.push({
-      id: novoId,
-      cliente_id: parseInt(cliId),
-      cliente_nome: cl ? (cl.nome_dentista || cl.nome_lab) : '',
-      tipo_servico: tipo,
-      valor: isNaN(valor) ? 0 : valor,
-      data_entrada: entrada,
-      data_saida: saida || null,
-      descricao: desc || null,
-      status: 'pendente',
-      pago: false,
-      data_pagamento: null
-    })
-    alerta('Serviço adicionado!','success')
+  const dados = {
+    cliente_id:   parseInt(cliId),
+    cliente_nome: cl ? (cl.nome_dentista || cl.nome_lab) : '',
+    tipo_servico: tipo,
+    valor:        isNaN(valor) ? 0 : valor,
+    data_entrada: entrada,
+    data_saida:   saida || null,
+    descricao:    desc || null
   }
+
+  document.getElementById('btn-salvar-servico').disabled = true
+  setSync('loading')
   
-  fechar('ov-servico')
-  salvarLocalmente()
-  renderTudo()
+  try {
+    if (editId) {
+      await api('PATCH','servicos',dados,`?id=eq.${editId}`)
+      alerta('Serviço atualizado!','success')
+    } else {
+      dados.status = 'pendente'
+      dados.pago = false
+      const result = await api('POST','servicos',dados)
+      if (!result || !Array.isArray(result)) throw new Error('Erro ao salvar serviço')
+      alerta('Serviço adicionado!','success')
+    }
+    fechar('ov-servico')
+    await carregar()
+  } catch(e) { 
+    setSync('error')
+    alerta('Erro: '+e.message,'danger') 
+  } finally {
+    document.getElementById('btn-salvar-servico').disabled = false
+  }
 }
 
-function apagarServico(id) {
+async function apagarServico(id) {
   if (!confirm('Apagar este serviço?')) return
-  servicos = servicos.filter(s => s.id !== id)
-  salvarLocalmente()
-  renderTudo()
-  alerta('Serviço apagado.','warning')
+  setSync('loading')
+  try {
+    await api('DELETE','servicos',null,`?id=eq.${id}`)
+    alerta('Serviço apagado.','warning')
+    await carregar()
+  } catch(e) { setSync('error'); alerta('Erro: '+e.message,'danger') }
 }
 
+// ── TIPOS ──
 function renderTipos() {
   const el = document.getElementById('lista-tipos')
   if (!tipos.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">⚙️</div><p>Nenhum tipo</p></div>'; return }
@@ -997,18 +1029,22 @@ function renderTipos() {
   </div>`).join('')
 }
 
-function salvarTipo() {
+async function salvarTipo() {
+  if (!conectado) { alerta('Sem conexão com Supabase', 'danger'); return }
+  
   const nome = document.getElementById('cfg-nome').value.trim()
   const desc = document.getElementById('cfg-desc').value.trim()
   if (!nome) { alerta('Informe o nome do tipo','warning'); return }
   
-  const novoId = Math.max(...tipos.map(t => t.id || 0), 0) + 1
-  tipos.push({id: novoId, nome, descricao: desc || null})
-  alerta(`Tipo "${nome}" adicionado!`,'success')
-  document.getElementById('cfg-nome').value = ''
-  document.getElementById('cfg-desc').value = ''
-  salvarLocalmente()
-  renderTudo()
+  setSync('loading')
+  try {
+    const result = await api('POST','tipos_servico',{nome, descricao:desc||null})
+    if (!result || !Array.isArray(result)) throw new Error('Erro ao salvar tipo')
+    alerta(`Tipo "${nome}" adicionado!`,'success')
+    document.getElementById('cfg-nome').value = ''
+    document.getElementById('cfg-desc').value = ''
+    await carregar()
+  } catch(e) { setSync('error'); alerta('Erro: '+e.message,'danger') }
 }
 
 function abrirEdicaoTipo(id) {
@@ -1019,33 +1055,35 @@ function abrirEdicaoTipo(id) {
   abrir('ov-tipo')
 }
 
-function salvarEdicaoTipo() {
+async function salvarEdicaoTipo() {
+  if (!conectado) { alerta('Sem conexão com Supabase', 'danger'); return }
+  
   const id   = document.getElementById('et-id').value
   const nome = document.getElementById('et-nome').value.trim()
   const desc = document.getElementById('et-desc').value.trim()
   if (!nome) { alerta('Informe o nome','warning'); return }
   
-  const t = tipos.find(x => x.id == id)
-  if (t) {
-    t.nome = nome
-    t.descricao = desc || null
+  setSync('loading')
+  try {
+    await api('PATCH','tipos_servico',{nome, descricao:desc||null},`?id=eq.${id}`)
     alerta('Tipo atualizado!','success')
-  }
-  fechar('ov-tipo')
-  salvarLocalmente()
-  renderTudo()
+    fechar('ov-tipo')
+    await carregar()
+  } catch(e) { setSync('error'); alerta('Erro: '+e.message,'danger') }
 }
 
-function apagarTipo(id, nome) {
+async function apagarTipo(id, nome) {
   if (!confirm(`Apagar o tipo "${nome}"?`)) return
-  tipos = tipos.filter(t => t.id !== id)
-  alerta('Tipo apagado.','warning')
-  salvarLocalmente()
-  renderTudo()
+  setSync('loading')
+  try {
+    await api('DELETE','tipos_servico',null,`?id=eq.${id}`)
+    alerta('Tipo apagado.','warning')
+    await carregar()
+  } catch(e) { setSync('error'); alerta('Erro: '+e.message,'danger') }
 }
 
 // ── INICIAR ──
-window.addEventListener('load', inicializar)
+window.addEventListener('load', carregar)
 </script>
 </body>
 </html>
