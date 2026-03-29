@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Laboratório Camini</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue:        #1a6fa8;
+  --blue-dark:   #134f7a;
+  --blue-light:  #e8f4fd;
+  --green:       #1e9e5e;
+  --green-light: #e6f7ef;
+  --red:         #d9363e;
+  --red-light:   #fdecea;
+  --orange:      #e07b00;
+  --orange-light:#fff4e0;
+  --gray-100:    #f0f2f5;
+  --gray-200:    #e0e4ea;
+  --gray-400:    #9ba5b4;
+  --gray-600:    #4b5563;
+  --gray-800:    #1f2937;
+  --white:       #ffffff;
+  --radius:      14px;
+  --shadow:      0 2px 12px rgba(0,0,0,0.08);
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--gray-100);
+  color: var(--gray-800);
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+.header {
+  background: var(--blue);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 3px 16px rgba(26,111,168,0.3);
+}
+.logo { display:flex; align-items:center; gap:10px; }
+.logo-icon { font-size:26px; }
+.logo h1 { font-size:19px; font-weight:800; color:white; line-height:1; }
+.logo p  { font-size:11px; color:rgba(255,255,255,0.7); font-weight:600; text-transform:uppercase; letter-spacing:.5px; }
+.sync-pill {
+  display:flex; align-items:center; gap:7px;
+  background:rgba(255,255,255,0.15);
+  padding:6px 12px; border-radius:20px;
+  font-size:12px; color:white; font-weight:700;
+}
+.dot { width:8px; height:8px; border-radius:50%; background:#4ade80; flex-shrink:0; }
+.dot.loading { background:#fbbf24; animation:blink .8s infinite; }
+.dot.error   { background:#f87171; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+.bottom-nav {
+  position:fixed; bottom:0; left:0; right:0;
+  background:white; display:flex;
+  border-top:2px solid var(--gray-200);
+  box-shadow:0 -4px 16px rgba(0,0,0,.08);
+  z-index:100;
+}
+.nav-btn {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:3px;
+  padding:10px 4px; border:none; background:none;
+  cursor:pointer; color:var(--gray-400);
+  font-family:'Nunito',sans-serif;
+  font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.3px;
+  transition:color .2s; -webkit-tap-highlight-color:transparent;
+}
+.nav-icon { font-size:22px; line-height:1; transition:transform .2s; }
+.nav-btn.active { color:var(--blue); }
+.nav-btn.active .nav-icon { transform:translateY(-2px); }
+
+.page { display:none; padding:18px 16px; max-width:680px; margin:0 auto; }
+.page.active { display:block; }
+.page-title { font-size:22px; font-weight:800; color:var(--gray-800); margin-bottom:16px; }
+
+.card { background:white; border-radius:var(--radius); box-shadow:var(--shadow); padding:20px; margin-bottom:14px; }
+.card-title { font-size:16px; font-weight:800; color:var(--blue); margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid var(--gray-100); }
+
+.stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
+.stat-card {
+  background:white; border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:18px 14px; text-align:center; border-top:4px solid var(--blue);
+  cursor:pointer; transition:all .2s;
+}
+.stat-card:hover { transform:translateY(-2px); box-shadow:0 4px 16px rgba(0,0,0,0.12); }
+.stat-card.green  { border-top-color:var(--green); }
+.stat-card.red    { border-top-color:var(--red); }
+.stat-card.orange { border-top-color:var(--orange); }
+.stat-card.active { background:var(--blue-light); }
+.stat-label { font-size:12px; font-weight:700; color:var(--gray-400); text-transform:uppercase; letter-spacing:.3px; margin-bottom:6px; }
+.stat-num   { font-size:38px; font-weight:800; color:var(--gray-800); line-height:1; }
+
+.monthly-section {
+  background:white; border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:20px; margin-bottom:14px;
+}
+.monthly-header {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid var(--gray-100);
+}
+.monthly-title { font-size:16px; font-weight:800; color:var(--blue); }
+.month-nav {
+  display:flex; gap:8px; align-items:center;
+}
+.month-btn {
+  width:36px; height:36px; border:2px solid var(--gray-200); border-radius:50%;
+  background:white; cursor:pointer; font-weight:700; font-size:14px;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .2s; -webkit-tap-highlight-color:transparent;
+}
+.month-btn:hover { border-color:var(--blue); color:var(--blue); }
+.month-btn.active { background:var(--blue); color:white; border-color:var(--blue); }
+.month-display { font-size:14px; font-weight:700; color:var(--gray-600); min-width:100px; text-align:center; }
+.monthly-stats {
+  display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;
+  margin-bottom:12px;
+}
+.mstat {
+  background:var(--gray-100); border-radius:10px; padding:12px 10px; text-align:center;
+}
+.mstat-label { font-size:12px; font-weight:700; color:var(--gray-400); margin-bottom:4px; }
+.mstat-valor { font-size:18px; font-weight:800; color:var(--gray-800); }
+
+.form-group { margin-bottom:14px; }
+.form-label { display:block; font-size:14px; font-weight:700; color:var(--gray-600); margin-bottom:7px; }
+.form-label .req { color:var(--red); }
+.form-control {
+  width:100%; padding:14px 16px;
+  border:2px solid var(--gray-200); border-radius:10px;
+  font-size:16px; font-family:'Nunito',sans-serif; font-weight:600;
+  color:var(--gray-800); background:white; appearance:none;
+  transition:border-color .2s;
+}
+.form-control:focus { outline:none; border-color:var(--blue); box-shadow:0 0 0 4px rgba(26,111,168,.1); }
+textarea.form-control { min-height:90px; resize:vertical; }
+
+.tipo-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+.tipo-opt {
+  border:3px solid var(--gray-200); border-radius:12px;
+  padding:16px 10px; text-align:center; cursor:pointer;
+  transition:all .2s; background:white; font-family:'Nunito',sans-serif;
+  -webkit-tap-highlight-color:transparent;
+}
+.tipo-opt:hover { border-color:var(--blue); }
+.tipo-opt.sel   { border-color:var(--blue); background:var(--blue-light); }
+.tipo-emoji { font-size:30px; display:block; margin-bottom:6px; }
+.tipo-name  { font-size:15px; font-weight:800; color:var(--gray-800); }
+.tipo-hint  { font-size:12px; color:var(--gray-400); font-weight:600; margin-top:3px; }
+
+.btn {
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:14px 22px; border:none; border-radius:10px;
+  font-size:15px; font-family:'Nunito',sans-serif; font-weight:800;
+  cursor:pointer; transition:all .2s; -webkit-tap-highlight-color:transparent;
+}
+.btn-block { width:100%; }
+.btn-primary { background:var(--blue); color:white; }
+.btn-primary:hover  { background:var(--blue-dark); }
+.btn-primary:active { transform:scale(.98); }
+.btn-ghost   { background:var(--gray-100); color:var(--gray-600); }
+.btn-danger  { background:var(--red); color:white; }
+.btn-row { display:flex; gap:10px; margin-top:6px; }
+.btn-row .btn { flex:1; }
+
+#alertBox {
+  position:fixed; top:76px; left:50%;
+  transform:translateX(-50%);
+  z-index:200; width:calc(100% - 32px);
+  max-width:500px; pointer-events:none;
+}
+.alert {
+  padding:14px 18px; border-radius:10px;
+  font-size:15px; font-weight:700; margin-bottom:8px;
+  opacity:0; transform:translateY(-10px);
+  transition:all .3s; pointer-events:auto;
+}
+.alert.show { opacity:1; transform:translateY(0); }
+.alert-success { background:var(--green-light); color:var(--green); border-left:4px solid var(--green); }
+.alert-danger  { background:var(--red-light);   color:var(--red);   border-left:4px solid var(--red);   }
+.alert-warning { background:var(--orange-light); color:var(--orange); border-left:4px solid var(--orange); }
+
+.list-item {
+  background:white; border-radius:var(--radius); padding:16px;
+  margin-bottom:10px; box-shadow:var(--shadow);
+  border-left:5px solid var(--blue);
+}
+.list-item.lab  { border-left-color:#7c3aed; }
+.list-item.pago { border-left-color:var(--green); }
+.list-item.venc { border-left-color:var(--red); }
+.item-header { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+.item-name { font-size:16px; font-weight:800; color:var(--gray-800); line-height:1.2; }
+.item-sub  { font-size:13px; color:var(--gray-400); font-weight:600; margin-top:4px; }
+.item-actions { display:flex; gap:8px; flex-shrink:0; }
+
+.icon-btn {
+  width:36px; height:36px; border-radius:8px; border:none;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  font-size:16px; transition:all .2s; -webkit-tap-highlight-color:transparent;
+}
+.icon-btn.edit   { background:var(--blue-light); }
+.icon-btn.delete { background:var(--red-light); }
+
+.badge {
+  display:inline-block; padding:4px 10px; border-radius:20px;
+  font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.3px;
+}
+.badge-dentista { background:#dbeafe; color:#1e40af; }
+.badge-lab      { background:#ede9fe; color:#5b21b6; }
+.badge-pago     { background:var(--green-light); color:var(--green); }
+.badge-pendente { background:var(--orange-light); color:var(--orange); }
+.badge-vencido  { background:var(--red-light); color:var(--red); }
+
+.seq-num {
+  display:inline-block; background:var(--blue); color:white;
+  font-size:11px; font-weight:800; padding:2px 8px;
+  border-radius:12px; font-family:monospace;
+}
+
+.pag-item {
+  background:white; border-radius:var(--radius); padding:16px;
+  margin-bottom:10px; box-shadow:var(--shadow);
+  display:flex; align-items:center; gap:14px;
+}
+.pag-check {
+  width:46px; height:46px; border-radius:50%;
+  border:3px solid var(--gray-200); background:none;
+  cursor:pointer; font-size:20px;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition:all .2s; -webkit-tap-highlight-color:transparent;
+}
+.pag-check.pago { background:var(--green); border-color:var(--green); color:white; }
+.pag-info { flex:1; min-width:0; }
+.pag-nome  { font-size:15px; font-weight:800; color:var(--gray-800); }
+.pag-det   { font-size:13px; color:var(--gray-400); font-weight:600; margin-top:3px; }
+.pag-valor { font-size:17px; font-weight:800; color:var(--gray-800); text-align:right; white-space:nowrap; }
+
+.empty { text-align:center; padding:40px 20px; color:var(--gray-400); }
+.empty-icon { font-size:48px; margin-bottom:12px; }
+.empty p { font-size:15px; font-weight:600; }
+
+.overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,.45);
+  z-index:300; display:none; align-items:flex-end;
+}
+.overlay.open { display:flex; }
+.sheet {
+  background:white; border-radius:20px 20px 0 0;
+  padding:24px 20px 44px; width:100%;
+  max-height:92vh; overflow-y:auto;
+}
+.sheet-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+.sheet-title  { font-size:20px; font-weight:800; color:var(--gray-800); }
+.sheet-close  {
+  background:var(--gray-100); border:none; border-radius:50%;
+  width:34px; height:34px; font-size:18px; cursor:pointer; line-height:1;
+  display:flex; align-items:center; justify-content:center;
+}
+
+.info-box {
+  display:flex; align-items:center; gap:8px;
+  background:var(--blue-light); border-radius:10px;
+  padding:12px 14px; margin-bottom:14px;
+  font-size:13px; font-weight:700; color:var(--blue-dark);
+}
+
+.filter-badge {
+  display:inline-block; background:var(--blue); color:white;
+  padding:8px 14px; border-radius:20px; font-size:13px; font-weight:700;
+  margin-bottom:14px;
+}
+.filter-close { margin-left:8px; cursor:pointer; font-weight:900; }
+
+@media (min-width:600px) {
+  .page { padding:24px 20px; }
+  .stats-grid { grid-template-columns:repeat(4,1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <span class="logo-icon">🦷</span>
+    <div>
+      <h1>Camini</h1>
+      <p>Laboratório de Prótese Dentária</p>
+    </div>
+  </div>
+  <div class="sync-pill">
+    <span class="dot" id="syncDot"></span>
+    <span id="syncText">Carregando...</span>
+  </div>
+</div>
+
+<div id="alertBox"></div>
+
+<!-- ══ INÍCIO ══ -->
+<div class="page active" id="page-dash">
+  <p class="page-title">Início</p>
+  
+  <div id="filterContainer" style="display:none;margin-bottom:14px">
+    <div class="filter-badge" id="filterBadge">
+      <span id="filterText"></span>
+      <span class="filter-close" onclick="limparFiltro()">✕</span>
+    </div>
+  </div>
+  
+  <div class="stats-grid">
+    <div class="stat-card" onclick="filtrarPor('pendentes')" title="Clique para filtrar">
+      <div class="stat-label">Pendentes</div>
+      <div class="stat-num" id="st-pendentes">0</div>
+    </div>
+    <div class="stat-card green" onclick="filtrarPor('pagos')" title="Clique para filtrar">
+      <div class="stat-label">Pagos</div>
+      <div class="stat-num" id="st-pagos">0</div>
+    </div>
+    <div class="stat-card red" onclick="filtrarPor('vencidos')" title="Clique para filtrar">
+      <div class="stat-label">Vencidos</div>
+      <div class="stat-num" id="st-vencidos">0</div>
+    </div>
+    <div class="stat-card orange">
+      <div class="stat-label">Clientes</div>
+      <div class="stat-num" id="st-clientes">0</div>
+    </div>
+  </div>
+
+  <!-- SEÇÃO FINANCEIRA MENSAL -->
+  <div class="monthly-section">
+    <div class="monthly-header">
+      <div class="monthly-title">💰 Resumo Mensal</div>
+      <div class="month-nav">
+        <button class="month-btn" onclick="mudarMes(-2)">«</button>
+        <button class="month-btn" onclick="mudarMes(-1)">‹</button>
+        <div class="month-display" id="monthDisplay"></div>
+        <button class="month-btn" onclick="mudarMes(1)">›</button>
+        <button class="month-btn" onclick="mudarMes(2)">»</button>
+      </div>
+    </div>
+    <div class="monthly-stats">
+      <div class="mstat">
+        <div class="mstat-label">Entrada</div>
+        <div class="mstat-valor" id="mstat-total">R$ 0</div>
+      </div>
+      <div class="mstat">
+        <div class="mstat-label">Pago</div>
+        <div class="mstat-valor" id="mstat-pago" style="color:var(--green)">R$ 0</div>
+      </div>
+      <div class="mstat">
+        <div class="mstat-label">Pendente</div>
+        <div class="mstat-valor" id="mstat-pendente" style="color:var(--orange)">R$ 0</div>
+      </div>
+    </div>
+    <div style="font-size:13px; color:var(--gray-400); font-weight:600; line-height:1.5;" id="monthlyDetails"></div>
+  </div>
+
+  <!-- LISTA DE PAGAMENTOS -->
+  <div class="card">
+    <div class="card-title">💳 Pagamentos <span id="pagCount" style="font-size:14px;color:var(--gray-400)">(0)</span></div>
+    <div id="lista-pagamentos">
+      <div class="empty"><div class="empty-icon">💳</div><p>Nenhum serviço</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CLIENTES ══ -->
+<div class="page" id="page-clientes">
+  <p class="page-title">Clientes</p>
+  <button class="btn btn-primary btn-block" style="margin-bottom:16px" onclick="abrirCliente()">＋ Novo Cliente</button>
+  <div id="lista-clientes"><div class="empty"><div class="empty-icon">👤</div><p>Nenhum cliente</p></div></div>
+</div>
+
+<!-- ══ SERVIÇOS ══ -->
+<div class="page" id="page-servicos">
+  <p class="page-title">Serviços</p>
+  <button class="btn btn-primary btn-block" style="margin-bottom:16px" onclick="abrirServico()">＋ Novo Serviço</button>
+  <div id="lista-servicos"><div class="empty"><div class="empty-icon">🔧</div><p>Nenhum serviço</p></div></div>
+</div>
+
+<!-- ══ TIPOS ══ -->
+<div class="page" id="page-config">
+  <p class="page-title">Tipos de Serviço</p>
+  <div class="card">
+    <div class="card-title">➕ Adicionar Tipo</div>
+    <div class="form-group">
+      <label class="form-label">Nome <span class="req">*</span></label>
+      <input class="form-control" id="cfg-nome" placeholder="Ex: Protético, Coroa...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descrição</label>
+      <textarea class="form-control" id="cfg-desc" placeholder="Opcional..."></textarea>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="salvarTipo()">Salvar Tipo</button>
+  </div>
+  <div id="lista-tipos"><div class="empty"><div class="empty-icon">⚙️</div><p>Nenhum tipo</p></div></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-dash"     onclick="irPara('dash')">    <span class="nav-icon">🏠</span>Início</button>
+  <button class="nav-btn"        id="nav-clientes" onclick="irPara('clientes')"><span class="nav-icon">👤</span>Clientes</button>
+  <button class="nav-btn"        id="nav-servicos" onclick="irPara('servicos')"><span class="nav-icon">🔧</span>Serviços</button>
+  <button class="nav-btn"        id="nav-config"   onclick="irPara('config')">  <span class="nav-icon">⚙️</span>Tipos</button>
+</nav>
+
+<!-- SHEET: CLIENTE -->
+<div class="overlay" id="ov-cliente" onclick="fechar('ov-cliente')">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-header">
+      <div class="sheet-title" id="titulo-cliente">Novo Cliente</div>
+      <button class="sheet-close" onclick="fechar('ov-cliente')">✕</button>
+    </div>
+    <input type="hidden" id="cli-id">
+    <div class="form-group">
+      <label class="form-label">Tipo de cliente <span class="req">*</span></label>
+      <div class="tipo-grid">
+        <div class="tipo-opt" id="opt-dentista" onclick="escolherTipo('Dentista')">
+          <span class="tipo-emoji">🦷</span>
+          <div class="tipo-name">Dentista</div>
+          <div class="tipo-hint">Profissional</div>
+        </div>
+        <div class="tipo-opt" id="opt-lab" onclick="escolherTipo('Laboratório')">
+          <span class="tipo-emoji">🏢</span>
+          <div class="tipo-name">Laboratório</div>
+          <div class="tipo-hint">Empresa</div>
+        </div>
+      </div>
+    </div>
+    <div id="campo-dentista" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Nome do Dentista <span class="req">*</span></label>
+        <input class="form-control" id="cli-dentista" placeholder="Dr. João Silva">
+      </div>
+    </div>
+    <div id="campo-lab" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Nome do Laboratório <span class="req">*</span></label>
+        <input class="form-control" id="cli-lab" placeholder="Lab Odonto Ltda.">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Observações</label>
+      <textarea class="form-control" id="cli-obs" placeholder="Informações adicionais..."></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="fechar('ov-cliente')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarCliente()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHEET: SERVIÇO -->
+<div class="overlay" id="ov-servico" onclick="fechar('ov-servico')">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-header">
+      <div class="sheet-title" id="titulo-servico">Novo Serviço</div>
+      <button class="sheet-close" onclick="fechar('ov-servico')">✕</button>
+    </div>
+    <input type="hidden" id="srv-id">
+    <div class="form-group">
+      <label class="form-label">Cliente <span class="req">*</span></label>
+      <select class="form-control" id="srv-cliente"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tipo de Serviço <span class="req">*</span></label>
+      <select class="form-control" id="srv-tipo"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Valor (R$)</label>
+      <input type="number" class="form-control" id="srv-valor" placeholder="0,00" step="0.01" min="0">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Data de Entrada <span class="req">*</span></label>
+      <input type="date" class="form-control" id="srv-entrada" onchange="calcularSaida()">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Saída Prevista <small style="font-weight:600;color:var(--gray-400)">(5 dias úteis seg–sáb)</small></label>
+      <input type="date" class="form-control" id="srv-saida" style="background:var(--blue-light)">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descrição / Observações</label>
+      <textarea class="form-control" id="srv-desc" placeholder="Detalhes..."></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="fechar('ov-servico')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarServico()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHEET: EDITAR TIPO -->
+<div class="overlay" id="ov-tipo" onclick="fechar('ov-tipo')">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-header">
+      <div class="sheet-title">Editar Tipo</div>
+      <button class="sheet-close" onclick="fechar('ov-tipo')">✕</button>
+    </div>
+    <input type="hidden" id="et-id">
+    <div class="form-group">
+      <label class="form-label">Nome <span class="req">*</span></label>
+      <input class="form-control" id="et-nome">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descrição</label>
+      <textarea class="form-control" id="et-desc"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="fechar('ov-tipo')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarEdicaoTipo()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let clientes = [], servicos = [], tipos = []
+let tipoSelecionado = ''
+let filtroAtivo = null
+let mesExibicao = 0
+
+// ── LOCAL STORAGE (Principal) ──
+const STORAGE_KEYS = {
+  clientes: 'camini_clientes',
+  servicos: 'camini_servicos',
+  tipos: 'camini_tipos',
+  lastSync: 'camini_lastSync'
+}
+
+function salvarLocalmente() {
+  try {
+    localStorage.setItem(STORAGE_KEYS.clientes, JSON.stringify(clientes))
+    localStorage.setItem(STORAGE_KEYS.servicos, JSON.stringify(servicos))
+    localStorage.setItem(STORAGE_KEYS.tipos, JSON.stringify(tipos))
+    localStorage.setItem(STORAGE_KEYS.lastSync, new Date().toISOString())
+  } catch(e) {
+    console.error('Erro ao salvar localmente:', e)
+  }
+}
+
+function carregarLocalmente() {
+  try {
+    const cli = localStorage.getItem(STORAGE_KEYS.clientes)
+    const srv = localStorage.getItem(STORAGE_KEYS.servicos)
+    const tip = localStorage.getItem(STORAGE_KEYS.tipos)
+    
+    if (cli) clientes = JSON.parse(cli)
+    if (srv) servicos = JSON.parse(srv)
+    if (tip) tipos = JSON.parse(tip)
+    
+    return clientes.length > 0 || servicos.length > 0 || tipos.length > 0
+  } catch(e) {
+    console.error('Erro ao carregar dados locais:', e)
+    return false
+  }
+}
+
+// ── INICIALIZAR ──
+function inicializar() {
+  document.getElementById('syncDot').className = 'dot'
+  document.getElementById('syncText').textContent = '✅ Pronto'
+  
+  const temDados = carregarLocalmente()
+  if (temDados) {
+    renderTudo()
+    alerta('✅ Dados carregados do navegador', 'success')
+  } else {
+    alerta('👋 Bem-vindo! Comece a adicionar clientes e serviços.', 'warning')
+  }
+}
+
+// ── NAV ──
+function irPara(p) {
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'))
+  document.querySelectorAll('.nav-btn').forEach(x => x.classList.remove('active'))
+  document.getElementById('page-' + p).classList.add('active')
+  document.getElementById('nav-' + p).classList.add('active')
+  window.scrollTo(0, 0)
+}
+
+function fechar(id) { document.getElementById(id).classList.remove('open') }
+function abrir(id)  { document.getElementById(id).classList.add('open') }
+
+function alerta(msg, tipo='success') {
+  const box = document.getElementById('alertBox')
+  const el = document.createElement('div')
+  el.className = `alert alert-${tipo}`
+  el.textContent = msg
+  box.appendChild(el)
+  requestAnimationFrame(() => el.classList.add('show'))
+  setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 300) }, 3200)
+}
+
+// ── RENDERIZAÇÃO ──
+function renderTudo() {
+  renderStats()
+  renderMensal()
+  renderPagamentos()
+  renderClientes()
+  renderServicos()
+  renderTipos()
+  popularSelects()
+}
+
+function renderStats() {
+  const hoje = new Date(); hoje.setHours(0,0,0,0)
+  document.getElementById('st-clientes').textContent  = clientes.length
+  document.getElementById('st-pendentes').textContent = servicos.filter(s => !s.pago).length
+  document.getElementById('st-pagos').textContent     = servicos.filter(s =>  s.pago).length
+  document.getElementById('st-vencidos').textContent  = servicos.filter(s =>
+    !s.pago && s.data_saida && new Date(s.data_saida+'T12:00:00') < hoje).length
+}
+
+function obterMesOffsetDatas(offset) {
+  const agora = new Date()
+  agora.setMonth(agora.getMonth() + offset)
+  const ano = agora.getFullYear()
+  const mes = agora.getMonth()
+  const primeiroDia = new Date(ano, mes, 1)
+  const ultimoDia = new Date(ano, mes + 1, 0)
+  return {
+    inicio: primeiroDia.toISOString().split('T')[0],
+    fim: ultimoDia.toISOString().split('T')[0],
+    display: new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(primeiroDia)
+  }
+}
+
+function renderMensal() {
+  const periodo = obterMesOffsetDatas(mesExibicao)
+  document.getElementById('monthDisplay').textContent = periodo.display.charAt(0).toUpperCase() + periodo.display.slice(1)
+
+  const servicosMes = servicos.filter(s =>
+    s.data_entrada && s.data_entrada >= periodo.inicio && s.data_entrada <= periodo.fim
+  )
+
+  const total = servicosMes.reduce((sum, s) => sum + (s.valor || 0), 0)
+  const pago = servicosMes.filter(s => s.pago).reduce((sum, s) => sum + (s.valor || 0), 0)
+  const pendente = total - pago
+
+  document.getElementById('mstat-total').textContent = total.toLocaleString('pt-BR', {style:'currency',currency:'BRL'})
+  document.getElementById('mstat-pago').textContent = pago.toLocaleString('pt-BR', {style:'currency',currency:'BRL'})
+  document.getElementById('mstat-pendente').textContent = pendente.toLocaleString('pt-BR', {style:'currency',currency:'BRL'})
+
+  const qtServiços = servicosMes.length
+  const qtPago = servicosMes.filter(s => s.pago).length
+  const qtPendente = qtServiços - qtPago
+  const msgDetalhes = `<strong>${qtServiços}</strong> serviço${qtServiços !== 1 ? 's' : ''} · <strong>${qtPago}</strong> pago${qtPago !== 1 ? 's' : ''} · <strong>${qtPendente}</strong> pendente${qtPendente !== 1 ? 's' : ''}`
+  document.getElementById('monthlyDetails').innerHTML = msgDetalhes
+}
+
+function mudarMes(delta) {
+  mesExibicao += delta
+  if (Math.abs(mesExibicao) > 2) mesExibicao = mesExibicao > 0 ? 2 : -2
+  renderMensal()
+}
+
+function filtrarPor(tipo) {
+  filtroAtivo = tipo
+  document.getElementById('filterContainer').style.display = 'block'
+  document.getElementById('filterText').textContent = tipo === 'pendentes' ? '⏳ Pendentes' : tipo === 'pagos' ? '✓ Pagos' : '⚠️ Vencidos'
+  renderPagamentos()
+}
+
+function limparFiltro() {
+  filtroAtivo = null
+  document.getElementById('filterContainer').style.display = 'none'
+  renderPagamentos()
+}
+
+function renderPagamentos() {
+  const el = document.getElementById('lista-pagamentos')
+  const hoje = new Date(); hoje.setHours(0,0,0,0)
+
+  let servicosExibir = servicos.filter(s => s.valor > 0)
+
+  if (filtroAtivo === 'pendentes') {
+    servicosExibir = servicosExibir.filter(s => !s.pago)
+  } else if (filtroAtivo === 'pagos') {
+    servicosExibir = servicosExibir.filter(s => s.pago)
+  } else if (filtroAtivo === 'vencidos') {
+    servicosExibir = servicosExibir.filter(s => !s.pago && s.data_saida && new Date(s.data_saida+'T12:00:00') < hoje)
+  }
+
+  document.getElementById('pagCount').textContent = `(${servicosExibir.length})`
+
+  if (!servicosExibir.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">💳</div><p>' + (filtroAtivo ? 'Nenhum registro nesta categoria' : 'Nenhum serviço') + '</p></div>'
+    return
+  }
+
+  const ord = servicosExibir.sort((a,b) => a.pago - b.pago)
+  el.innerHTML = ord.map(s => {
+    const cl = clientes.find(c => c.id === s.cliente_id)
+    const nome = s.cliente_nome || cl?.nome_dentista || cl?.nome_lab || 'Cliente'
+    const saida = s.data_saida ? new Date(s.data_saida+'T12:00:00') : null
+    const venc  = !s.pago && saida && saida < hoje
+    const valor = (s.valor||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})
+    const dataSaida = saida ? saida.toLocaleDateString('pt-BR') : '—'
+    return `<div class="pag-item">
+      <button class="pag-check ${s.pago?'pago':''}" onclick="togglePago(${s.id},${s.pago})" title="${s.pago?'Marcar pendente':'Marcar pago'}">
+        ${s.pago ? '✓' : ''}
+      </button>
+      <div class="pag-info">
+        <div class="pag-nome">${nome}</div>
+        <div class="pag-det">${s.tipo_servico||'—'} · Saída: ${dataSaida}${venc?' · <strong style="color:var(--red)">VENCIDO</strong>':''}${s.pago&&s.data_pagamento?' · Pago em '+new Date(s.data_pagamento).toLocaleDateString('pt-BR'):''}</div>
+      </div>
+      <div class="pag-valor">${valor}</div>
+    </div>`
+  }).join('')
+}
+
+function togglePago(id, pagoAtual) {
+  const servico = servicos.find(s => s.id === id)
+  if (!servico) return
+  servico.pago = !pagoAtual
+  if (servico.pago) servico.data_pagamento = new Date().toISOString().split('T')[0]
+  salvarLocalmente()
+  renderTudo()
+  alerta(servico.pago ? '✓ Marcado como pago!' : 'Marcado como pendente', servico.pago?'success':'warning')
+}
+
+function renderClientes() {
+  const el = document.getElementById('lista-clientes')
+  if (!clientes.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">👤</div><p>Nenhum cliente cadastrado</p></div>'
+    return
+  }
+  el.innerHTML = clientes.map(c => {
+    const isDent = c.tipo_cliente === 'Dentista'
+    const nome   = isDent ? c.nome_dentista : c.nome_lab
+    const badge  = isDent
+      ? '<span class="badge badge-dentista">🦷 Dentista</span>'
+      : '<span class="badge badge-lab">🏢 Laboratório</span>'
+    const seq = c.numero_sequencial ? `<span class="seq-num">${c.numero_sequencial}</span> ` : ''
+    return `<div class="list-item ${isDent?'':'lab'}">
+      <div class="item-header">
+        <div>
+          <div class="item-name">${seq}${nome||'—'}</div>
+          <div class="item-sub" style="margin-top:6px">${badge}</div>
+          ${c.observacoes ? `<div class="item-sub" style="margin-top:6px;color:var(--gray-600)">${c.observacoes}</div>` : ''}
+        </div>
+        <div class="item-actions">
+          <button class="icon-btn edit" onclick="editarCliente(${c.id})">✏️</button>
+          <button class="icon-btn delete" onclick="apagarCliente(${c.id},'${(nome||'').replace(/'/g,"\\'")}')">🗑️</button>
+        </div>
+      </div>
+    </div>`
+  }).join('')
+}
+
+function escolherTipo(tipo) {
+  tipoSelecionado = tipo
+  document.getElementById('opt-dentista').classList.toggle('sel', tipo==='Dentista')
+  document.getElementById('opt-lab').classList.toggle('sel', tipo==='Laboratório')
+  document.getElementById('campo-dentista').style.display = tipo==='Dentista'    ? 'block' : 'none'
+  document.getElementById('campo-lab').style.display      = tipo==='Laboratório' ? 'block' : 'none'
+}
+
+function abrirCliente(id=null) {
+  tipoSelecionado = ''
+  ;['cli-id','cli-dentista','cli-lab','cli-obs'].forEach(x => document.getElementById(x).value = '')
+  ;['opt-dentista','opt-lab'].forEach(x => document.getElementById(x).classList.remove('sel'))
+  ;['campo-dentista','campo-lab'].forEach(x => document.getElementById(x).style.display = 'none')
+  document.getElementById('titulo-cliente').textContent = id ? 'Editar Cliente' : 'Novo Cliente'
+
+  if (id) {
+    const c = clientes.find(x => x.id === id)
+    if (!c) return
+    document.getElementById('cli-id').value       = id
+    document.getElementById('cli-obs').value      = c.observacoes || ''
+    document.getElementById('cli-dentista').value = c.nome_dentista || ''
+    document.getElementById('cli-lab').value      = c.nome_lab || ''
+    escolherTipo(c.tipo_cliente)
+  }
+  abrir('ov-cliente')
+}
+
+function editarCliente(id) { abrirCliente(id) }
+
+function proximoSeq(tipo) {
+  return String(clientes.filter(c => c.tipo_cliente === tipo).length + 1).padStart(3,'0')
+}
+
+function salvarCliente() {
+  if (!tipoSelecionado) { alerta('Selecione o tipo de cliente','warning'); return }
+  const isDent     = tipoSelecionado === 'Dentista'
+  const nomeDent   = document.getElementById('cli-dentista').value.trim()
+  const nomeLab    = document.getElementById('cli-lab').value.trim()
+  const obs        = document.getElementById('cli-obs').value.trim()
+  const editId     = document.getElementById('cli-id').value
+
+  if (isDent && !nomeDent) { alerta('Informe o nome do dentista','warning'); return }
+  if (!isDent && !nomeLab) { alerta('Informe o nome do laboratório','warning'); return }
+
+  if (editId) {
+    const c = clientes.find(x => x.id == editId)
+    if (c) {
+      c.tipo_cliente = tipoSelecionado
+      c.nome_dentista = isDent ? nomeDent : null
+      c.nome_lab = isDent ? null : nomeLab
+      c.observacoes = obs || null
+      alerta('Cliente atualizado!','success')
+    }
+  } else {
+    const novoId = Math.max(...clientes.map(c => c.id || 0), 0) + 1
+    clientes.push({
+      id: novoId,
+      tipo_cliente: tipoSelecionado,
+      nome_dentista: isDent ? nomeDent : null,
+      nome_lab: isDent ? null : nomeLab,
+      numero_sequencial: proximoSeq(tipoSelecionado),
+      observacoes: obs || null
+    })
+    alerta('Cliente salvo!','success')
+  }
+  
+  fechar('ov-cliente')
+  salvarLocalmente()
+  renderTudo()
+}
+
+function apagarCliente(id, nome) {
+  if (!confirm(`Apagar "${nome}"?`)) return
+  clientes = clientes.filter(c => c.id !== id)
+  servicos = servicos.filter(s => s.cliente_id !== id)
+  salvarLocalmente()
+  renderTudo()
+  alerta('Cliente apagado.','warning')
+}
+
+function renderServicos() {
+  const el = document.getElementById('lista-servicos')
+  const hoje = new Date(); hoje.setHours(0,0,0,0)
+  if (!servicos.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">🔧</div><p>Nenhum serviço</p></div>'
+    return
+  }
+  el.innerHTML = servicos.map(s => {
+    const cl    = clientes.find(c => c.id === s.cliente_id)
+    const nome  = s.cliente_nome || cl?.nome_dentista || cl?.nome_lab || 'Cliente'
+    const saida = s.data_saida ? new Date(s.data_saida+'T12:00:00') : null
+    const venc  = !s.pago && saida && saida < hoje
+    const valor = (s.valor||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})
+    const dEnt  = s.data_entrada ? new Date(s.data_entrada+'T12:00:00').toLocaleDateString('pt-BR') : '—'
+    const dSai  = saida ? saida.toLocaleDateString('pt-BR') : '—'
+    const bCls  = s.pago ? 'badge-pago' : venc ? 'badge-vencido' : 'badge-pendente'
+    const bTxt  = s.pago ? '✓ Pago'    : venc ? '⚠ Vencido'    : '⏳ Pendente'
+    const iCls  = s.pago ? 'pago'       : venc ? 'venc'          : ''
+    return `<div class="list-item ${iCls}">
+      <div class="item-header">
+        <div style="flex:1;min-width:0">
+          <div class="item-name">${nome}</div>
+          <div class="item-sub">${s.tipo_servico||'—'} · ${valor}</div>
+          <div class="item-sub">📅 Entrada: ${dEnt} · Saída: ${dSai}</div>
+          ${s.descricao?`<div class="item-sub" style="color:var(--gray-600);margin-top:4px">${s.descricao}</div>`:''}
+          <div style="margin-top:8px"><span class="badge ${bCls}">${bTxt}</span></div>
+        </div>
+        <div class="item-actions" style="flex-direction:column;gap:6px">
+          <button class="icon-btn edit" onclick="editarServico(${s.id})">✏️</button>
+          <button class="icon-btn delete" onclick="apagarServico(${s.id})">🗑️</button>
+        </div>
+      </div>
+    </div>`
+  }).join('')
+}
+
+function popularSelects() {
+  const selCli = document.getElementById('srv-cliente')
+  selCli.innerHTML = '<option value="">— Selecione o cliente —</option>'
+  clientes.forEach(c => {
+    const nome = c.tipo_cliente === 'Dentista' ? c.nome_dentista : c.nome_lab
+    const seq  = c.numero_sequencial ? ` [${c.numero_sequencial}]` : ''
+    selCli.innerHTML += `<option value="${c.id}">${nome}${seq}</option>`
+  })
+  const selTipo = document.getElementById('srv-tipo')
+  selTipo.innerHTML = '<option value="">— Selecione o tipo —</option>'
+  tipos.forEach(t => selTipo.innerHTML += `<option value="${t.nome}">${t.nome}</option>`)
+}
+
+function abrirServico(id=null) {
+  const hoje = new Date().toISOString().split('T')[0]
+  ;['srv-id','srv-valor','srv-desc'].forEach(x => document.getElementById(x).value = '')
+  document.getElementById('srv-cliente').value = ''
+  document.getElementById('srv-tipo').value    = ''
+  document.getElementById('srv-entrada').value = hoje
+  document.getElementById('titulo-servico').textContent = id ? 'Editar Serviço' : 'Novo Serviço'
+  calcularSaida()
+
+  if (id) {
+    const s = servicos.find(x => x.id === id)
+    if (!s) return
+    document.getElementById('srv-id').value      = id
+    document.getElementById('srv-cliente').value = s.cliente_id || ''
+    document.getElementById('srv-tipo').value    = s.tipo_servico || ''
+    document.getElementById('srv-valor').value   = s.valor || ''
+    document.getElementById('srv-entrada').value = s.data_entrada || hoje
+    document.getElementById('srv-saida').value   = s.data_saida || ''
+    document.getElementById('srv-desc').value    = s.descricao || ''
+  }
+  abrir('ov-servico')
+}
+
+function editarServico(id) { abrirServico(id) }
+
+function calcularSaida() {
+  const entrada = document.getElementById('srv-entrada').value
+  if (!entrada) return
+  let d = new Date(entrada+'T12:00:00'), dias = 0
+  while (dias < 5) { d.setDate(d.getDate()+1); if (d.getDay() !== 0 && d.getDay() !== 6) dias++ }
+  document.getElementById('srv-saida').value = d.toISOString().split('T')[0]
+}
+
+function salvarServico() {
+  const editId  = document.getElementById('srv-id').value
+  const cliId   = document.getElementById('srv-cliente').value
+  const tipo    = document.getElementById('srv-tipo').value
+  const valor   = parseFloat(document.getElementById('srv-valor').value)
+  const entrada = document.getElementById('srv-entrada').value
+  const saida   = document.getElementById('srv-saida').value
+  const desc    = document.getElementById('srv-desc').value.trim()
+
+  if (!cliId)   { alerta('Selecione o cliente','warning');       return }
+  if (!tipo)    { alerta('Selecione o tipo de serviço','warning'); return }
+  if (!entrada) { alerta('Informe a data de entrada','warning');  return }
+
+  const cl = clientes.find(c => c.id == cliId)
+  
+  if (editId) {
+    const s = servicos.find(x => x.id == editId)
+    if (s) {
+      s.cliente_id = parseInt(cliId)
+      s.cliente_nome = cl ? (cl.nome_dentista || cl.nome_lab) : ''
+      s.tipo_servico = tipo
+      s.valor = isNaN(valor) ? 0 : valor
+      s.data_entrada = entrada
+      s.data_saida = saida || null
+      s.descricao = desc || null
+      alerta('Serviço atualizado!','success')
+    }
+  } else {
+    const novoId = Math.max(...servicos.map(s => s.id || 0), 0) + 1
+    servicos.push({
+      id: novoId,
+      cliente_id: parseInt(cliId),
+      cliente_nome: cl ? (cl.nome_dentista || cl.nome_lab) : '',
+      tipo_servico: tipo,
+      valor: isNaN(valor) ? 0 : valor,
+      data_entrada: entrada,
+      data_saida: saida || null,
+      descricao: desc || null,
+      status: 'pendente',
+      pago: false,
+      data_pagamento: null
+    })
+    alerta('Serviço adicionado!','success')
+  }
+  
+  fechar('ov-servico')
+  salvarLocalmente()
+  renderTudo()
+}
+
+function apagarServico(id) {
+  if (!confirm('Apagar este serviço?')) return
+  servicos = servicos.filter(s => s.id !== id)
+  salvarLocalmente()
+  renderTudo()
+  alerta('Serviço apagado.','warning')
+}
+
+function renderTipos() {
+  const el = document.getElementById('lista-tipos')
+  if (!tipos.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">⚙️</div><p>Nenhum tipo</p></div>'; return }
+  el.innerHTML = tipos.map(t => `<div class="list-item">
+    <div class="item-header">
+      <div>
+        <div class="item-name">${t.nome}</div>
+        <div class="item-sub">${t.descricao||''}</div>
+      </div>
+      <div class="item-actions">
+        <button class="icon-btn edit" onclick="abrirEdicaoTipo(${t.id})">✏️</button>
+        <button class="icon-btn delete" onclick="apagarTipo(${t.id},'${(t.nome||'').replace(/'/g,"\\'")}')">🗑️</button>
+      </div>
+    </div>
+  </div>`).join('')
+}
+
+function salvarTipo() {
+  const nome = document.getElementById('cfg-nome').value.trim()
+  const desc = document.getElementById('cfg-desc').value.trim()
+  if (!nome) { alerta('Informe o nome do tipo','warning'); return }
+  
+  const novoId = Math.max(...tipos.map(t => t.id || 0), 0) + 1
+  tipos.push({id: novoId, nome, descricao: desc || null})
+  alerta(`Tipo "${nome}" adicionado!`,'success')
+  document.getElementById('cfg-nome').value = ''
+  document.getElementById('cfg-desc').value = ''
+  salvarLocalmente()
+  renderTudo()
+}
+
+function abrirEdicaoTipo(id) {
+  const t = tipos.find(x => x.id === id); if (!t) return
+  document.getElementById('et-id').value   = id
+  document.getElementById('et-nome').value = t.nome || ''
+  document.getElementById('et-desc').value = t.descricao || ''
+  abrir('ov-tipo')
+}
+
+function salvarEdicaoTipo() {
+  const id   = document.getElementById('et-id').value
+  const nome = document.getElementById('et-nome').value.trim()
+  const desc = document.getElementById('et-desc').value.trim()
+  if (!nome) { alerta('Informe o nome','warning'); return }
+  
+  const t = tipos.find(x => x.id == id)
+  if (t) {
+    t.nome = nome
+    t.descricao = desc || null
+    alerta('Tipo atualizado!','success')
+  }
+  fechar('ov-tipo')
+  salvarLocalmente()
+  renderTudo()
+}
+
+function apagarTipo(id, nome) {
+  if (!confirm(`Apagar o tipo "${nome}"?`)) return
+  tipos = tipos.filter(t => t.id !== id)
+  alerta('Tipo apagado.','warning')
+  salvarLocalmente()
+  renderTudo()
+}
+
+// ── INICIAR ──
+window.addEventListener('load', inicializar)
+</script>
+</body>
+</html>
