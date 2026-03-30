@@ -497,33 +497,61 @@ textarea.form-control { min-height:90px; resize:vertical; }
       <button class="sheet-close" onclick="fechar('ov-servico')">✕</button>
     </div>
     <input type="hidden" id="srv-id">
+    
+    <!-- DADOS BÁSICOS -->
     <div class="form-group">
       <label class="form-label">Cliente <span class="req">*</span></label>
       <select class="form-control" id="srv-cliente"></select>
     </div>
     <div class="form-group">
-      <label class="form-label">Tipo de Serviço <span class="req">*</span></label>
-      <select class="form-control" id="srv-tipo"></select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Valor (R$)</label>
-      <input type="number" class="form-control" id="srv-valor" placeholder="0,00" step="0.01" min="0">
-    </div>
-    <div class="form-group">
       <label class="form-label">Data de Entrada <span class="req">*</span></label>
-      <input type="date" class="form-control" id="srv-entrada" onchange="calcularSaida()">
+      <input type="date" class="form-control" id="srv-entrada">
     </div>
-    <div class="form-group">
-      <label class="form-label">Saída Prevista <small style="font-weight:600;color:var(--gray-400)">(5 dias úteis seg–sáb)</small></label>
-      <input type="date" class="form-control" id="srv-saida" style="background:var(--blue-light)">
+    
+    <!-- ADICIONAR ITENS -->
+    <div style="background:var(--blue-light); border-radius:10px; padding:16px; margin-bottom:16px;">
+      <div style="font-weight:800; color:var(--blue); margin-bottom:12px;">➕ ADICIONAR SERVIÇOS</div>
+      
+      <div class="form-group" style="margin-bottom:10px;">
+        <label class="form-label">Tipo de Serviço <span class="req">*</span></label>
+        <select class="form-control" id="srv-tipo-temp" style="margin-bottom:8px;"></select>
+      </div>
+      
+      <div class="form-group" style="margin-bottom:10px;">
+        <label class="form-label">Valor (R$)</label>
+        <input type="number" class="form-control" id="srv-valor-temp" placeholder="0,00" step="0.01" min="0" style="margin-bottom:8px;">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Descrição (opcional)</label>
+        <textarea class="form-control" id="srv-desc-temp" placeholder="..." style="min-height:60px; margin-bottom:10px;"></textarea>
+      </div>
+      
+      <button class="btn btn-primary btn-block" onclick="adicionarItem()">➕ Adicionar Serviço</button>
     </div>
-    <div class="form-group">
-      <label class="form-label">Descrição / Observações</label>
-      <textarea class="form-control" id="srv-desc" placeholder="Detalhes..."></textarea>
+    
+    <!-- LISTA DE ITENS -->
+    <div style="margin-bottom:16px;">
+      <div style="font-weight:800; color:var(--gray-800); margin-bottom:10px;">📋 ITENS ADICIONADOS</div>
+      <div id="lista-itens-srv" style="background:white; border-radius:10px; padding:12px;">
+        <div style="color:var(--gray-400); font-size:13px; text-align:center;">Nenhum item adicionado</div>
+      </div>
     </div>
+    
+    <!-- RESUMO -->
+    <div style="background:var(--green-light); border-radius:10px; padding:14px; margin-bottom:16px;">
+      <div style="font-size:12px; color:var(--gray-400); font-weight:700; margin-bottom:4px;">RESUMO</div>
+      <div style="font-size:18px; font-weight:800; color:var(--green); margin-bottom:8px;" id="srv-total-display">Total: R$ 0,00</div>
+      <div style="font-size:12px; color:var(--gray-600); font-weight:600;" id="srv-qtd-display">0 itens</div>
+      <div style="font-size:12px; color:var(--gray-600); font-weight:600; margin-top:6px;" id="srv-saida-display">Saída: —</div>
+    </div>
+    
+    <input type="hidden" id="srv-saida">
+    <input type="hidden" id="itens-json" value="[]">
+    
     <div class="btn-row">
       <button class="btn btn-ghost" onclick="fechar('ov-servico')">Cancelar</button>
-      <button class="btn btn-primary" id="btn-salvar-servico" onclick="salvarServico()">Salvar</button>
+      <button class="btn btn-primary" id="btn-salvar-servico" onclick="salvarServico()">Salvar Serviço</button>
     </div>
   </div>
 </div>
@@ -760,6 +788,7 @@ function renderPagamentos() {
     const venc  = !s.pago && saida && saida < hoje
     const valor = (s.valor||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})
     const dataSaida = saida ? saida.toLocaleDateString('pt-BR') : '—'
+    const qtdItens = s.quantidade_itens || 1
     
     let btnClass = s.pago ? 'pag-btn pago' : 'pag-btn pendente'
     let btnText = s.pago ? '✓ Pago' : '⏳ Não pago'
@@ -768,7 +797,7 @@ function renderPagamentos() {
       <button class="${btnClass}" onclick="abrirPagamento(${s.id})">${btnText}</button>
       <div class="pag-info">
         <div class="pag-nome"><span class="seq-num">#${numero}</span> ${nome}</div>
-        <div class="pag-det">${s.tipo_servico||'—'} · Saída: ${dataSaida}${venc?' · <strong style="color:var(--red)">VENCIDO</strong>':''}${s.pago&&s.data_pagamento?' · Pago em '+new Date(s.data_pagamento).toLocaleDateString('pt-BR'):''}</div>
+        <div class="pag-det">${qtdItens} item${qtdItens !== 1 ? 's' : ''} · Saída: ${dataSaida}${venc?' · <strong style="color:var(--red)">VENCIDO</strong>':''}${s.pago&&s.data_pagamento?' · Pago em '+new Date(s.data_pagamento).toLocaleDateString('pt-BR'):''}</div>
       </div>
       <div class="pag-valor">${valor}</div>
     </div>`
@@ -1087,42 +1116,123 @@ function popularSelects() {
     const seq  = c.numero_sequencial ? ` [${c.numero_sequencial}]` : ''
     selCli.innerHTML += `<option value="${c.id}">${nome}${seq}</option>`
   })
-  const selTipo = document.getElementById('srv-tipo')
-  selTipo.innerHTML = '<option value="">— Selecione o tipo —</option>'
-  tipos.forEach(t => selTipo.innerHTML += `<option value="${t.nome}">${t.nome}</option>`)
+  
+  // Também popular o select temporário
+  const selTipoTemp = document.getElementById('srv-tipo-temp')
+  if (selTipoTemp) {
+    selTipoTemp.innerHTML = '<option value="">— Selecione o tipo —</option>'
+    tipos.forEach(t => selTipoTemp.innerHTML += `<option value="${t.nome}">${t.nome}</option>`)
+  }
+}
 }
 
 function abrirServico(id=null) {
   const hoje = new Date().toISOString().split('T')[0]
-  ;['srv-id','srv-valor','srv-desc'].forEach(x => document.getElementById(x).value = '')
+  
+  // Limpar tudo
+  document.getElementById('srv-id').value = ''
   document.getElementById('srv-cliente').value = ''
-  document.getElementById('srv-tipo').value    = ''
   document.getElementById('srv-entrada').value = hoje
+  document.getElementById('srv-tipo-temp').value = ''
+  document.getElementById('srv-valor-temp').value = ''
+  document.getElementById('srv-desc-temp').value = ''
+  document.getElementById('itens-json').value = '[]'
+  
   document.getElementById('titulo-servico').textContent = id ? 'Editar Serviço' : 'Novo Serviço'
-  calcularSaida()
-
+  
   if (id) {
     const s = servicos.find(x => x.id === id)
     if (!s) return
-    document.getElementById('srv-id').value      = id
+    document.getElementById('srv-id').value = id
     document.getElementById('srv-cliente').value = s.cliente_id || ''
-    document.getElementById('srv-tipo').value    = s.tipo_servico || ''
-    document.getElementById('srv-valor').value   = s.valor || ''
     document.getElementById('srv-entrada').value = s.data_entrada || hoje
-    document.getElementById('srv-saida').value   = s.data_saida || ''
-    document.getElementById('srv-desc').value    = s.descricao || ''
+    document.getElementById('srv-saida').value = s.data_saida || ''
+    
+    // TODO: Carregar itens do serviço (se houver banco de dados)
   }
+  
+  renderizarItens()
   abrir('ov-servico')
 }
 
 function editarServico(id) { abrirServico(id) }
 
+function adicionarItem() {
+  const tipo = document.getElementById('srv-tipo-temp').value.trim()
+  const valor = parseFloat(document.getElementById('srv-valor-temp').value)
+  const desc = document.getElementById('srv-desc-temp').value.trim()
+  
+  if (!tipo) { alerta('Selecione o tipo de serviço', 'warning'); return }
+  if (isNaN(valor) || valor <= 0) { alerta('Informe um valor válido', 'warning'); return }
+  
+  let itens = JSON.parse(document.getElementById('itens-json').value)
+  itens.push({
+    tipo: tipo,
+    valor: valor,
+    desc: desc,
+    id: Date.now()
+  })
+  
+  document.getElementById('itens-json').value = JSON.stringify(itens)
+  
+  // Limpar campos
+  document.getElementById('srv-tipo-temp').value = ''
+  document.getElementById('srv-valor-temp').value = ''
+  document.getElementById('srv-desc-temp').value = ''
+  
+  renderizarItens()
+  alerta('✅ Serviço adicionado!', 'success')
+}
+
+function removerItem(itemId) {
+  let itens = JSON.parse(document.getElementById('itens-json').value)
+  itens = itens.filter(i => i.id !== itemId)
+  document.getElementById('itens-json').value = JSON.stringify(itens)
+  renderizarItens()
+  alerta('⚠️ Serviço removido', 'warning')
+}
+
+function renderizarItens() {
+  const itens = JSON.parse(document.getElementById('itens-json').value)
+  const listaEl = document.getElementById('lista-itens-srv')
+  
+  if (itens.length === 0) {
+    listaEl.innerHTML = '<div style="color:var(--gray-400); font-size:13px; text-align:center;">Nenhum item adicionado</div>'
+  } else {
+    listaEl.innerHTML = itens.map(item => `
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:var(--gray-100); border-radius:8px; margin-bottom:8px;">
+        <div>
+          <div style="font-weight:700; color:var(--gray-800); font-size:13px;">${item.tipo}</div>
+          <div style="font-size:12px; color:var(--gray-400); margin-top:2px;">R$ ${item.valor.toFixed(2).replace('.', ',')}</div>
+          ${item.desc ? `<div style="font-size:11px; color:var(--gray-600); margin-top:2px;">${item.desc}</div>` : ''}
+        </div>
+        <button class="icon-btn delete" onclick="removerItem(${item.id})" style="margin:0;">❌</button>
+      </div>
+    `).join('')
+  }
+  
+  // Calcular total
+  const total = itens.reduce((sum, i) => sum + i.valor, 0)
+  const qtd = itens.length
+  
+  document.getElementById('srv-total-display').textContent = `Total: R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
+  document.getElementById('srv-qtd-display').textContent = `${qtd} item${qtd !== 1 ? 's' : ''}`
+  
+  // Calcular data de saída
+  if (qtd > 0) {
+    const entrada = document.getElementById('srv-entrada').value
+    if (entrada) {
+      let d = new Date(entrada+'T12:00:00'), dias = 0
+      while (dias < 5) { d.setDate(d.getDate()+1); if (d.getDay() !== 0 && d.getDay() !== 6) dias++ }
+      const dataSaida = d.toISOString().split('T')[0]
+      document.getElementById('srv-saida').value = dataSaida
+      document.getElementById('srv-saida-display').textContent = `Saída: ${new Date(dataSaida+'T12:00:00').toLocaleDateString('pt-BR')}`
+    }
+  }
+}
+
 function calcularSaida() {
-  const entrada = document.getElementById('srv-entrada').value
-  if (!entrada) return
-  let d = new Date(entrada+'T12:00:00'), dias = 0
-  while (dias < 5) { d.setDate(d.getDate()+1); if (d.getDay() !== 0 && d.getDay() !== 6) dias++ }
-  document.getElementById('srv-saida').value = d.toISOString().split('T')[0]
+  renderizarItens()
 }
 
 async function salvarServico() {
@@ -1130,25 +1240,28 @@ async function salvarServico() {
   
   const editId  = document.getElementById('srv-id').value
   const cliId   = document.getElementById('srv-cliente').value
-  const tipo    = document.getElementById('srv-tipo').value
-  const valor   = parseFloat(document.getElementById('srv-valor').value)
   const entrada = document.getElementById('srv-entrada').value
   const saida   = document.getElementById('srv-saida').value
-  const desc    = document.getElementById('srv-desc').value.trim()
+  const itens   = JSON.parse(document.getElementById('itens-json').value)
 
   if (!cliId)   { alerta('Selecione o cliente','warning');       return }
-  if (!tipo)    { alerta('Selecione o tipo de serviço','warning'); return }
+  if (itens.length === 0) { alerta('Adicione pelo menos um serviço','warning'); return }
   if (!entrada) { alerta('Informe a data de entrada','warning');  return }
 
+  // Calcular total
+  const valor = itens.reduce((sum, i) => sum + i.valor, 0)
+  const tipo_servico = itens.map(i => i.tipo).join(' + ')
+  
   const cl = clientes.find(c => c.id == cliId)
   const dados = {
-    cliente_id:   parseInt(cliId),
-    cliente_nome: cl ? (cl.nome_dentista || cl.nome_lab) : '',
-    tipo_servico: tipo,
-    valor:        isNaN(valor) ? 0 : valor,
-    data_entrada: entrada,
-    data_saida:   saida || null,
-    descricao:    desc || null
+    cliente_id:    parseInt(cliId),
+    cliente_nome:  cl ? (cl.nome_dentista || cl.nome_lab) : '',
+    tipo_servico:  tipo_servico,
+    valor:         valor,
+    data_entrada:  entrada,
+    data_saida:    saida || null,
+    descricao:     `${itens.length} item(s) - ` + itens.map(i => i.tipo).join(', '),
+    quantidade_itens: itens.length
   }
 
   document.getElementById('btn-salvar-servico').disabled = true
@@ -1163,7 +1276,7 @@ async function salvarServico() {
       dados.pago = false
       const result = await api('POST','servicos',dados)
       if (!result || !Array.isArray(result)) throw new Error('Erro ao salvar serviço')
-      alerta('Serviço adicionado!','success')
+      alerta(`✅ Serviço criado com ${itens.length} item(s)!`,'success')
     }
     fechar('ov-servico')
     await carregar()
@@ -1269,6 +1382,20 @@ function gerarHTMLServico(id) {
   const dSai = s.data_saida ? new Date(s.data_saida+'T12:00:00').toLocaleDateString('pt-BR') : '—'
   const status = s.pago ? '✓ Pago' : '⏳ Pendente'
   
+  // Extrair itens da descrição
+  const descricao = s.descricao || ''
+  const linhas = descricao.split(' - ').slice(1) || []
+  const tipos = s.tipo_servico ? s.tipo_servico.split(' + ') : []
+  
+  let itensHTML = ''
+  tipos.forEach((tipo, idx) => {
+    itensHTML += `
+      <tr style="border-bottom:1px solid #eee;">
+        <td style="padding:8px; color:#666;">${idx + 1}. ${tipo.trim()}</td>
+      </tr>
+    `
+  })
+  
   return `
     <div style="font-family:Arial,sans-serif; padding:20px; max-width:600px;">
       <h2 style="text-align:center; color:#1a6fa8; border-bottom:3px solid #1a6fa8; padding-bottom:10px;">
@@ -1284,11 +1411,13 @@ function gerarHTMLServico(id) {
           <td style="padding:10px; color:#666;">${nome}</td>
         </tr>
         <tr style="border-bottom:1px solid #ccc;">
-          <td style="padding:10px; font-weight:bold; color:#333;">Tipo de Serviço:</td>
-          <td style="padding:10px; color:#666;">${s.tipo_servico || '—'}</td>
+          <td style="padding:10px; font-weight:bold; color:#333; vertical-align:top;">Serviços:</td>
+          <td style="padding:10px; color:#666;">
+            ${tipos.map((t, i) => `${i + 1}. ${t.trim()}`).join('<br>')}
+          </td>
         </tr>
         <tr style="border-bottom:1px solid #ccc;">
-          <td style="padding:10px; font-weight:bold; color:#333;">Valor:</td>
+          <td style="padding:10px; font-weight:bold; color:#333;">Valor Total:</td>
           <td style="padding:10px; color:#1e9e5e; font-weight:bold; font-size:16px;">${valor}</td>
         </tr>
         <tr style="border-bottom:1px solid #ccc;">
@@ -1298,10 +1427,6 @@ function gerarHTMLServico(id) {
         <tr style="border-bottom:1px solid #ccc;">
           <td style="padding:10px; font-weight:bold; color:#333;">Saída Prevista:</td>
           <td style="padding:10px; color:#666;">${dSai}</td>
-        </tr>
-        <tr style="border-bottom:1px solid #ccc;">
-          <td style="padding:10px; font-weight:bold; color:#333;">Descrição:</td>
-          <td style="padding:10px; color:#666;">${s.descricao || '—'}</td>
         </tr>
         <tr style="background-color:#f0f2f5;">
           <td style="padding:10px; font-weight:bold; color:#333;">Status:</td>
@@ -1361,15 +1486,17 @@ function compartilharWhatsApp(id) {
   const dEnt = s.data_entrada ? new Date(s.data_entrada+'T12:00:00').toLocaleDateString('pt-BR') : '—'
   const dSai = s.data_saida ? new Date(s.data_saida+'T12:00:00').toLocaleDateString('pt-BR') : '—'
   const status = s.pago ? '✓ Pago' : '⏳ Pendente'
+  const tipos = s.tipo_servico ? s.tipo_servico.split(' + ') : []
+  
+  let itensText = tipos.map((t, i) => `  ${i+1}. ${t.trim()}`).join('\n')
   
   const mensagem = `*SERVIÇO - LABORATÓRIO CAMINI*\n\n` +
     `🔢 Cliente #${numero}\n` +
     `👤 Cliente: ${nome}\n` +
-    `🔧 Tipo: ${s.tipo_servico || '—'}\n` +
-    `💰 Valor: ${valor}\n` +
+    `📋 Serviços:\n${itensText}\n` +
+    `💰 TOTAL: ${valor}\n` +
     `📅 Entrada: ${dEnt}\n` +
     `📅 Saída: ${dSai}\n` +
-    `📝 Descrição: ${s.descricao || '—'}\n` +
     `✓ Status: ${status}\n\n` +
     `Laboratório de Prótese Dentária Camini`
   
@@ -1399,7 +1526,7 @@ function imprimirServico(id) {
 }
 
 // ── INICIAR ──
-window.addEventListener('load', carregar)
+window.addEventListener('DOMContentLoaded', carregar)
 </script>
 </body>
 </html>
