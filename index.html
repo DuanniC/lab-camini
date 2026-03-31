@@ -1407,11 +1407,6 @@ function renderServicosInicio(lista) {
       console.error('Erro ao parsear itens:', e)
     }
     
-    // RESUMO CONSOLIDADO (linha única no topo)
-    const resumoLinha = Object.values(agrupadosDoCard)
-      .map(a => `${a.tipo} ${a.quantidade}`)
-      .join(' · ')
-    
     // ITENS DETALHADOS (lista completa)
     let itensDetalhesHtml = ''
     if (itens.length) {
@@ -1448,9 +1443,6 @@ function renderServicosInicio(lista) {
           <div class="item-sub">${s.tipo_servico||'—'} · ${valor}</div>
           <div class="item-sub">📅 Entrada: ${dEnt} · Saída: ${dSai}</div>
           ${s.descricao?`<div class="item-sub" style="color:var(--gray-600);margin-top:4px">${s.descricao}</div>`:''}
-          
-          <!-- RESUMO CONSOLIDADO (linha única) -->
-          ${resumoLinha ? `<div style="margin-top:8px; padding:8px; background:var(--bg-light); border-radius:4px; font-size:12px; color:var(--gray-700);"><strong>${resumoLinha} · ${totalItens} itens</strong></div>` : ''}
           
           <!-- ITENS DETALHADOS -->
           ${itensDetalhesHtml}
@@ -1529,11 +1521,6 @@ function renderServicosList(lista) {
       console.error('Erro ao parsear itens:', e)
     }
     
-    // RESUMO CONSOLIDADO (linha única no topo)
-    const resumoLinha = Object.values(agrupadosDoCard)
-      .map(a => `${a.tipo} ${a.quantidade}`)
-      .join(' · ')
-    
     // ITENS DETALHADOS (lista completa)
     let itensDetalhesHtml = ''
     if (itens.length) {
@@ -1570,9 +1557,6 @@ function renderServicosList(lista) {
           <div class="item-sub">${s.tipo_servico||'—'} · ${valor}</div>
           <div class="item-sub">📅 Entrada: ${dEnt} · Saída: ${dSai}</div>
           ${s.descricao?`<div class="item-sub" style="color:var(--gray-600);margin-top:4px">${s.descricao}</div>`:''}
-          
-          <!-- RESUMO CONSOLIDADO (linha única) -->
-          ${resumoLinha ? `<div style="margin-top:8px; padding:8px; background:var(--bg-light); border-radius:4px; font-size:12px; color:var(--gray-700);"><strong>${resumoLinha} · ${totalItens} itens</strong></div>` : ''}
           
           <!-- ITENS DETALHADOS -->
           ${itensDetalhesHtml}
