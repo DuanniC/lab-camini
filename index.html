@@ -789,11 +789,22 @@ function renderTudo() {
 
 // ── STATS ──
 function renderStats() {
-  const hoje = new Date(); hoje.setHours(0,0,0,0)
-  document.getElementById('st-pendentes').textContent = servicos.filter(s => !s.pago).length
-  document.getElementById('st-pagos').textContent     = servicos.filter(s =>  s.pago).length
-  document.getElementById('st-vencidos').textContent  = servicos.filter(s =>
+  try {
+    const hoje = new Date(); hoje.setHours(0,0,0,0)
+    
+    const stPendentes = document.getElementById('st-pendentes')
+    const stPagos = document.getElementById('st-pagos')
+    const stVencidos = document.getElementById('st-vencidos')
+    
+    if (!stPendentes || !stPagos || !stVencidos) return
+    
+    stPendentes.textContent = servicos.filter(s => !s.pago).length
+    stPagos.textContent     = servicos.filter(s =>  s.pago).length
+    stVencidos.textContent  = servicos.filter(s =>
     !s.pago && s.data_saida && new Date(s.data_saida+'T12:00:00') < hoje).length
+  } catch(e) {
+    console.error('Erro em renderStats:', e)
+  }
 }
 
 function obterMesOffsetDatas(offset) {
@@ -812,31 +823,43 @@ function obterMesOffsetDatas(offset) {
 
 // ── NAVEGAÇÃO DE MESES (12 MESES) ──
 function renderMensal() {
-  // Inicializa no mês atual na primeira carga
-  if (mesExibicao === 0 && document.getElementById('monthDisplay').textContent === '') {
-    mesExibicao = 0 // Garante que começa no mês atual
+  try {
+    const monthDisplay = document.getElementById('monthDisplay')
+    if (!monthDisplay) return
+    
+    // Inicializa no mês atual na primeira carga
+    if (mesExibicao === 0 && monthDisplay.textContent === '') {
+      mesExibicao = 0 // Garante que começa no mês atual
+    }
+    
+    const periodo = obterMesOffsetDatas(mesExibicao)
+    monthDisplay.textContent = periodo.display.charAt(0).toUpperCase() + periodo.display.slice(1)
+
+    const servicosMes = servicos.filter(s =>
+      s.data_entrada && s.data_entrada >= periodo.inicio && s.data_entrada <= periodo.fim
+    )
+
+    const total = servicosMes.reduce((sum, s) => sum + (s.valor || 0), 0)
+    const pago = servicosMes.filter(s => s.pago).reduce((sum, s) => sum + (s.valor || 0), 0)
+    const pendente = total - pago
+
+    const mstatTotal = document.getElementById('mstat-total')
+    const mstatPago = document.getElementById('mstat-pago')
+    const mstatPendente = document.getElementById('mstat-pendente')
+    const monthlyDetails = document.getElementById('monthlyDetails')
+    
+    if (mstatTotal) mstatTotal.textContent = total.toLocaleString('pt-BR', {style:'currency',currency:'BRL'})
+    if (mstatPago) mstatPago.textContent = pago.toLocaleString('pt-BR', {style:'currency',currency:'BRL'})
+    if (mstatPendente) mstatPendente.textContent = pendente.toLocaleString('pt-BR', {style:'currency',currency:'BRL'})
+
+    const qtServiços = servicosMes.length
+    const qtPago = servicosMes.filter(s => s.pago).length
+    const qtPendente = qtServiços - qtPago
+    const msgDetalhes = `<strong>${qtServiços}</strong> serviço${qtServiços !== 1 ? 's' : ''} · <strong>${qtPago}</strong> pago${qtPago !== 1 ? 's' : ''} · <strong>${qtPendente}</strong> pendente${qtPendente !== 1 ? 's' : ''}`
+    if (monthlyDetails) monthlyDetails.innerHTML = msgDetalhes
+  } catch(e) {
+    console.error('Erro em renderMensal:', e)
   }
-  
-  const periodo = obterMesOffsetDatas(mesExibicao)
-  document.getElementById('monthDisplay').textContent = periodo.display.charAt(0).toUpperCase() + periodo.display.slice(1)
-
-  const servicosMes = servicos.filter(s =>
-    s.data_entrada && s.data_entrada >= periodo.inicio && s.data_entrada <= periodo.fim
-  )
-
-  const total = servicosMes.reduce((sum, s) => sum + (s.valor || 0), 0)
-  const pago = servicosMes.filter(s => s.pago).reduce((sum, s) => sum + (s.valor || 0), 0)
-  const pendente = total - pago
-
-  document.getElementById('mstat-total').textContent = total.toLocaleString('pt-BR', {style:'currency',currency:'BRL'})
-  document.getElementById('mstat-pago').textContent = pago.toLocaleString('pt-BR', {style:'currency',currency:'BRL'})
-  document.getElementById('mstat-pendente').textContent = pendente.toLocaleString('pt-BR', {style:'currency',currency:'BRL'})
-
-  const qtServiços = servicosMes.length
-  const qtPago = servicosMes.filter(s => s.pago).length
-  const qtPendente = qtServiços - qtPago
-  const msgDetalhes = `<strong>${qtServiços}</strong> serviço${qtServiços !== 1 ? 's' : ''} · <strong>${qtPago}</strong> pago${qtPago !== 1 ? 's' : ''} · <strong>${qtPendente}</strong> pendente${qtPendente !== 1 ? 's' : ''}`
-  document.getElementById('monthlyDetails').innerHTML = msgDetalhes
 }
 
 function mudarMes(delta) {
