@@ -1369,44 +1369,9 @@ function renderServicosInicio(lista) {
     return
   }
   
-  const agrupados = agruparServicosPorTipo(lista)
-  const totalGeral = agrupados.reduce((sum, a) => sum + a.valor_total, 0)
-  
-  // RESUMO AGRUPADO
-  let html = `
-    <div class="card" style="margin-bottom:20px;">
-      <div class="card-title" style="margin-bottom:12px;">📊 Resumo Consolidado</div>
-      <table style="width:100%; border-collapse:collapse;">
-        <thead>
-          <tr style="border-bottom:2px solid var(--border-color);">
-            <th style="text-align:left; padding:8px 0; font-weight:600; color:var(--gray-700);">Serviço</th>
-            <th style="text-align:center; padding:8px 0; font-weight:600; color:var(--gray-700); width:80px;">Qtd</th>
-            <th style="text-align:right; padding:8px 0; font-weight:600; color:var(--gray-700); width:120px;">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${agrupados.map(a => `
-            <tr style="border-bottom:1px solid var(--border-color);">
-              <td style="padding:12px 0; color:var(--text-color);">${a.tipo}</td>
-              <td style="text-align:center; padding:12px 0; color:var(--gray-700);">${a.quantidade}</td>
-              <td style="text-align:right; padding:12px 0; color:var(--text-color); font-weight:600;">${a.valor_total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-        <tfoot>
-          <tr style="border-top:2px solid var(--border-color); background:var(--bg-light); font-weight:700;">
-            <td style="padding:12px 0; color:var(--text-color);">TOTAL</td>
-            <td style="text-align:center; padding:12px 0; color:var(--text-color);">${agrupados.reduce((sum, a) => sum + a.quantidade, 0)}</td>
-            <td style="text-align:right; padding:12px 0; color:var(--green); font-size:18px;">${totalGeral.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}</td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
-  `
-  
-  // CARDS COMPLETOS
   const hoje = new Date(); hoje.setHours(0,0,0,0)
-  html += lista.map(s => {
+  
+  let html = lista.map(s => {
     const cl    = clientes.find(c => c.id === s.cliente_id)
     const nome  = s.cliente_nome || cl?.nome_dentista || cl?.nome_lab || 'Cliente'
     const numero = cl?.numero_sequencial || '—'
@@ -1419,20 +1384,62 @@ function renderServicosInicio(lista) {
     const bTxt  = s.pago ? '✓ Pago'    : venc ? '⚠ Vencido'    : '⏳ Pendente'
     const iCls  = s.pago ? 'pago'       : venc ? 'venc'          : ''
     
-    // Extrair itens com pacientes
-    let itensHtml = ''
+    // Extrair itens e agrupar
+    let itens = []
+    let agrupadosDoCard = {}
+    let totalItens = 0
+    
     try {
-      const itens = s.itens_json ? JSON.parse(s.itens_json) : []
-      if (itens.length) {
-        itensHtml = `<div style="margin-top:8px; padding-top:8px; border-top:1px solid var(--border-color);"><strong>Itens:</strong><br>`
-        itensHtml += itens.map(item => {
-          let linha = `• ${item.tipo} - ${(item.valor||0).toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}`
-          if (item.paciente) linha += ` 👤 ${item.paciente}`
-          return linha
-        }).join('<br>')
-        itensHtml += '</div>'
-      }
-    } catch(e) {}
+      itens = s.itens_json ? JSON.parse(s.itens_json) : []
+      itens.forEach(item => {
+        totalItens++
+        const tipo = item.tipo || '—'
+        if (!agrupadosDoCard[tipo]) {
+          agrupadosDoCard[tipo] = {
+            tipo: tipo,
+            quantidade: 0,
+            valor_unitario: item.valor || 0
+          }
+        }
+        agrupadosDoCard[tipo].quantidade += 1
+      })
+    } catch(e) {
+      console.error('Erro ao parsear itens:', e)
+    }
+    
+    // RESUMO CONSOLIDADO (linha única no topo)
+    const resumoLinha = Object.values(agrupadosDoCard)
+      .map(a => `${a.tipo} ${a.quantidade}`)
+      .join(' · ')
+    
+    // ITENS DETALHADOS (lista completa)
+    let itensDetalhesHtml = ''
+    if (itens.length) {
+      itensDetalhesHtml = `<div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border-color);">
+        <strong style="color:var(--gray-700);">Itens Detalhados:</strong><br>
+        <table style="width:100%; margin-top:8px; font-size:13px;">
+          <tbody>`
+      
+      itens.forEach((item, idx) => {
+        const itemValor = (item.valor||0).toLocaleString('pt-BR', {style:'currency', currency:'BRL'})
+        let itemLinha = `
+          <tr style="border-bottom:1px solid var(--border-color);">
+            <td style="padding:6px 0; color:var(--text-color);">${item.tipo}</td>
+            <td style="text-align:right; padding:6px 0; color:var(--text-color);">${itemValor}</td>`
+        
+        if (item.paciente) {
+          itemLinha += `<td style="padding:6px 0 6px 8px; color:var(--gray-600);">👤 ${item.paciente}</td>`
+        }
+        
+        itemLinha += `</tr>`
+        itensDetalhesHtml += itemLinha
+      })
+      
+      itensDetalhesHtml += `
+          </tbody>
+        </table>
+      </div>`
+    }
     
     return `<div class="list-item ${iCls}" style="margin-bottom:12px;">
       <div class="item-header">
@@ -1441,7 +1448,13 @@ function renderServicosInicio(lista) {
           <div class="item-sub">${s.tipo_servico||'—'} · ${valor}</div>
           <div class="item-sub">📅 Entrada: ${dEnt} · Saída: ${dSai}</div>
           ${s.descricao?`<div class="item-sub" style="color:var(--gray-600);margin-top:4px">${s.descricao}</div>`:''}
-          ${itensHtml}
+          
+          <!-- RESUMO CONSOLIDADO (linha única) -->
+          ${resumoLinha ? `<div style="margin-top:8px; padding:8px; background:var(--bg-light); border-radius:4px; font-size:12px; color:var(--gray-700);"><strong>${resumoLinha} · ${totalItens} itens</strong></div>` : ''}
+          
+          <!-- ITENS DETALHADOS -->
+          ${itensDetalhesHtml}
+          
           <div style="margin-top:8px"><span class="badge ${bCls}">${bTxt}</span></div>
           
           <!-- BOTÕES DE AÇÃO -->
@@ -1478,44 +1491,9 @@ function renderServicosList(lista) {
     return
   }
   
-  const agrupados = agruparServicosPorTipo(lista)
-  const totalGeral = agrupados.reduce((sum, a) => sum + a.valor_total, 0)
-  
-  // RESUMO AGRUPADO
-  let html = `
-    <div class="card" style="margin-bottom:20px;">
-      <div class="card-title" style="margin-bottom:12px;">📊 Resumo Consolidado</div>
-      <table style="width:100%; border-collapse:collapse;">
-        <thead>
-          <tr style="border-bottom:2px solid var(--border-color);">
-            <th style="text-align:left; padding:8px 0; font-weight:600; color:var(--gray-700);">Serviço</th>
-            <th style="text-align:center; padding:8px 0; font-weight:600; color:var(--gray-700); width:80px;">Qtd</th>
-            <th style="text-align:right; padding:8px 0; font-weight:600; color:var(--gray-700); width:120px;">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${agrupados.map(a => `
-            <tr style="border-bottom:1px solid var(--border-color);">
-              <td style="padding:12px 0; color:var(--text-color);">${a.tipo}</td>
-              <td style="text-align:center; padding:12px 0; color:var(--gray-700);">${a.quantidade}</td>
-              <td style="text-align:right; padding:12px 0; color:var(--text-color); font-weight:600;">${a.valor_total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-        <tfoot>
-          <tr style="border-top:2px solid var(--border-color); background:var(--bg-light); font-weight:700;">
-            <td style="padding:12px 0; color:var(--text-color);">TOTAL</td>
-            <td style="text-align:center; padding:12px 0; color:var(--text-color);">${agrupados.reduce((sum, a) => sum + a.quantidade, 0)}</td>
-            <td style="text-align:right; padding:12px 0; color:var(--green); font-size:18px;">${totalGeral.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}</td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
-  `
-  
-  // CARDS COMPLETOS
   const hoje = new Date(); hoje.setHours(0,0,0,0)
-  html += lista.map(s => {
+  
+  let html = lista.map(s => {
     const cl    = clientes.find(c => c.id === s.cliente_id)
     const nome  = s.cliente_nome || cl?.nome_dentista || cl?.nome_lab || 'Cliente'
     const numero = cl?.numero_sequencial || '—'
@@ -1528,20 +1506,62 @@ function renderServicosList(lista) {
     const bTxt  = s.pago ? '✓ Pago'    : venc ? '⚠ Vencido'    : '⏳ Pendente'
     const iCls  = s.pago ? 'pago'       : venc ? 'venc'          : ''
     
-    // Extrair itens com pacientes
-    let itensHtml = ''
+    // Extrair itens e agrupar
+    let itens = []
+    let agrupadosDoCard = {}
+    let totalItens = 0
+    
     try {
-      const itens = s.itens_json ? JSON.parse(s.itens_json) : []
-      if (itens.length) {
-        itensHtml = `<div style="margin-top:8px; padding-top:8px; border-top:1px solid var(--border-color);"><strong>Itens:</strong><br>`
-        itensHtml += itens.map(item => {
-          let linha = `• ${item.tipo} - ${(item.valor||0).toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}`
-          if (item.paciente) linha += ` 👤 ${item.paciente}`
-          return linha
-        }).join('<br>')
-        itensHtml += '</div>'
-      }
-    } catch(e) {}
+      itens = s.itens_json ? JSON.parse(s.itens_json) : []
+      itens.forEach(item => {
+        totalItens++
+        const tipo = item.tipo || '—'
+        if (!agrupadosDoCard[tipo]) {
+          agrupadosDoCard[tipo] = {
+            tipo: tipo,
+            quantidade: 0,
+            valor_unitario: item.valor || 0
+          }
+        }
+        agrupadosDoCard[tipo].quantidade += 1
+      })
+    } catch(e) {
+      console.error('Erro ao parsear itens:', e)
+    }
+    
+    // RESUMO CONSOLIDADO (linha única no topo)
+    const resumoLinha = Object.values(agrupadosDoCard)
+      .map(a => `${a.tipo} ${a.quantidade}`)
+      .join(' · ')
+    
+    // ITENS DETALHADOS (lista completa)
+    let itensDetalhesHtml = ''
+    if (itens.length) {
+      itensDetalhesHtml = `<div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border-color);">
+        <strong style="color:var(--gray-700);">Itens Detalhados:</strong><br>
+        <table style="width:100%; margin-top:8px; font-size:13px;">
+          <tbody>`
+      
+      itens.forEach((item, idx) => {
+        const itemValor = (item.valor||0).toLocaleString('pt-BR', {style:'currency', currency:'BRL'})
+        let itemLinha = `
+          <tr style="border-bottom:1px solid var(--border-color);">
+            <td style="padding:6px 0; color:var(--text-color);">${item.tipo}</td>
+            <td style="text-align:right; padding:6px 0; color:var(--text-color);">${itemValor}</td>`
+        
+        if (item.paciente) {
+          itemLinha += `<td style="padding:6px 0 6px 8px; color:var(--gray-600);">👤 ${item.paciente}</td>`
+        }
+        
+        itemLinha += `</tr>`
+        itensDetalhesHtml += itemLinha
+      })
+      
+      itensDetalhesHtml += `
+          </tbody>
+        </table>
+      </div>`
+    }
     
     return `<div class="list-item ${iCls}" style="margin-bottom:12px;">
       <div class="item-header">
@@ -1550,7 +1570,13 @@ function renderServicosList(lista) {
           <div class="item-sub">${s.tipo_servico||'—'} · ${valor}</div>
           <div class="item-sub">📅 Entrada: ${dEnt} · Saída: ${dSai}</div>
           ${s.descricao?`<div class="item-sub" style="color:var(--gray-600);margin-top:4px">${s.descricao}</div>`:''}
-          ${itensHtml}
+          
+          <!-- RESUMO CONSOLIDADO (linha única) -->
+          ${resumoLinha ? `<div style="margin-top:8px; padding:8px; background:var(--bg-light); border-radius:4px; font-size:12px; color:var(--gray-700);"><strong>${resumoLinha} · ${totalItens} itens</strong></div>` : ''}
+          
+          <!-- ITENS DETALHADOS -->
+          ${itensDetalhesHtml}
+          
           <div style="margin-top:8px"><span class="badge ${bCls}">${bTxt}</span></div>
           
           <!-- BOTÕES DE AÇÃO -->
