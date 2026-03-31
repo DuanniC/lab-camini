@@ -1541,6 +1541,38 @@ function removerItemForm(itemId) {
   }
 }
 
+// ── EDITAR ITEM ──
+function editarItemForm(itemId) {
+  try {
+    let itens = JSON.parse(document.getElementById('srv-form-itens-json').value)
+    const itemIdx = itens.findIndex(i => i.id === itemId)
+    
+    if (itemIdx === -1) {
+      alerta('Item não encontrado', 'warning')
+      return
+    }
+    
+    const item = itens[itemIdx]
+    
+    // Preencher formulário com dados do item
+    document.getElementById('srv-form-tipo').value = item.tipo
+    document.getElementById('srv-form-item-paciente').value = item.paciente || ''
+    document.getElementById('srv-form-valor').value = item.valor
+    document.getElementById('srv-form-desc').value = item.desc || ''
+    
+    // Remover item temporariamente
+    itens.splice(itemIdx, 1)
+    document.getElementById('srv-form-itens-json').value = JSON.stringify(itens)
+    
+    renderizarItensForm()
+    atualizarVisibilidadePaciente()
+    alerta('📝 Edite o item acima e clique em ➕ Adicionar Serviço', 'success')
+  } catch(e) {
+    console.error('Erro em editarItemForm:', e)
+    alerta('Erro ao editar serviço', 'danger')
+  }
+}
+
 function renderizarItensForm() {
   try {
     const itensJson = document.getElementById('srv-form-itens-json').value || '[]'
@@ -1554,13 +1586,16 @@ function renderizarItensForm() {
     } else {
       listaEl.innerHTML = itens.map(item => `
         <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; background:white; border-radius:8px; margin-bottom:8px;">
-          <div>
+          <div style="flex:1;">
             <div style="font-weight:700; color:var(--gray-800); font-size:13px;">${item.tipo}</div>
             ${item.paciente ? `<div style="font-size:12px; color:var(--blue); margin-top:2px;">👤 ${item.paciente}</div>` : ''}
             <div style="font-size:12px; color:var(--gray-400); margin-top:2px;">R$ ${item.valor.toFixed(2).replace('.', ',')}</div>
             ${item.desc ? `<div style="font-size:11px; color:var(--gray-600); margin-top:2px;">${item.desc}</div>` : ''}
           </div>
-          <button class="icon-btn delete" onclick="removerItemForm(${item.id})" style="margin:0;">❌</button>
+          <div style="display:flex; gap:6px;">
+            <button class="icon-btn edit" onclick="editarItemForm(${item.id})" style="margin:0; background:#e3f2fd; color:var(--blue); padding:6px 10px; font-size:12px;">✏️</button>
+            <button class="icon-btn delete" onclick="removerItemForm(${item.id})" style="margin:0;">❌</button>
+          </div>
         </div>
       `).join('')
     }
@@ -1595,7 +1630,6 @@ function renderizarItensForm() {
 async function salvarServicoForm() {
   const editId  = document.getElementById('srv-form-id').value
   const cliId   = document.getElementById('srv-form-cliente').value
-  const paciente = document.getElementById('srv-form-paciente').value.trim()
   const entrada = document.getElementById('srv-form-entrada').value
   const saida   = document.getElementById('srv-form-saida').value
   const itens   = JSON.parse(document.getElementById('srv-form-itens-json').value)
