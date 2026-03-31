@@ -1287,7 +1287,13 @@ function popularSelects() {
 function abrirServico(id=null) {
   const hoje = new Date().toISOString().split('T')[0]
   
-  // Ir para a página de formulário
+  console.log('📂 abrirServico chamado com ID:', id)
+  
+  // Se id foi passado e não é null/undefined/vazio
+  const ehEdicao = id && id !== null && id !== '' && id !== 'undefined'
+  console.log('É edição?', ehEdicao)
+  
+  // IR PARA A PÁGINA PRIMEIRO
   irPara('servico-form')
   window.scrollTo(0, 0)
   
@@ -1318,11 +1324,11 @@ function abrirServico(id=null) {
   if (id) {
     const s = servicos.find(x => x.id === id)
     if (!s) {
-      console.error('Serviço não encontrado:', id)
+      console.error('❌ Serviço não encontrado com ID:', id, 'Serviços disponíveis:', servicos.map(srv => srv.id))
       return
     }
     
-    console.log('🔧 Editando serviço:', s)
+    console.log('✅ Editando serviço:', s)
     
     srvFormId.value = id
     srvFormCliente.value = s.cliente_id || ''
@@ -1354,7 +1360,10 @@ function abrirServico(id=null) {
   renderizarItensForm()
 }
 
-function editarServico(id) { abrirServico(id) }
+function editarServico(id) { 
+  console.log('🔧 Editando serviço ID:', id, 'Tipo:', typeof id)
+  abrirServico(id) 
+}
 
 function adicionarItem() {
   const tipo = document.getElementById('srv-tipo-temp').value.trim()
