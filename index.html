@@ -1440,9 +1440,7 @@ function renderServicosInicio(lista) {
       <div class="item-header">
         <div style="flex:1;min-width:0">
           <div class="item-name"><span class="seq-num">#${numero}</span> ${nome}</div>
-          <div class="item-sub">${s.tipo_servico||'—'} · ${valor}</div>
           <div class="item-sub">📅 Entrada: ${dEnt} · Saída: ${dSai}</div>
-          ${s.descricao?`<div class="item-sub" style="color:var(--gray-600);margin-top:4px">${s.descricao}</div>`:''}
           
           <!-- ITENS DETALHADOS -->
           ${itensDetalhesHtml}
@@ -1554,9 +1552,7 @@ function renderServicosList(lista) {
       <div class="item-header">
         <div style="flex:1;min-width:0">
           <div class="item-name"><span class="seq-num">#${numero}</span> ${nome}</div>
-          <div class="item-sub">${s.tipo_servico||'—'} · ${valor}</div>
           <div class="item-sub">📅 Entrada: ${dEnt} · Saída: ${dSai}</div>
-          ${s.descricao?`<div class="item-sub" style="color:var(--gray-600);margin-top:4px">${s.descricao}</div>`:''}
           
           <!-- ITENS DETALHADOS -->
           ${itensDetalhesHtml}
