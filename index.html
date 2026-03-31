@@ -414,6 +414,7 @@ textarea.form-control { min-height:90px; resize:vertical; }
     <input type="text" id="search-servicos" placeholder="🔍 Buscar por cliente ou serviço..." onkeyup="filtrarServicos()">
   </div>
   
+  <div id="lista-servicos"><div class="empty"><div class="empty-icon">🔧</div><p>Nenhum serviço</p></div></div>
 </div>
 
 <!-- ══ NOVO/EDITAR SERVIÇO (PÁGINA EXCLUSIVA) ══ -->
@@ -747,6 +748,10 @@ async function carregar() {
   console.log('🔄 Carregando dados do Supabase...')
   console.log('URL:', URL_SB)
   console.log('API Key:', KEY_SB.substring(0, 20) + '...')
+  
+  // RESET: voltar para o mês atual
+  mesServicos = 0
+  mesExibicao = 0
   
   setSync('loading')
   try {
