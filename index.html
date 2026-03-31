@@ -1068,12 +1068,7 @@ async function confirmarPagamentoAsync() {
       return 
     }
     
-    if (!conectado) { 
-      alert('❌ Sem conexão! conectado=' + conectado)
-      return 
-    }
-    
-    alert('4️⃣ Validações OK, enviando PATCH...')
+    alert('4️⃣ Enviando PATCH...')
     console.log('Enviando PATCH para servicos id=' + srvId)
     
     const response = await api('PATCH','servicos',{
@@ -1130,11 +1125,6 @@ async function desmarcarPagamentoAsync() {
     if (!confirm('Desmarcar este serviço como pago?')) {
       alert('Cancelado pelo usuário')
       return
-    }
-    
-    if (!conectado) { 
-      alert('❌ Sem conexão!')
-      return 
     }
     
     alert('3️⃣ Enviando PATCH...')
