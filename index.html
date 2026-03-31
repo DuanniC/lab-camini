@@ -640,8 +640,8 @@ textarea.form-control { min-height:90px; resize:vertical; }
     </div>
     <div class="btn-row">
       <button class="btn btn-ghost" onclick="event.stopPropagation(); fechar('ov-pagamento')">Cancelar</button>
-      <button class="btn btn-primary" id="pag-btn-confirmar" type="button" onclick="event.stopPropagation(); event.preventDefault(); alert('🎯 BOTÃO CLICADO!'); console.log('🎯 BOTÃO CONFIRMAR CLICADO!'); confirmarPagamentoWrapper(); return false;">Confirmar Pagamento</button>
-      <button class="btn btn-ghost" id="pag-btn-desmarcar" style="display:none; background:#ffebee; color:var(--red)" type="button" onclick="event.stopPropagation(); event.preventDefault(); alert('🎯 DESMARCAR CLICADO!'); console.log('🎯 BOTÃO DESMARCAR CLICADO!'); desmarcarPagamentoWrapper(); return false;">Desmarcar Pagamento</button>
+      <button class="btn btn-primary" id="pag-btn-confirmar" type="button">Confirmar Pagamento</button>
+      <button class="btn btn-ghost" id="pag-btn-desmarcar" style="display:none; background:#ffebee; color:var(--red)" type="button">Desmarcar Pagamento</button>
     </div>
   </div>
 </div>
@@ -1068,6 +1068,11 @@ async function confirmarPagamentoAsync() {
       return 
     }
     
+    // Log ao invés de return
+    if (!conectado) {
+      console.warn('⚠️ Sem conexão, tentando mesmo assim...')
+    }
+    
     alert('4️⃣ Enviando PATCH...')
     console.log('Enviando PATCH para servicos id=' + srvId)
     
@@ -1125,6 +1130,11 @@ async function desmarcarPagamentoAsync() {
     if (!confirm('Desmarcar este serviço como pago?')) {
       alert('Cancelado pelo usuário')
       return
+    }
+    
+    // Log ao invés de return
+    if (!conectado) {
+      console.warn('⚠️ Sem conexão, tentando mesmo assim...')
     }
     
     alert('3️⃣ Enviando PATCH...')
