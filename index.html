@@ -1370,16 +1370,12 @@ function renderServicosInicio(lista) {
   }
   
   const agrupados = agruparServicosPorTipo(lista)
-  
-  if (!agrupados.length) {
-    el.innerHTML = '<div class="empty"><div class="empty-icon">🔧</div><p>Nenhum serviço</p></div>'
-    return
-  }
-  
   const totalGeral = agrupados.reduce((sum, a) => sum + a.valor_total, 0)
   
-  el.innerHTML = `
-    <div class="card">
+  // RESUMO AGRUPADO
+  let html = `
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-title" style="margin-bottom:12px;">📊 Resumo Consolidado</div>
       <table style="width:100%; border-collapse:collapse;">
         <thead>
           <tr style="border-bottom:2px solid var(--border-color);">
@@ -1390,7 +1386,7 @@ function renderServicosInicio(lista) {
         </thead>
         <tbody>
           ${agrupados.map(a => `
-            <tr style="border-bottom:1px solid var(--border-color); padding:8px 0;">
+            <tr style="border-bottom:1px solid var(--border-color);">
               <td style="padding:12px 0; color:var(--text-color);">${a.tipo}</td>
               <td style="text-align:center; padding:12px 0; color:var(--gray-700);">${a.quantidade}</td>
               <td style="text-align:right; padding:12px 0; color:var(--text-color); font-weight:600;">${a.valor_total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}</td>
@@ -1407,6 +1403,70 @@ function renderServicosInicio(lista) {
       </table>
     </div>
   `
+  
+  // CARDS COMPLETOS
+  const hoje = new Date(); hoje.setHours(0,0,0,0)
+  html += lista.map(s => {
+    const cl    = clientes.find(c => c.id === s.cliente_id)
+    const nome  = s.cliente_nome || cl?.nome_dentista || cl?.nome_lab || 'Cliente'
+    const numero = cl?.numero_sequencial || '—'
+    const saida = s.data_saida ? new Date(s.data_saida+'T12:00:00') : null
+    const venc  = !s.pago && saida && saida < hoje
+    const valor = (s.valor||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})
+    const dEnt  = s.data_entrada ? new Date(s.data_entrada+'T12:00:00').toLocaleDateString('pt-BR') : '—'
+    const dSai  = saida ? saida.toLocaleDateString('pt-BR') : '—'
+    const bCls  = s.pago ? 'badge-pago' : venc ? 'badge-vencido' : 'badge-pendente'
+    const bTxt  = s.pago ? '✓ Pago'    : venc ? '⚠ Vencido'    : '⏳ Pendente'
+    const iCls  = s.pago ? 'pago'       : venc ? 'venc'          : ''
+    
+    // Extrair itens com pacientes
+    let itensHtml = ''
+    try {
+      const itens = s.itens_json ? JSON.parse(s.itens_json) : []
+      if (itens.length) {
+        itensHtml = `<div style="margin-top:8px; padding-top:8px; border-top:1px solid var(--border-color);"><strong>Itens:</strong><br>`
+        itensHtml += itens.map(item => {
+          let linha = `• ${item.tipo} - ${(item.valor||0).toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}`
+          if (item.paciente) linha += ` 👤 ${item.paciente}`
+          return linha
+        }).join('<br>')
+        itensHtml += '</div>'
+      }
+    } catch(e) {}
+    
+    return `<div class="list-item ${iCls}" style="margin-bottom:12px;">
+      <div class="item-header">
+        <div style="flex:1;min-width:0">
+          <div class="item-name"><span class="seq-num">#${numero}</span> ${nome}</div>
+          <div class="item-sub">${s.tipo_servico||'—'} · ${valor}</div>
+          <div class="item-sub">📅 Entrada: ${dEnt} · Saída: ${dSai}</div>
+          ${s.descricao?`<div class="item-sub" style="color:var(--gray-600);margin-top:4px">${s.descricao}</div>`:''}
+          ${itensHtml}
+          <div style="margin-top:8px"><span class="badge ${bCls}">${bTxt}</span></div>
+          
+          <!-- BOTÕES DE AÇÃO -->
+          <div class="export-buttons" style="margin-top:10px">
+            ${s.pago ? 
+              `<button class="export-btn" style="background:#ffebee;color:var(--red)" onclick="marcarComoPago(${s.id}, false)" title="Desmarcar como pago">⏳ Desmarcar</button>` :
+              `<button class="export-btn" style="background:#e8f5e9;color:var(--green)" onclick="marcarComoPago(${s.id}, true)" title="Marcar como pago">✓ Marcar Pago</button>`
+            }
+            <button class="export-btn whatsapp" onclick="compartilharWhatsApp(${s.id})" title="Enviar via WhatsApp">
+              💬 WhatsApp
+            </button>
+            <button class="export-btn imprimir" onclick="imprimirServico(${s.id})" title="Imprimir">
+              🖨️ Imprimir
+            </button>
+          </div>
+        </div>
+        <div class="item-actions" style="flex-direction:column;gap:6px">
+          <button class="icon-btn edit" onclick="editarServico(${s.id})">✏️</button>
+          <button class="icon-btn delete" onclick="apagarServico(${s.id})">🗑️</button>
+        </div>
+      </div>
+    </div>`
+  }).join('')
+  
+  el.innerHTML = html
 }
 
 function renderServicosList(lista) {
@@ -1419,16 +1479,12 @@ function renderServicosList(lista) {
   }
   
   const agrupados = agruparServicosPorTipo(lista)
-  
-  if (!agrupados.length) {
-    el.innerHTML = '<div class="empty"><div class="empty-icon">🔧</div><p>Nenhum serviço</p></div>'
-    return
-  }
-  
   const totalGeral = agrupados.reduce((sum, a) => sum + a.valor_total, 0)
   
-  el.innerHTML = `
-    <div class="card">
+  // RESUMO AGRUPADO
+  let html = `
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-title" style="margin-bottom:12px;">📊 Resumo Consolidado</div>
       <table style="width:100%; border-collapse:collapse;">
         <thead>
           <tr style="border-bottom:2px solid var(--border-color);">
@@ -1439,7 +1495,7 @@ function renderServicosList(lista) {
         </thead>
         <tbody>
           ${agrupados.map(a => `
-            <tr style="border-bottom:1px solid var(--border-color); padding:8px 0;">
+            <tr style="border-bottom:1px solid var(--border-color);">
               <td style="padding:12px 0; color:var(--text-color);">${a.tipo}</td>
               <td style="text-align:center; padding:12px 0; color:var(--gray-700);">${a.quantidade}</td>
               <td style="text-align:right; padding:12px 0; color:var(--text-color); font-weight:600;">${a.valor_total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}</td>
@@ -1456,6 +1512,70 @@ function renderServicosList(lista) {
       </table>
     </div>
   `
+  
+  // CARDS COMPLETOS
+  const hoje = new Date(); hoje.setHours(0,0,0,0)
+  html += lista.map(s => {
+    const cl    = clientes.find(c => c.id === s.cliente_id)
+    const nome  = s.cliente_nome || cl?.nome_dentista || cl?.nome_lab || 'Cliente'
+    const numero = cl?.numero_sequencial || '—'
+    const saida = s.data_saida ? new Date(s.data_saida+'T12:00:00') : null
+    const venc  = !s.pago && saida && saida < hoje
+    const valor = (s.valor||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})
+    const dEnt  = s.data_entrada ? new Date(s.data_entrada+'T12:00:00').toLocaleDateString('pt-BR') : '—'
+    const dSai  = saida ? saida.toLocaleDateString('pt-BR') : '—'
+    const bCls  = s.pago ? 'badge-pago' : venc ? 'badge-vencido' : 'badge-pendente'
+    const bTxt  = s.pago ? '✓ Pago'    : venc ? '⚠ Vencido'    : '⏳ Pendente'
+    const iCls  = s.pago ? 'pago'       : venc ? 'venc'          : ''
+    
+    // Extrair itens com pacientes
+    let itensHtml = ''
+    try {
+      const itens = s.itens_json ? JSON.parse(s.itens_json) : []
+      if (itens.length) {
+        itensHtml = `<div style="margin-top:8px; padding-top:8px; border-top:1px solid var(--border-color);"><strong>Itens:</strong><br>`
+        itensHtml += itens.map(item => {
+          let linha = `• ${item.tipo} - ${(item.valor||0).toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}`
+          if (item.paciente) linha += ` 👤 ${item.paciente}`
+          return linha
+        }).join('<br>')
+        itensHtml += '</div>'
+      }
+    } catch(e) {}
+    
+    return `<div class="list-item ${iCls}" style="margin-bottom:12px;">
+      <div class="item-header">
+        <div style="flex:1;min-width:0">
+          <div class="item-name"><span class="seq-num">#${numero}</span> ${nome}</div>
+          <div class="item-sub">${s.tipo_servico||'—'} · ${valor}</div>
+          <div class="item-sub">📅 Entrada: ${dEnt} · Saída: ${dSai}</div>
+          ${s.descricao?`<div class="item-sub" style="color:var(--gray-600);margin-top:4px">${s.descricao}</div>`:''}
+          ${itensHtml}
+          <div style="margin-top:8px"><span class="badge ${bCls}">${bTxt}</span></div>
+          
+          <!-- BOTÕES DE AÇÃO -->
+          <div class="export-buttons" style="margin-top:10px">
+            ${s.pago ? 
+              `<button class="export-btn" style="background:#ffebee;color:var(--red)" onclick="marcarComoPago(${s.id}, false)" title="Desmarcar como pago">⏳ Desmarcar</button>` :
+              `<button class="export-btn" style="background:#e8f5e9;color:var(--green)" onclick="marcarComoPago(${s.id}, true)" title="Marcar como pago">✓ Marcar Pago</button>`
+            }
+            <button class="export-btn whatsapp" onclick="compartilharWhatsApp(${s.id})" title="Enviar via WhatsApp">
+              💬 WhatsApp
+            </button>
+            <button class="export-btn imprimir" onclick="imprimirServico(${s.id})" title="Imprimir">
+              🖨️ Imprimir
+            </button>
+          </div>
+        </div>
+        <div class="item-actions" style="flex-direction:column;gap:6px">
+          <button class="icon-btn edit" onclick="editarServico(${s.id})">✏️</button>
+          <button class="icon-btn delete" onclick="apagarServico(${s.id})">🗑️</button>
+        </div>
+      </div>
+    </div>`
+  }).join('')
+  
+  el.innerHTML = html
 }
 
 function popularSelects() {
