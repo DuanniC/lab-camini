@@ -640,8 +640,8 @@ textarea.form-control { min-height:90px; resize:vertical; }
     </div>
     <div class="btn-row">
       <button class="btn btn-ghost" onclick="if(event) event.stopPropagation(); fechar('ov-pagamento')">Cancelar</button>
-      <button class="btn btn-primary" id="pag-btn-confirmar" type="button">Confirmar Pagamento</button>
-      <button class="btn btn-ghost" id="pag-btn-desmarcar" style="display:none; background:#ffebee; color:var(--red)" type="button">Desmarcar Pagamento</button>
+      <button class="btn btn-primary" id="pag-btn-confirmar" type="button" onclick="(async function(){try{const srvId=parseInt(document.getElementById('pag-srv-id').value);const dataPagamento=document.getElementById('pag-data').value;if(!dataPagamento){alerta('Data vazia','warning');return}const response=await api('PATCH','servicos',{pago:true,data_pagamento:dataPagamento},`?id=eq.${srvId}`);fechar('ov-pagamento');await carregar();alerta('✓ Pago!','success')}catch(e){alerta('Erro: '+e.message,'danger')}})()">Confirmar Pagamento</button>
+      <button class="btn btn-ghost" id="pag-btn-desmarcar" style="display:none; background:#ffebee; color:var(--red)" type="button" onclick="(async function(){const srvId=parseInt(document.getElementById('pag-srv-id').value);if(!confirm('Desmarcar?'))return;try{const response=await api('PATCH','servicos',{pago:false,data_pagamento:null},`?id=eq.${srvId}`);fechar('ov-pagamento');await carregar();alerta('⏳ Não pago!','success')}catch(e){alerta('Erro: '+e.message,'danger')}})()">Desmarcar Pagamento</button>
     </div>
   </div>
 </div>
@@ -2080,40 +2080,7 @@ function imprimirServico(id) {
 }
 
 // ── INICIAR ──
-window.addEventListener('DOMContentLoaded', () => {
-  console.log('🔧 Inicializando event listeners...')
-  
-  // Botão confirmar pagamento
-  const btnConfirmar = document.getElementById('pag-btn-confirmar')
-  if (btnConfirmar) {
-    console.log('✅ Botão confirmar encontrado')
-    btnConfirmar.addEventListener('click', (e) => {
-      console.log('🎯 CLIQUE NO BOTÃO CONFIRMAR!')
-      if (e) {
-        e.preventDefault()
-        e.stopPropagation()
-      }
-      confirmarPagamentoWrapper()
-    })
-  }
-  
-  // Botão desmarcar pagamento
-  const btnDesmarcar = document.getElementById('pag-btn-desmarcar')
-  if (btnDesmarcar) {
-    console.log('✅ Botão desmarcar encontrado')
-    btnDesmarcar.addEventListener('click', (e) => {
-      console.log('🎯 CLIQUE NO BOTÃO DESMARCAR!')
-      if (e) {
-        e.preventDefault()
-        e.stopPropagation()
-      }
-      desmarcarPagamentoWrapper()
-    })
-  }
-  
-  // Carregar dados
-  carregar()
-})
+window.addEventListener('DOMContentLoaded', carregar)
 </script>
 </body>
 </html>
