@@ -1,389 +1,737 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Laboratório Camini - Sistema de Gestão</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box }
-    :root {
-      --blue: #1a6fa8;
-      --blue-light: #e3f2fd;
-      --green: #1e9e5e;
-      --green-light: #e8f5e9;
-      --red: #d32f2f;
-      --gray-100: #f5f5f5;
-      --gray-400: #999;
-      --gray-600: #666;
-      --gray-800: #333;
-      --shadow: 0 2px 8px rgba(0,0,0,0.1);
-      --radius: 8px;
-    }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: var(--gray-100);
-      color: var(--gray-800);
-    }
-    .header {
-      background: var(--blue);
-      color: white;
-      padding: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: var(--shadow);
-    }
-    .header h1 { font-size: 18px; font-weight: 700 }
-    .header-sub { font-size: 12px; opacity: 0.9 }
-    .sync-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      padding: 6px 12px;
-      background: rgba(255,255,255,0.2);
-      border-radius: var(--radius);
-    }
-    .sync-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #4caf50;
-    }
-    .sync-dot.loading { background: #ff9800; animation: pulse 1s infinite }
-    .sync-dot.error { background: #f44336 }
-    @keyframes pulse { 50% { opacity: 0.5 } }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Laboratório Camini</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    .container { max-width: 800px; margin: 0 auto }
-    
-    .nav {
-      display: flex;
-      gap: 0;
-      background: white;
-      border-bottom: 1px solid var(--gray-100);
-      position: sticky;
-      bottom: 0;
-      z-index: 100;
-    }
-    .nav-btn {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      background: none;
-      color: var(--gray-600);
-      font-size: 12px;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      border-top: 3px solid transparent;
-    }
-    .nav-btn.active {
-      color: var(--blue);
-      border-top-color: var(--blue);
-      font-weight: 700;
-    }
+:root {
+  --blue:        #1a6fa8;
+  --blue-dark:   #134f7a;
+  --blue-light:  #e8f4fd;
+  --green:       #1e9e5e;
+  --green-light: #e6f7ef;
+  --red:         #d9363e;
+  --red-light:   #fdecea;
+  --orange:      #e07b00;
+  --orange-light:#fff4e0;
+  --gray-100:    #f0f2f5;
+  --gray-200:    #e0e4ea;
+  --gray-400:    #9ba5b4;
+  --gray-600:    #4b5563;
+  --gray-800:    #1f2937;
+  --white:       #ffffff;
+  --radius:      14px;
+  --shadow:      0 2px 12px rgba(0,0,0,0.08);
+}
 
-    .page { display: none; padding: 20px 16px; margin-bottom: 80px }
-    .page.active { display: block }
-    .page-title { font-size: 24px; font-weight: 700; margin-bottom: 20px }
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--gray-100);
+  color: var(--gray-800);
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
 
-    .card {
-      background: white;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 20px;
-      margin-bottom: 16px;
-    }
-    .card-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--blue);
-      margin-bottom: 16px;
-      padding-bottom: 12px;
-      border-bottom: 2px solid var(--gray-100);
-    }
+.header {
+  background: var(--blue);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 3px 16px rgba(26,111,168,0.3);
+}
+.logo { display:flex; align-items:center; gap:10px; }
+.logo-icon { font-size:26px; }
+.logo h1 { font-size:19px; font-weight:800; color:white; line-height:1; }
+.logo p  { font-size:11px; color:rgba(255,255,255,0.7); font-weight:600; text-transform:uppercase; letter-spacing:.5px; }
+.sync-pill {
+  display:flex; align-items:center; gap:7px;
+  background:rgba(255,255,255,0.15);
+  padding:6px 12px; border-radius:20px;
+  font-size:12px; color:white; font-weight:700;
+}
+.dot { width:8px; height:8px; border-radius:50%; background:#4ade80; flex-shrink:0; }
+.dot.loading { background:#fbbf24; animation:blink .8s infinite; }
+.dot.error   { background:#f87171; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-    .form-group { margin-bottom: 16px }
-    .form-label {
-      display: block;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--gray-800);
-      margin-bottom: 6px;
-    }
-    .req { color: var(--red) }
-    .form-control {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid var(--gray-100);
-      border-radius: var(--radius);
-      font-size: 14px;
-      font-family: inherit;
-    }
-    .form-control:focus {
-      outline: none;
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(26, 111, 168, 0.1);
-    }
-    textarea.form-control { resize: vertical; min-height: 80px }
+.bottom-nav {
+  position:fixed; bottom:0; left:0; right:0;
+  background:white; display:flex;
+  border-top:2px solid var(--gray-200);
+  box-shadow:0 -4px 16px rgba(0,0,0,.08);
+  z-index:100;
+}
+.nav-btn {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:3px;
+  padding:10px 4px; border:none; background:none;
+  cursor:pointer; color:var(--gray-400);
+  font-family:'Nunito',sans-serif;
+  font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.3px;
+  transition:color .2s; -webkit-tap-highlight-color:transparent;
+}
+.nav-icon { font-size:22px; line-height:1; transition:transform .2s; }
+.nav-btn.active { color:var(--blue); }
+.nav-btn.active .nav-icon { transform:translateY(-2px); }
 
-    .btn {
-      padding: 12px 20px;
-      border: none;
-      border-radius: var(--radius);
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .btn-primary {
-      background: var(--blue);
-      color: white;
-    }
-    .btn-primary:hover { background: #0d4a7a }
-    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed }
-    .btn-ghost {
-      background: var(--gray-100);
-      color: var(--gray-800);
-    }
-    .btn-ghost:hover { background: #e0e0e0 }
-    .btn-block { width: 100% }
-    .btn-row {
-      display: flex;
-      gap: 12px;
-      margin-top: 24px;
-    }
-    .btn-row .btn { flex: 1 }
+.page { display:none; padding:18px 16px; max-width:680px; margin:0 auto; }
+.page.active { display:block; }
+.page-title { font-size:22px; font-weight:800; color:var(--gray-800); margin-bottom:16px; }
 
-    .item-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px;
-      background: var(--gray-100);
-      border-radius: var(--radius);
-      margin-bottom: 8px;
-    }
-    .item-info { flex: 1 }
-    .item-name { font-weight: 700; color: var(--gray-800); font-size: 14px }
-    .item-valor { font-size: 12px; color: var(--gray-400); margin-top: 2px }
-    .item-desc { font-size: 11px; color: var(--gray-600); margin-top: 2px }
-    .btn-remove { background: var(--red); color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px }
-    .btn-remove:hover { background: #c62828 }
+.card { background:white; border-radius:var(--radius); box-shadow:var(--shadow); padding:20px; margin-bottom:14px; }
+.card-title { font-size:16px; font-weight:800; color:var(--blue); margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid var(--gray-100); }
 
-    .resumo {
-      background: var(--green-light);
-      border: 2px solid var(--green);
-      border-radius: var(--radius);
-      padding: 16px;
-      margin: 16px 0;
-    }
-    .resumo-title { font-size: 12px; color: var(--gray-400); font-weight: 700; margin-bottom: 8px }
-    .resumo-total { font-size: 24px; font-weight: 800; color: var(--green); margin-bottom: 8px }
-    .resumo-info { font-size: 12px; color: var(--gray-600) }
+.stats-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:14px; }
+.stat-card {
+  background:white; border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:18px 14px; text-align:center; border-top:4px solid var(--blue);
+  cursor:pointer; transition:all .2s;
+}
+.stat-card:hover { transform:translateY(-2px); box-shadow:0 4px 16px rgba(0,0,0,0.12); }
+.stat-card.green  { border-top-color:var(--green); }
+.stat-card.red    { border-top-color:var(--red); }
+.stat-card.orange { border-top-color:var(--orange); }
+.stat-label { font-size:12px; font-weight:700; color:var(--gray-400); text-transform:uppercase; letter-spacing:.3px; margin-bottom:6px; }
+.stat-num   { font-size:38px; font-weight:800; color:var(--gray-800); line-height:1; }
 
-    .alerta-box { position: fixed; top: 80px; right: 16px; z-index: 1000 }
-    .alerta {
-      padding: 12px 16px;
-      border-radius: var(--radius);
-      margin-bottom: 8px;
-      animation: slideIn 0.3s ease-out;
-      font-size: 13px;
-      font-weight: 600;
-    }
-    .alerta.success { background: #c8e6c9; color: #2e7d32 }
-    .alerta.warning { background: #fff3cd; color: #856404 }
-    .alerta.danger { background: #f8d7da; color: #721c24 }
-    @keyframes slideIn { from { transform: translateX(400px); opacity: 0 } to { transform: translateX(0); opacity: 1 } }
+.search-box {
+  background:white; border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:12px 16px; margin-bottom:14px;
+}
+.search-box input {
+  width:100%; padding:10px 12px; border:2px solid var(--gray-200);
+  border-radius:8px; font-size:14px; font-family:'Nunito',sans-serif;
+  transition:border-color .2s;
+}
+.search-box input:focus {
+  outline:none; border-color:var(--blue); box-shadow:0 0 0 4px rgba(26,111,168,.1);
+}
 
-    .list-item {
-      background: white;
-      border-radius: var(--radius);
-      padding: 16px;
-      margin-bottom: 12px;
-      box-shadow: var(--shadow);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-    }
-    .list-item-info { flex: 1 }
-    .list-item-title { font-weight: 700; color: var(--gray-800); font-size: 14px; margin-bottom: 4px }
-    .list-item-meta { font-size: 12px; color: var(--gray-400) }
-    .list-item-actions { display: flex; gap: 8px }
-    .btn-icon {
-      width: 36px;
-      height: 36px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      transition: all 0.2s;
-    }
-    .btn-icon.edit { background: var(--blue-light); color: var(--blue) }
-    .btn-icon.delete { background: #ffebee; color: var(--red) }
-    .btn-icon:hover { transform: scale(1.1) }
+.monthly-section {
+  background:white; border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:20px; margin-bottom:14px;
+}
+.monthly-header {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid var(--gray-100);
+}
+.monthly-title { font-size:16px; font-weight:800; color:var(--blue); }
+.month-nav {
+  display:flex; gap:8px; align-items:center;
+}
+.month-btn {
+  width:36px; height:36px; border:2px solid var(--gray-200); border-radius:50%;
+  background:white; cursor:pointer; font-weight:700; font-size:14px;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .2s; -webkit-tap-highlight-color:transparent;
+}
+.month-btn:hover { border-color:var(--blue); color:var(--blue); }
+.month-display { font-size:14px; font-weight:700; color:var(--gray-600); min-width:120px; text-align:center; }
+.monthly-stats {
+  display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;
+  margin-bottom:12px;
+}
+.mstat {
+  background:var(--gray-100); border-radius:10px; padding:12px 10px; text-align:center;
+}
+.mstat-label { font-size:12px; font-weight:700; color:var(--gray-400); margin-bottom:4px; }
+.mstat-valor { font-size:18px; font-weight:800; color:var(--gray-800); }
 
-    .empty {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--gray-400);
-    }
-    .empty-icon { font-size: 48px; margin-bottom: 12px }
-    .empty p { font-size: 14px }
-  </style>
+.form-group { margin-bottom:14px; }
+.form-label { display:block; font-size:14px; font-weight:700; color:var(--gray-600); margin-bottom:7px; }
+.form-label .req { color:var(--red); }
+.form-control {
+  width:100%; padding:14px 16px;
+  border:2px solid var(--gray-200); border-radius:10px;
+  font-size:16px; font-family:'Nunito',sans-serif; font-weight:600;
+  color:var(--gray-800); background:white; appearance:none;
+  transition:border-color .2s;
+}
+.form-control:focus { outline:none; border-color:var(--blue); box-shadow:0 0 0 4px rgba(26,111,168,.1); }
+textarea.form-control { min-height:90px; resize:vertical; }
+
+.tipo-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+.tipo-opt {
+  border:3px solid var(--gray-200); border-radius:12px;
+  padding:16px 10px; text-align:center; cursor:pointer;
+  transition:all .2s; background:white; font-family:'Nunito',sans-serif;
+  -webkit-tap-highlight-color:transparent;
+}
+.tipo-opt:hover { border-color:var(--blue); }
+.tipo-opt.sel   { border-color:var(--blue); background:var(--blue-light); }
+.tipo-emoji { font-size:30px; display:block; margin-bottom:6px; }
+.tipo-name  { font-size:15px; font-weight:800; color:var(--gray-800); }
+.tipo-hint  { font-size:12px; color:var(--gray-400); font-weight:600; margin-top:3px; }
+
+.btn {
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:14px 22px; border:none; border-radius:10px;
+  font-size:15px; font-family:'Nunito',sans-serif; font-weight:800;
+  cursor:pointer; transition:all .2s; -webkit-tap-highlight-color:transparent;
+}
+.btn-block { width:100%; }
+.btn-primary { background:var(--blue); color:white; }
+.btn-primary:hover  { background:var(--blue-dark); }
+.btn-primary:active { transform:scale(.98); }
+.btn-primary:disabled { background:var(--gray-400); cursor:not-allowed; }
+.btn-ghost   { background:var(--gray-100); color:var(--gray-600); }
+.btn-danger  { background:var(--red); color:white; }
+.btn-row { display:flex; gap:10px; margin-top:6px; }
+.btn-row .btn { flex:1; }
+
+#alertBox {
+  position:fixed; top:76px; left:50%;
+  transform:translateX(-50%);
+  z-index:200; width:calc(100% - 32px);
+  max-width:500px; pointer-events:none;
+}
+.alert {
+  padding:14px 18px; border-radius:10px;
+  font-size:15px; font-weight:700; margin-bottom:8px;
+  opacity:0; transform:translateY(-10px);
+  transition:all .3s; pointer-events:auto;
+}
+.alert.show { opacity:1; transform:translateY(0); }
+.alert-success { background:var(--green-light); color:var(--green); border-left:4px solid var(--green); }
+.alert-danger  { background:var(--red-light);   color:var(--red);   border-left:4px solid var(--red);   }
+.alert-warning { background:var(--orange-light); color:var(--orange); border-left:4px solid var(--orange); }
+
+.list-item {
+  background:white; border-radius:var(--radius); padding:16px;
+  margin-bottom:10px; box-shadow:var(--shadow);
+  border-left:5px solid var(--blue);
+}
+.list-item.lab  { border-left-color:#7c3aed; }
+.list-item.pago { border-left-color:var(--green); }
+.list-item.venc { border-left-color:var(--red); }
+.item-header { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+.item-name { font-size:16px; font-weight:800; color:var(--gray-800); line-height:1.2; }
+.item-sub  { font-size:13px; color:var(--gray-400); font-weight:600; margin-top:4px; }
+.item-actions { display:flex; gap:8px; flex-shrink:0; }
+
+.icon-btn {
+  width:36px; height:36px; border-radius:8px; border:none;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  font-size:16px; transition:all .2s; -webkit-tap-highlight-color:transparent;
+}
+.icon-btn.edit   { background:var(--blue-light); }
+.icon-btn.delete { background:var(--red-light); }
+
+.badge {
+  display:inline-block; padding:4px 10px; border-radius:20px;
+  font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.3px;
+}
+.badge-dentista { background:#dbeafe; color:#1e40af; }
+.badge-lab      { background:#ede9fe; color:#5b21b6; }
+.badge-pago     { background:var(--green-light); color:var(--green); }
+.badge-pendente { background:var(--orange-light); color:var(--orange); }
+.badge-vencido  { background:var(--red-light); color:var(--red); }
+
+.seq-num {
+  display:inline-block; background:var(--blue); color:white;
+  font-size:11px; font-weight:800; padding:2px 8px;
+  border-radius:12px; font-family:monospace;
+}
+
+.pag-item {
+  background:white; border-radius:var(--radius); padding:16px;
+  margin-bottom:10px; box-shadow:var(--shadow);
+  display:flex; align-items:center; gap:14px;
+}
+.pag-btn {
+  padding:10px 16px; border-radius:8px; border:none;
+  cursor:pointer; font-family:'Nunito',sans-serif; font-weight:700;
+  transition:all .2s; white-space:nowrap; -webkit-tap-highlight-color:transparent;
+}
+.pag-btn.pago { background:var(--green); color:white; }
+.pag-btn.pendente { background:var(--orange); color:white; }
+.pag-info { flex:1; min-width:0; }
+.pag-nome  { font-size:15px; font-weight:800; color:var(--gray-800); }
+.pag-det   { font-size:13px; color:var(--gray-400); font-weight:600; margin-top:3px; }
+.pag-valor { font-size:17px; font-weight:800; color:var(--gray-800); text-align:right; }
+
+.export-buttons {
+  display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;
+}
+.export-btn {
+  padding:8px 14px; border-radius:8px; border:none;
+  cursor:pointer; font-family:'Nunito',sans-serif; font-weight:700;
+  font-size:12px; transition:all .2s; -webkit-tap-highlight-color:transparent;
+  display:flex; align-items:center; gap:4px;
+}
+.export-btn.foto { background:#fef3c7; color:#92400e; }
+.export-btn.foto:hover { background:#fcd34d; }
+.export-btn.whatsapp { background:#d1fae5; color:#065f46; }
+.export-btn.whatsapp:hover { background:#a7f3d0; }
+.export-btn.imprimir { background:#dbeafe; color:#1e40af; }
+.export-btn.imprimir:hover { background:#bfdbfe; }
+
+.empty { text-align:center; padding:40px 20px; color:var(--gray-400); }
+.empty-icon { font-size:48px; margin-bottom:12px; }
+.empty p { font-size:15px; font-weight:600; }
+
+.overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,.45);
+  z-index:300; display:none; align-items:flex-end;
+}
+.overlay.open { display:flex; }
+.sheet {
+  background:white; border-radius:20px 20px 0 0;
+  padding:24px 20px 44px; width:100%;
+  max-height:92vh; overflow-y:auto;
+}
+.sheet-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+.sheet-title  { font-size:20px; font-weight:800; color:var(--gray-800); }
+.sheet-close  {
+  background:var(--gray-100); border:none; border-radius:50%;
+  width:34px; height:34px; font-size:18px; cursor:pointer; line-height:1;
+  display:flex; align-items:center; justify-content:center;
+}
+
+.filter-badge {
+  display:inline-block; background:var(--blue); color:white;
+  padding:8px 14px; border-radius:20px; font-size:13px; font-weight:700;
+  margin-bottom:14px;
+}
+.filter-close { margin-left:8px; cursor:pointer; font-weight:900; }
+
+@media (min-width:600px) {
+  .page { padding:24px 20px; }
+  .stats-grid { grid-template-columns:repeat(3,1fr); }
+}
+</style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="header">
-  <div>
-    <h1>🦷 Camini</h1>
-    <div class="header-sub">LABORATÓRIO DE PRÓTESE DENTÁRIA</div>
+  <div class="logo">
+    <span class="logo-icon">🦷</span>
+    <div>
+      <h1>Camini</h1>
+      <p>Laboratório de Prótese Dentária</p>
+    </div>
   </div>
-  <div class="sync-status">
-    <div class="sync-dot" id="syncDot"></div>
-    <span id="syncText">Online</span>
+  <div class="sync-pill">
+    <span class="dot" id="syncDot"></span>
+    <span id="syncText">Carregando...</span>
   </div>
 </div>
 
-<!-- ALERT BOX -->
-<div class="alerta-box" id="alertBox"></div>
+<div id="alertBox"></div>
 
-<!-- PÁGINAS -->
+<!-- ══ INÍCIO ══ -->
+<div class="page active" id="page-dash">
+  <p class="page-title">Início</p>
+  
+  <div class="stats-grid">
+    <div class="stat-card" onclick="filtrarPor('pendentes')" title="Clique para filtrar">
+      <div class="stat-label">Pendentes</div>
+      <div class="stat-num" id="st-pendentes">0</div>
+    </div>
+    <div class="stat-card green" onclick="filtrarPor('pagos')" title="Clique para filtrar">
+      <div class="stat-label">Pagos</div>
+      <div class="stat-num" id="st-pagos">0</div>
+    </div>
+    <div class="stat-card red" onclick="filtrarPor('vencidos')" title="Clique para filtrar">
+      <div class="stat-label">Vencidos</div>
+      <div class="stat-num" id="st-vencidos">0</div>
+    </div>
+  </div>
 
-<!-- PÁGINA: SERVIÇOS -->
-<div class="page active" id="page-servicos">
-  <div class="page-title">📋 Serviços</div>
-  
-  <button class="btn btn-primary btn-block" onclick="novoServico()">➕ Novo Serviço</button>
-  
-  <div id="lista-servicos" style="margin-top: 16px;">
-    <div class="empty">
-      <div class="empty-icon">🔧</div>
-      <p>Carregando serviços...</p>
+  <!-- SEÇÃO FINANCEIRA MENSAL -->
+  <div class="monthly-section">
+    <div class="monthly-header">
+      <div class="monthly-title">💰 Resumo Mensal</div>
+      <div class="month-nav">
+        <button class="month-btn" onclick="mudarMes(-5)" title="5 meses atrás">«</button>
+        <button class="month-btn" onclick="mudarMes(-1)" title="Mês anterior">‹</button>
+        <div class="month-display" id="monthDisplay"></div>
+        <button class="month-btn" onclick="mudarMes(1)" title="Próximo mês">›</button>
+        <button class="month-btn" onclick="mudarMes(5)" title="5 meses à frente">»</button>
+      </div>
+    </div>
+    <div class="monthly-stats">
+      <div class="mstat">
+        <div class="mstat-label">Entrada</div>
+        <div class="mstat-valor" id="mstat-total">R$ 0</div>
+      </div>
+      <div class="mstat">
+        <div class="mstat-label">Pago</div>
+        <div class="mstat-valor" id="mstat-pago" style="color:var(--green)">R$ 0</div>
+      </div>
+      <div class="mstat">
+        <div class="mstat-label">Pendente</div>
+        <div class="mstat-valor" id="mstat-pendente" style="color:var(--orange)">R$ 0</div>
+      </div>
+    </div>
+    <div style="font-size:13px; color:var(--gray-400); font-weight:600; line-height:1.5;" id="monthlyDetails"></div>
+  </div>
+
+  <!-- LISTA DE PAGAMENTOS -->
+  <div class="card">
+    <div class="card-title">💳 Pagamentos <span id="pagCount" style="font-size:14px;color:var(--gray-400)">(0)</span></div>
+    <div id="lista-pagamentos">
+      <div class="empty"><div class="empty-icon">💳</div><p>Nenhum serviço</p></div>
     </div>
   </div>
 </div>
 
-<!-- PÁGINA: FORMULÁRIO DE SERVIÇO -->
-<div class="page" id="page-form-servico">
-  <button class="btn btn-ghost" onclick="voltarServicos()" style="margin-bottom: 16px;">← Voltar</button>
+<!-- ══ CLIENTES ══ -->
+<div class="page" id="page-clientes">
+  <p class="page-title">Clientes</p>
+  <button class="btn btn-primary btn-block" style="margin-bottom:16px" onclick="abrirCliente()">＋ Novo Cliente</button>
   
-  <div class="page-title" id="form-titulo">Novo Serviço</div>
-  <input type="hidden" id="form-srv-id">
+  <div class="search-box">
+    <input type="text" id="search-clientes" placeholder="🔍 Buscar por nome..." onkeyup="filtrarClientes()">
+  </div>
+  
+  <div id="lista-clientes"><div class="empty"><div class="empty-icon">👤</div><p>Nenhum cliente</p></div></div>
+</div>
+
+<!-- ══ SERVIÇOS ══ -->
+<div class="page" id="page-servicos">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+    <p class="page-title" style="margin:0">Serviços - <span id="servicos-mes-titulo">Março</span></p>
+    <div class="month-nav">
+      <button class="month-btn" onclick="mudarMesServicos(-1)" title="Mês anterior">‹</button>
+      <button class="month-btn" onclick="mudarMesServicos(1)" title="Próximo mês">›</button>
+    </div>
+  </div>
+  
+  <button class="btn btn-primary btn-block" style="margin-bottom:16px" onclick="abrirServico()">＋ Novo Serviço</button>
+  
+  <div class="search-box">
+    <input type="text" id="search-servicos" placeholder="🔍 Buscar por cliente ou serviço..." onkeyup="filtrarServicos()">
+  </div>
+  
+  <div id="lista-servicos"><div class="empty"><div class="empty-icon">🔧</div><p>Nenhum serviço</p></div></div>
+</div>
+
+<!-- ══ NOVO/EDITAR SERVIÇO (PÁGINA EXCLUSIVA) ══ -->
+<div class="page" id="page-servico-form">
+  <div style="margin-bottom:24px;">
+    <button class="btn btn-ghost" onclick="voltarParaServicos()" style="margin-bottom:12px;">← Voltar</button>
+    <p class="page-title" id="titulo-form-srv">Novo Serviço</p>
+  </div>
+  
+  <input type="hidden" id="srv-form-id">
   
   <!-- DADOS BÁSICOS -->
   <div class="card">
     <div class="card-title">📋 Dados do Serviço</div>
     
     <div class="form-group">
-      <label class="form-label">Consultório (Cliente) <span class="req">*</span></label>
-      <select class="form-control" id="form-cliente"></select>
+      <label class="form-label">Cliente (Consultório) <span class="req">*</span></label>
+      <select class="form-control" id="srv-form-cliente"></select>
     </div>
     
     <div class="form-group">
-      <label class="form-label">Paciente <span class="req">*</span></label>
-      <input type="text" class="form-control" id="form-paciente" placeholder="Nome do paciente">
+      <label class="form-label">Paciente (Nome do Paciente)</label>
+      <input type="text" class="form-control" id="srv-form-paciente" placeholder="Ex: João Silva, Maria Santos...">
     </div>
     
     <div class="form-group">
       <label class="form-label">Data de Entrada <span class="req">*</span></label>
-      <input type="date" class="form-control" id="form-entrada">
+      <input type="date" class="form-control" id="srv-form-entrada">
     </div>
   </div>
-
+  
   <!-- ADICIONAR ITENS -->
-  <div class="card" style="background: var(--blue-light); border: 2px solid var(--blue);">
-    <div class="card-title" style="color: var(--blue); border-bottom-color: var(--blue);">➕ Adicionar Serviços</div>
+  <div class="card" style="background:var(--blue-light); border:2px solid var(--blue);">
+    <div class="card-title" style="color:var(--blue);">➕ Adicionar Serviços</div>
     
     <div class="form-group">
       <label class="form-label">Tipo de Serviço <span class="req">*</span></label>
-      <select class="form-control" id="form-tipo"></select>
+      <select class="form-control" id="srv-form-tipo"></select>
     </div>
     
     <div class="form-group">
-      <label class="form-label">Valor (R$) <span class="req">*</span></label>
-      <input type="number" class="form-control" id="form-valor" placeholder="0,00" step="0.01" min="0">
+      <label class="form-label">Valor (R$)</label>
+      <input type="number" class="form-control" id="srv-form-valor" placeholder="0,00" step="0.01" min="0">
     </div>
     
     <div class="form-group">
       <label class="form-label">Descrição (opcional)</label>
-      <textarea class="form-control" id="form-desc" placeholder="Ex: Cor 16, anotações importantes..."></textarea>
+      <textarea class="form-control" id="srv-form-desc" placeholder="Observações..." style="min-height:80px;"></textarea>
     </div>
     
-    <button class="btn btn-primary btn-block" onclick="adicionarItem()">➕ Adicionar</button>
+    <button class="btn btn-primary btn-block" onclick="adicionarItemForm()">➕ Adicionar Serviço</button>
   </div>
-
-  <!-- ITENS ADICIONADOS -->
+  
+  <!-- LISTA DE ITENS -->
   <div class="card">
-    <div class="card-title">📋 Itens</div>
-    <div id="form-items-list">
-      <div class="empty">
-        <p>Nenhum item adicionado</p>
+    <div class="card-title">📋 Itens Adicionados</div>
+    <div id="lista-itens-form" style="background:var(--gray-100); border-radius:10px; padding:12px;">
+      <div style="color:var(--gray-400); font-size:13px; text-align:center;">Nenhum item adicionado</div>
+    </div>
+  </div>
+  
+  <!-- RESUMO -->
+  <div class="card" style="background:var(--green-light); border:2px solid var(--green);">
+    <div style="font-size:12px; color:var(--gray-400); font-weight:700; margin-bottom:8px;">RESUMO DO SERVIÇO</div>
+    <div style="font-size:24px; font-weight:800; color:var(--green); margin-bottom:8px;" id="srv-form-total-display">Total: R$ 0,00</div>
+    <div style="font-size:13px; color:var(--gray-600); font-weight:600; margin-bottom:6px;" id="srv-form-qtd-display">0 itens</div>
+    <div style="font-size:13px; color:var(--gray-600); font-weight:600;" id="srv-form-saida-display">Saída: —</div>
+  </div>
+  
+  <input type="hidden" id="srv-form-saida">
+  <input type="hidden" id="srv-form-itens-json" value="[]">
+  
+  <!-- BOTÕES -->
+  <div style="display:flex; gap:12px; margin-top:24px; margin-bottom:24px;">
+    <button class="btn btn-ghost btn-block" onclick="voltarParaServicos()">Cancelar</button>
+    <button class="btn btn-primary btn-block" id="btn-salvar-servico-form" onclick="salvarServicoForm()">💾 Salvar Serviço</button>
+  </div>
+</div>
+
+<! ──────────────────────────────────────────────────
+
+<!-- ══ TIPOS ══ -->
+<div class="page" id="page-config">
+  <p class="page-title">Tipos de Serviço</p>
+  <div class="card">
+    <div class="card-title">➕ Adicionar Tipo</div>
+    <div class="form-group">
+      <label class="form-label">Nome <span class="req">*</span></label>
+      <input class="form-control" id="cfg-nome" placeholder="Ex: Protético, Coroa...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descrição</label>
+      <textarea class="form-control" id="cfg-desc" placeholder="Opcional..."></textarea>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="salvarTipo()">Salvar Tipo</button>
+  </div>
+  <div id="lista-tipos"><div class="empty"><div class="empty-icon">⚙️</div><p>Nenhum tipo</p></div></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-dash"     onclick="irPara('dash')">    <span class="nav-icon">🏠</span>Início</button>
+  <button class="nav-btn"        id="nav-clientes" onclick="irPara('clientes')"><span class="nav-icon">👤</span>Clientes</button>
+  <button class="nav-btn"        id="nav-servicos" onclick="irPara('servicos')"><span class="nav-icon">🔧</span>Serviços</button>
+  <button class="nav-btn"        id="nav-config"   onclick="irPara('config')">  <span class="nav-icon">⚙️</span>Tipos</button>
+</nav>
+
+<!-- SHEET: CLIENTE -->
+<div class="overlay" id="ov-cliente" onclick="fechar('ov-cliente')">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-header">
+      <div class="sheet-title" id="titulo-cliente">Novo Cliente</div>
+      <button class="sheet-close" onclick="fechar('ov-cliente')">✕</button>
+    </div>
+    <input type="hidden" id="cli-id">
+    <div class="form-group">
+      <label class="form-label">Tipo de cliente <span class="req">*</span></label>
+      <div class="tipo-grid">
+        <div class="tipo-opt" id="opt-dentista" onclick="escolherTipo('Dentista')">
+          <span class="tipo-emoji">🦷</span>
+          <div class="tipo-name">Dentista</div>
+          <div class="tipo-hint">Profissional</div>
+        </div>
+        <div class="tipo-opt" id="opt-lab" onclick="escolherTipo('Laboratório')">
+          <span class="tipo-emoji">🏢</span>
+          <div class="tipo-name">Laboratório</div>
+          <div class="tipo-hint">Empresa</div>
+        </div>
       </div>
     </div>
-  </div>
-
-  <!-- RESUMO -->
-  <div class="resumo">
-    <div class="resumo-title">RESUMO DO SERVIÇO</div>
-    <div class="resumo-total" id="form-total">Total: R$ 0,00</div>
-    <div class="resumo-info">
-      <div id="form-qtd-items">0 itens</div>
-      <div id="form-saida-info">Saída: —</div>
+    <div id="campo-dentista" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Nome do Dentista <span class="req">*</span></label>
+        <input class="form-control" id="cli-dentista" placeholder="Dr. João Silva">
+      </div>
+    </div>
+    <div id="campo-lab" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Nome do Laboratório <span class="req">*</span></label>
+        <input class="form-control" id="cli-lab" placeholder="Lab Odonto Ltda.">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Observações</label>
+      <textarea class="form-control" id="cli-obs" placeholder="Informações adicionais..."></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="fechar('ov-cliente')">Cancelar</button>
+      <button class="btn btn-primary" id="btn-salvar-cliente" onclick="salvarCliente()">Salvar</button>
     </div>
   </div>
+</div>
 
-  <input type="hidden" id="form-saida">
-  <input type="hidden" id="form-itens-json" value="[]">
+<!-- SHEET: SERVIÇO -->
+<div class="overlay" id="ov-servico" onclick="fechar('ov-servico')">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-header">
+      <div class="sheet-title" id="titulo-servico">Novo Serviço</div>
+      <button class="sheet-close" onclick="fechar('ov-servico')">✕</button>
+    </div>
+    <input type="hidden" id="srv-id">
+    
+    <!-- DADOS BÁSICOS -->
+    <div class="form-group">
+      <label class="form-label">Cliente <span class="req">*</span></label>
+      <select class="form-control" id="srv-cliente"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Data de Entrada <span class="req">*</span></label>
+      <input type="date" class="form-control" id="srv-entrada">
+    </div>
+    
+    <!-- ADICIONAR ITENS -->
+    <div style="background:var(--blue-light); border-radius:10px; padding:16px; margin-bottom:16px;">
+      <div style="font-weight:800; color:var(--blue); margin-bottom:12px;">➕ ADICIONAR SERVIÇOS</div>
+      
+      <div class="form-group" style="margin-bottom:10px;">
+        <label class="form-label">Tipo de Serviço <span class="req">*</span></label>
+        <select class="form-control" id="srv-tipo-temp" style="margin-bottom:8px;"></select>
+      </div>
+      
+      <div class="form-group" style="margin-bottom:10px;">
+        <label class="form-label">Valor (R$)</label>
+        <input type="number" class="form-control" id="srv-valor-temp" placeholder="0,00" step="0.01" min="0" style="margin-bottom:8px;">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Descrição (opcional)</label>
+        <textarea class="form-control" id="srv-desc-temp" placeholder="..." style="min-height:60px; margin-bottom:10px;"></textarea>
+      </div>
+      
+      <button class="btn btn-primary btn-block" onclick="adicionarItem()">➕ Adicionar Serviço</button>
+    </div>
+    
+    <!-- LISTA DE ITENS -->
+    <div style="margin-bottom:16px;">
+      <div style="font-weight:800; color:var(--gray-800); margin-bottom:10px;">📋 ITENS ADICIONADOS</div>
+      <div id="lista-itens-srv" style="background:white; border-radius:10px; padding:12px;">
+        <div style="color:var(--gray-400); font-size:13px; text-align:center;">Nenhum item adicionado</div>
+      </div>
+    </div>
+    
+    <!-- RESUMO -->
+    <div style="background:var(--green-light); border-radius:10px; padding:14px; margin-bottom:16px;">
+      <div style="font-size:12px; color:var(--gray-400); font-weight:700; margin-bottom:4px;">RESUMO</div>
+      <div style="font-size:18px; font-weight:800; color:var(--green); margin-bottom:8px;" id="srv-total-display">Total: R$ 0,00</div>
+      <div style="font-size:12px; color:var(--gray-600); font-weight:600;" id="srv-qtd-display">0 itens</div>
+      <div style="font-size:12px; color:var(--gray-600); font-weight:600; margin-top:6px;" id="srv-saida-display">Saída: —</div>
+    </div>
+    
 
-  <!-- BOTÕES -->
-  <div class="btn-row">
-    <button class="btn btn-ghost" onclick="voltarServicos()">Cancelar</button>
-    <button class="btn btn-primary" onclick="salvarServico()">💾 Salvar Serviço</button>
+<!-- SHEET: PAGAMENTO -->
+<div class="overlay" id="ov-pagamento" onclick="fechar('ov-pagamento')">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-header">
+      <div class="sheet-title">Registrar Pagamento</div>
+      <button class="sheet-close" onclick="fechar('ov-pagamento')">✕</button>
+    </div>
+    <input type="hidden" id="pag-srv-id">
+    <div class="form-group">
+      <label class="form-label">Data do Pagamento <span class="req">*</span></label>
+      <input type="date" class="form-control" id="pag-data" value="">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="fechar('ov-pagamento')">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmarPagamento()">Confirmar Pagamento</button>
+    </div>
   </div>
 </div>
 
-<!-- NAV -->
-<div class="nav">
-  <button class="nav-btn active" onclick="irPara('servicos')">
-    <span style="font-size:20px">🏠</span>
-    <span>Serviços</span>
-  </button>
+<!-- SHEET: EDITAR TIPO -->
+<div class="overlay" id="ov-tipo" onclick="fechar('ov-tipo')">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-header">
+      <div class="sheet-title">Editar Tipo</div>
+      <button class="sheet-close" onclick="fechar('ov-tipo')">✕</button>
+    </div>
+    <input type="hidden" id="et-id">
+    <div class="form-group">
+      <label class="form-label">Nome <span class="req">*</span></label>
+      <input class="form-control" id="et-nome">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descrição</label>
+      <textarea class="form-control" id="et-desc"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="fechar('ov-tipo')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarEdicaoTipo()">Salvar</button>
+    </div>
+  </div>
 </div>
 
-<!-- SCRIPT -->
 <script>
 const URL_SB = 'https://riojhleayqxvoslcjjfx.supabase.co'
 const KEY_SB = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpb2pobGVheXF4dm9zbGNqamZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MDU1OTgsImV4cCI6MjA5MDM4MTU5OH0.6x6xXra7051CgF72QwudpEGc_pktBws5nJCp740OAu0'
 
-let clientes = []
-let servicos = []
-let tipos = []
+let clientes = [], servicos = [], tipos = []
+let tipoSelecionado = ''
+let filtroAtivo = null
+let mesExibicao = 0
+let mesServicos = 0  // NOVO: filtro de mês para serviços
 let conectado = false
-let servicoEmEdicao = null
-let itensTemp = []
 
 // ── NAV ──
 function irPara(p) {
-  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'))
-  const page = document.getElementById('page-' + p)
-  if (page) page.classList.add('active')
+  try {
+    const pageEl = document.getElementById('page-' + p)
+    if (!pageEl) {
+      console.warn('Página não encontrada:', 'page-' + p)
+      return
+    }
+    
+    document.querySelectorAll('.page').forEach(x => x.classList.remove('active'))
+    document.querySelectorAll('.nav-btn').forEach(x => x.classList.remove('active'))
+    
+    pageEl.classList.add('active')
+    
+    const navBtn = document.getElementById('nav-' + p)
+    if (navBtn) navBtn.classList.add('active')
+    
+    window.scrollTo(0, 0)
+  } catch(e) {
+    console.error('Erro em irPara:', e)
+  }
 }
 
-// ── API ──
-async function api(metodo, tabela, dados = null, params = '') {
+function fechar(id) { document.getElementById(id).classList.remove('open') }
+function abrir(id)  { document.getElementById(id).classList.add('open') }
+
+function alerta(msg, tipo='success') {
+  const box = document.getElementById('alertBox')
+  const el = document.createElement('div')
+  el.className = `alert alert-${tipo}`
+  el.textContent = msg
+  box.appendChild(el)
+  requestAnimationFrame(() => el.classList.add('show'))
+  setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 300) }, 3200)
+}
+
+function setSync(s) {
+  const dot = document.getElementById('syncDot')
+  const txt = document.getElementById('syncText')
+  dot.className = 'dot'
+  if (s === 'loading') { dot.classList.add('loading'); txt.textContent = 'Sincronizando...' }
+  else if (s === 'error') { dot.classList.add('error'); txt.textContent = 'Sem conexão'; conectado = false }
+  else { txt.textContent = '✅ Online'; conectado = true }
+}
+
+// ── API SUPABASE ──
+async function api(metodo, tabela, dados=null, params='') {
+  let r
   try {
     const url = `${URL_SB}/rest/v1/${tabela}${params}`
-    console.log(`📡 ${metodo} ${tabela}`)
+    console.log(`API: ${metodo} ${url}`)
     
-    const resp = await fetch(url, {
+    r = await fetch(url, {
       method: metodo,
       headers: {
         'Content-Type': 'application/json',
@@ -393,414 +741,1206 @@ async function api(metodo, tabela, dados = null, params = '') {
       },
       body: dados ? JSON.stringify(dados) : undefined
     })
-
-    if (!resp.ok) {
-      const erro = await resp.json()
-      throw new Error(erro.message || `Erro ${resp.status}`)
-    }
-
-    return resp.status === 204 ? [] : await resp.json()
-  } catch(e) {
-    console.error('❌ Erro API:', e.message)
-    throw e
+    
+    console.log(`Resposta: ${r.status}`)
+  } catch(netErr) {
+    console.error('Erro de conexão:', netErr)
+    throw new Error('Sem conexão com internet. Verifique sua conexão.')
   }
-}
-
-// ── SINCRONIZAR ──
-function setSync(s) {
-  const dot = document.getElementById('syncDot')
-  const txt = document.getElementById('syncText')
-  if (s === 'ok') {
-    dot.style.background = '#4caf50'
-    dot.style.animation = 'none'
-    txt.textContent = 'Online'
-    conectado = true
-  } else if (s === 'loading') {
-    dot.style.background = '#ff9800'
-    dot.style.animation = 'pulse 1s infinite'
-    txt.textContent = 'Sincronizando...'
-  } else {
-    dot.style.background = '#f44336'
-    dot.style.animation = 'none'
-    txt.textContent = 'Erro'
-    conectado = false
+  
+  if (!r.ok) {
+    let msg = `HTTP ${r.status}`
+    try { 
+      const e = await r.json()
+      console.error('Erro Supabase:', e)
+      msg += ': ' + (e.message || e.error || e.hint || JSON.stringify(e)) 
+    } catch {}
+    throw new Error(msg)
   }
-}
-
-function alerta(msg, tipo = 'success') {
-  const box = document.getElementById('alertBox')
-  const el = document.createElement('div')
-  el.className = `alerta ${tipo}`
-  el.textContent = msg
-  box.appendChild(el)
-  setTimeout(() => {
-    el.style.opacity = '0'
-    setTimeout(() => el.remove(), 300)
-  }, 3000)
+  
+  if (r.status === 204) return []
+  return r.json()
 }
 
 // ── CARREGAR ──
 async function carregar() {
+  console.log('🔄 Carregando dados do Supabase...')
+  console.log('URL:', URL_SB)
+  console.log('API Key:', KEY_SB.substring(0, 20) + '...')
+  
+  // RESET: voltar para o mês atual
+  mesServicos = 0
+  mesExibicao = 0
+  
   setSync('loading')
   try {
-    clientes = await api('GET', 'clientes', null, '?select=*&order=numero_sequencial.asc')
-    servicos = await api('GET', 'servicos', null, '?select=*&order=id.desc')
-    tipos = await api('GET', 'tipos_servico', null, '?select=*&order=nome.asc')
+    console.log('📦 Buscando clientes...')
+    const clientesResult = await api('GET','clientes',null,'?select=*&order=numero_sequencial.asc')
+    clientes = clientesResult || []
+    console.log('✅ Clientes carregados:', clientes.length)
     
-    console.log('✅ Dados carregados:', { clientes: clientes.length, servicos: servicos.length, tipos: tipos.length })
+    console.log('📦 Buscando serviços...')
+    const servicosResult = await api('GET','servicos',null,'?select=*&order=id.desc')
+    servicos = servicosResult || []
+    console.log('✅ Serviços carregados:', servicos.length)
     
-    renderizar()
+    console.log('📦 Buscando tipos...')
+    const tiposResult = await api('GET','tipos_servico',null,'?select=*&order=nome.asc')
+    tipos = tiposResult || []
+    console.log('✅ Tipos carregados:', tipos.length)
+    
+    console.log('✅ CONEXÃO ESTABELECIDA!')
+    renderTudo()
     setSync('ok')
+    conectado = true
   } catch(e) {
+    console.error('❌ ERRO:', e.message)
     setSync('error')
     alerta('❌ Erro: ' + e.message, 'danger')
+    conectado = false
   }
 }
 
-function renderizar() {
-  renderizarServiços()
-  popularSelects()
+function renderTudo() {
+  try {
+    console.log('📊 Renderizando tudo...')
+    
+    // Renderizar cada parte com try-catch individual
+    try { renderStats() } catch(e) { console.error('Erro renderStats:', e) }
+    try { renderMensal() } catch(e) { console.error('Erro renderMensal:', e) }
+    try { renderPagamentos() } catch(e) { console.error('Erro renderPagamentos:', e) }
+    try { renderClientes() } catch(e) { console.error('Erro renderClientes:', e) }
+    try { renderServicos() } catch(e) { console.error('Erro renderServicos:', e) }
+    try { renderTipos() } catch(e) { console.error('Erro renderTipos:', e) }
+    try { popularSelects() } catch(e) { console.error('Erro popularSelects:', e) }
+    
+    console.log('✅ Renderização concluída!')
+  } catch(e) {
+    console.error('❌ Erro geral em renderTudo:', e)
+  }
 }
 
-function renderizarServiços() {
-  const el = document.getElementById('lista-servicos')
+// ── STATS ──
+function renderStats() {
+  try {
+    const hoje = new Date(); hoje.setHours(0,0,0,0)
+    
+    const stPendentes = document.getElementById('st-pendentes')
+    const stPagos = document.getElementById('st-pagos')
+    const stVencidos = document.getElementById('st-vencidos')
+    
+    if (!stPendentes || !stPagos || !stVencidos) return
+    
+    stPendentes.textContent = servicos.filter(s => !s.pago).length
+    stPagos.textContent     = servicos.filter(s =>  s.pago).length
+    stVencidos.textContent  = servicos.filter(s =>
+    !s.pago && s.data_saida && new Date(s.data_saida+'T12:00:00') < hoje).length
+  } catch(e) {
+    console.error('Erro em renderStats:', e)
+  }
+}
+
+function obterMesOffsetDatas(offset) {
+  const agora = new Date()
+  agora.setMonth(agora.getMonth() + offset)
+  const ano = agora.getFullYear()
+  const mes = agora.getMonth()
+  const primeiroDia = new Date(ano, mes, 1)
+  const ultimoDia = new Date(ano, mes + 1, 0)
+  return {
+    inicio: primeiroDia.toISOString().split('T')[0],
+    fim: ultimoDia.toISOString().split('T')[0],
+    display: new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(primeiroDia)
+  }
+}
+
+// ── NAVEGAÇÃO DE MESES (12 MESES) ──
+function renderMensal() {
+  try {
+    const monthDisplay = document.getElementById('monthDisplay')
+    if (!monthDisplay) return
+    
+    // Inicializa no mês atual na primeira carga
+    if (mesExibicao === 0 && monthDisplay.textContent === '') {
+      mesExibicao = 0 // Garante que começa no mês atual
+    }
+    
+    const periodo = obterMesOffsetDatas(mesExibicao)
+    monthDisplay.textContent = periodo.display.charAt(0).toUpperCase() + periodo.display.slice(1)
+
+    const servicosMes = servicos.filter(s =>
+      s.data_entrada && s.data_entrada >= periodo.inicio && s.data_entrada <= periodo.fim
+    )
+
+    const total = servicosMes.reduce((sum, s) => sum + (s.valor || 0), 0)
+    const pago = servicosMes.filter(s => s.pago).reduce((sum, s) => sum + (s.valor || 0), 0)
+    const pendente = total - pago
+
+    const mstatTotal = document.getElementById('mstat-total')
+    const mstatPago = document.getElementById('mstat-pago')
+    const mstatPendente = document.getElementById('mstat-pendente')
+    const monthlyDetails = document.getElementById('monthlyDetails')
+    
+    if (mstatTotal) mstatTotal.textContent = total.toLocaleString('pt-BR', {style:'currency',currency:'BRL'})
+    if (mstatPago) mstatPago.textContent = pago.toLocaleString('pt-BR', {style:'currency',currency:'BRL'})
+    if (mstatPendente) mstatPendente.textContent = pendente.toLocaleString('pt-BR', {style:'currency',currency:'BRL'})
+
+    const qtServiços = servicosMes.length
+    const qtPago = servicosMes.filter(s => s.pago).length
+    const qtPendente = qtServiços - qtPago
+    const msgDetalhes = `<strong>${qtServiços}</strong> serviço${qtServiços !== 1 ? 's' : ''} · <strong>${qtPago}</strong> pago${qtPago !== 1 ? 's' : ''} · <strong>${qtPendente}</strong> pendente${qtPendente !== 1 ? 's' : ''}`
+    if (monthlyDetails) monthlyDetails.innerHTML = msgDetalhes
+  } catch(e) {
+    console.error('Erro em renderMensal:', e)
+  }
+}
+
+function mudarMes(delta) {
+  mesExibicao += delta
+  // Limita a ±5 meses
+  if (mesExibicao > 5) mesExibicao = 5
+  if (mesExibicao < -5) mesExibicao = -5
+  renderMensal()
+}
+
+function filtrarPor(tipo) {
+  filtroAtivo = tipo
+  renderPagamentos()
+}
+
+function renderPagamentos() {
+  const el = document.getElementById('lista-pagamentos')
+  if (!el) return
   
-  if (!servicos.length) {
-    el.innerHTML = '<div class="empty"><div class="empty-icon">🔧</div><p>Nenhum serviço cadastrado</p></div>'
+  const hoje = new Date(); hoje.setHours(0,0,0,0)
+
+  let servicosExibir = servicos.filter(s => s.valor > 0)
+
+  if (filtroAtivo === 'pendentes') {
+    servicosExibir = servicosExibir.filter(s => !s.pago)
+  } else if (filtroAtivo === 'pagos') {
+    servicosExibir = servicosExibir.filter(s => s.pago)
+  } else if (filtroAtivo === 'vencidos') {
+    servicosExibir = servicosExibir.filter(s => !s.pago && s.data_saida && new Date(s.data_saida+'T12:00:00') < hoje)
+  }
+
+  const pagCount = document.getElementById('pagCount')
+  if (pagCount) pagCount.textContent = `(${servicosExibir.length})`
+
+  if (!servicosExibir.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">💳</div><p>' + (filtroAtivo ? 'Nenhum registro nesta categoria' : 'Nenhum serviço') + '</p></div>'
     return
   }
 
-  el.innerHTML = servicos.map(s => {
-    const cli = clientes.find(c => c.id === s.cliente_id)
-    const nomeCli = s.cliente_nome || cli?.nome_dentista || cli?.nome_lab || 'Cliente'
-    const numCli = cli?.numero_sequencial || '—'
-    const total = (s.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-    const qtdItems = s.quantidade_itens || 0
-    const status = s.pago ? '✓ Pago' : '⏳ Pendente'
+  const ord = servicosExibir.sort((a,b) => a.pago - b.pago)
+  el.innerHTML = ord.map(s => {
+    const cl = clientes.find(c => c.id === s.cliente_id)
+    const nome = s.cliente_nome || cl?.nome_dentista || cl?.nome_lab || 'Cliente'
+    const numero = cl?.numero_sequencial || '—'
+    const saida = s.data_saida ? new Date(s.data_saida+'T12:00:00') : null
+    const venc  = !s.pago && saida && saida < hoje
+    const valor = (s.valor||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})
+    const dataSaida = saida ? saida.toLocaleDateString('pt-BR') : '—'
+    const qtdItens = s.quantidade_itens || 1
     
-    return `<div class="list-item">
-      <div class="list-item-info">
-        <div class="list-item-title">#${numCli} ${nomeCli}</div>
-        <div class="list-item-meta">👤 ${s.paciente || '—'}</div>
-        <div class="list-item-meta">📦 ${qtdItems} item${qtdItems !== 1 ? 's' : ''} · ${total}</div>
-        <div class="list-item-meta">${status}</div>
+    let btnClass = s.pago ? 'pag-btn pago' : 'pag-btn pendente'
+    let btnText = s.pago ? '✓ Pago' : '⏳ Não pago'
+    
+    return `<div class="pag-item">
+      <button class="${btnClass}" onclick="abrirPagamento(${s.id})">${btnText}</button>
+      <div class="pag-info">
+        <div class="pag-nome"><span class="seq-num">#${numero}</span> ${nome}</div>
+        <div class="pag-det">${qtdItens} item${qtdItens !== 1 ? 's' : ''} · Saída: ${dataSaida}${venc?' · <strong style="color:var(--red)">VENCIDO</strong>':''}${s.pago&&s.data_pagamento?' · Pago em '+new Date(s.data_pagamento).toLocaleDateString('pt-BR'):''}</div>
       </div>
-      <div class="list-item-actions">
-        <button class="btn-icon edit" onclick="editarServico(${s.id})">✏️</button>
-        <button class="btn-icon" style="background: var(--green-light); color: var(--green)" onclick="exportarWhatsApp(${s.id})">💬</button>
-        <button class="btn-icon" style="background: var(--blue-light); color: var(--blue)" onclick="imprimirServico(${s.id})">🖨️</button>
+      <div class="pag-valor">${valor}</div>
+    </div>`
+  }).join('')
+}
+
+function abrirPagamento(id) {
+  if (!conectado) { alerta('Sem conexão com Supabase', 'danger'); return }
+  
+  const servico = servicos.find(s => s.id === id)
+  if (!servico) return
+  
+  document.getElementById('pag-srv-id').value = id
+  
+  if (servico.data_pagamento) {
+    document.getElementById('pag-data').value = servico.data_pagamento
+  } else {
+    document.getElementById('pag-data').value = new Date().toISOString().split('T')[0]
+  }
+  
+  abrir('ov-pagamento')
+}
+
+async function confirmarPagamento() {
+  const srvId = parseInt(document.getElementById('pag-srv-id').value)
+  const dataPagamento = document.getElementById('pag-data').value
+  
+  if (!dataPagamento) { alerta('Informe a data do pagamento', 'warning'); return }
+  
+  setSync('loading')
+  try {
+    await api('PATCH','servicos',{
+      pago: true,
+      data_pagamento: dataPagamento
+    }, `?id=eq.${srvId}`)
+    
+    fechar('ov-pagamento')
+    await carregar()
+    alerta('✓ Pagamento registrado!', 'success')
+  } catch(e) {
+    setSync('error')
+    alerta('Erro: '+e.message, 'danger')
+  }
+}
+
+// ── CLIENTES ──
+function filtrarClientes() {
+  const termo = document.getElementById('search-clientes').value.toLowerCase()
+  const lista = document.getElementById('lista-clientes')
+  
+  const clientesFiltrados = clientes.filter(c => {
+    const nome = c.tipo_cliente === 'Dentista' ? c.nome_dentista : c.nome_lab
+    return nome.toLowerCase().includes(termo)
+  })
+  
+  if (!clientesFiltrados.length) {
+    lista.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><p>Nenhum cliente encontrado</p></div>'
+    return
+  }
+  
+  renderClientesList(clientesFiltrados)
+}
+
+function renderClientes() {
+  renderClientesList(clientes)
+}
+
+function renderClientesList(lista) {
+  const el = document.getElementById('lista-clientes')
+  if (!el) return
+  
+  if (!lista.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">👤</div><p>Nenhum cliente cadastrado</p></div>'
+    return
+  }
+  el.innerHTML = lista.map(c => {
+    const isDent = c.tipo_cliente === 'Dentista'
+    const nome   = isDent ? c.nome_dentista : c.nome_lab
+    const badge  = isDent
+      ? '<span class="badge badge-dentista">🦷 Dentista</span>'
+      : '<span class="badge badge-lab">🏢 Laboratório</span>'
+    const seq = c.numero_sequencial ? `<span class="seq-num">${c.numero_sequencial}</span> ` : ''
+    return `<div class="list-item ${isDent?'':'lab'}">
+      <div class="item-header">
+        <div>
+          <div class="item-name">${seq}${nome||'—'}</div>
+          <div class="item-sub" style="margin-top:6px">${badge}</div>
+          ${c.observacoes ? `<div class="item-sub" style="margin-top:6px;color:var(--gray-600)">${c.observacoes}</div>` : ''}
+        </div>
+        <div class="item-actions">
+          <button class="icon-btn edit" onclick="editarCliente(${c.id})">✏️</button>
+          <button class="icon-btn delete" onclick="apagarCliente(${c.id},'${(nome||'').replace(/'/g,"\\'")}')">🗑️</button>
+        </div>
+      </div>
+    </div>`
+  }).join('')
+}
+
+function escolherTipo(tipo) {
+  tipoSelecionado = tipo
+  document.getElementById('opt-dentista').classList.toggle('sel', tipo==='Dentista')
+  document.getElementById('opt-lab').classList.toggle('sel', tipo==='Laboratório')
+  document.getElementById('campo-dentista').style.display = tipo==='Dentista'    ? 'block' : 'none'
+  document.getElementById('campo-lab').style.display      = tipo==='Laboratório' ? 'block' : 'none'
+}
+
+function abrirCliente(id=null) {
+  tipoSelecionado = ''
+  ;['cli-id','cli-dentista','cli-lab','cli-obs'].forEach(x => document.getElementById(x).value = '')
+  ;['opt-dentista','opt-lab'].forEach(x => document.getElementById(x).classList.remove('sel'))
+  ;['campo-dentista','campo-lab'].forEach(x => document.getElementById(x).style.display = 'none')
+  document.getElementById('titulo-cliente').textContent = id ? 'Editar Cliente' : 'Novo Cliente'
+
+  if (id) {
+    const c = clientes.find(x => x.id === id)
+    if (!c) return
+    document.getElementById('cli-id').value       = id
+    document.getElementById('cli-obs').value      = c.observacoes || ''
+    document.getElementById('cli-dentista').value = c.nome_dentista || ''
+    document.getElementById('cli-lab').value      = c.nome_lab || ''
+    escolherTipo(c.tipo_cliente)
+  }
+  abrir('ov-cliente')
+}
+
+function editarCliente(id) { abrirCliente(id) }
+
+async function obterProximoNumero() {
+  try {
+    const result = await api('GET','clientes',null,'?select=numero_sequencial&order=numero_sequencial.desc&limit=1')
+    if (!result || result.length === 0) return '001'
+    const ultimo = parseInt(result[0].numero_sequencial)
+    return String(ultimo + 1).padStart(3, '0')
+  } catch(e) {
+    console.error('Erro ao obter próximo número:', e)
+    return '001'
+  }
+}
+
+async function salvarCliente() {
+  if (!conectado) { alerta('Sem conexão com Supabase', 'danger'); return }
+  if (!tipoSelecionado) { alerta('Selecione o tipo de cliente','warning'); return }
+  
+  const isDent     = tipoSelecionado === 'Dentista'
+  const nomeDent   = document.getElementById('cli-dentista').value.trim()
+  const nomeLab    = document.getElementById('cli-lab').value.trim()
+  const obs        = document.getElementById('cli-obs').value.trim()
+  const editId     = document.getElementById('cli-id').value
+  const nomeAtual  = isDent ? nomeDent : nomeLab
+
+  if (isDent && !nomeDent) { alerta('Informe o nome do dentista','warning'); return }
+  if (!isDent && !nomeLab) { alerta('Informe o nome do laboratório','warning'); return }
+
+  // Validar duplicação de nome (se não estiver editando)
+  if (!editId) {
+    const existe = clientes.find(c => {
+      const nomeCli = c.tipo_cliente === 'Dentista' ? c.nome_dentista : c.nome_lab
+      return nomeCli?.toLowerCase() === nomeAtual.toLowerCase()
+    })
+    if (existe) { 
+      alerta(`⚠️ Este cliente já foi criado!`, 'warning')
+      return 
+    }
+  }
+
+  const dados = {
+    tipo_cliente:  tipoSelecionado,
+    nome_dentista: isDent ? nomeDent : null,
+    nome_lab:      isDent ? null : nomeLab,
+    observacoes:   obs || null
+  }
+
+  document.getElementById('btn-salvar-cliente').disabled = true
+  setSync('loading')
+  
+  try {
+    if (editId) {
+      await api('PATCH','clientes',dados,`?id=eq.${editId}`)
+      alerta('Cliente atualizado!','success')
+    } else {
+      dados.numero_sequencial = await obterProximoNumero()
+      const result = await api('POST','clientes',dados)
+      if (!result || !Array.isArray(result)) throw new Error('Erro ao salvar cliente')
+      alerta(`Cliente ${dados.numero_sequencial} criado!`,'success')
+    }
+    fechar('ov-cliente')
+    await carregar()
+  } catch(e) { 
+    setSync('error')
+    alerta('Erro: '+e.message,'danger') 
+  } finally {
+    document.getElementById('btn-salvar-cliente').disabled = false
+  }
+}
+
+async function apagarCliente(id, nome) {
+  if (!confirm(`Apagar "${nome}"?`)) return
+  setSync('loading')
+  try {
+    await api('DELETE','clientes',null,`?id=eq.${id}`)
+    alerta('Cliente apagado.','warning')
+    await carregar()
+  } catch(e) { setSync('error'); alerta('Erro: '+e.message,'danger') }
+}
+
+// ── SERVIÇOS ──
+function filtrarServicos() {
+  const termo = document.getElementById('search-servicos').value.toLowerCase()
+  const periodo = obterMesOffsetDatas(mesServicos)
+  
+  const servicosFiltrados = servicos.filter(s => {
+    // Filtrar por mês
+    if (!s.data_entrada || s.data_entrada < periodo.inicio || s.data_entrada > periodo.fim) {
+      return false
+    }
+    // Filtrar por termo de busca
+    const cliente = s.cliente_nome.toLowerCase()
+    const tipo = (s.tipo_servico || '').toLowerCase()
+    return cliente.includes(termo) || tipo.includes(termo)
+  })
+  
+  if (!servicosFiltrados.length) {
+    document.getElementById('lista-servicos').innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><p>Nenhum serviço encontrado</p></div>'
+    return
+  }
+  
+  renderServicosList(servicosFiltrados)
+}
+
+function mudarMesServicos(delta) {
+  mesServicos += delta
+  if (mesServicos > 5) mesServicos = 5
+  if (mesServicos < -5) mesServicos = -5
+  
+  const periodo = obterMesOffsetDatas(mesServicos)
+  const display = periodo.display.charAt(0).toUpperCase() + periodo.display.slice(1)
+  document.getElementById('servicos-mes-titulo').textContent = display
+  
+  // Limpar busca ao mudar mês
+  document.getElementById('search-servicos').value = ''
+  
+  // Renderizar serviços do mês
+  const servicosMes = servicos.filter(s =>
+    s.data_entrada && s.data_entrada >= periodo.inicio && s.data_entrada <= periodo.fim
+  )
+  renderServicosList(servicosMes)
+}
+
+function renderServicos() {
+  // Detectar mês atual automaticamente
+  const periodo = obterMesOffsetDatas(mesServicos)
+  const display = periodo.display.charAt(0).toUpperCase() + periodo.display.slice(1)
+  document.getElementById('servicos-mes-titulo').textContent = display
+  
+  // Renderizar apenas serviços do mês atual
+  const servicosMes = servicos.filter(s =>
+    s.data_entrada && s.data_entrada >= periodo.inicio && s.data_entrada <= periodo.fim
+  )
+  renderServicosList(servicosMes)
+}
+
+function renderServicosList(lista) {
+  const el = document.getElementById('lista-servicos')
+  if (!el) return
+  
+  const hoje = new Date(); hoje.setHours(0,0,0,0)
+  if (!lista.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">🔧</div><p>Nenhum serviço</p></div>'
+    return
+  }
+  el.innerHTML = lista.map(s => {
+    const cl    = clientes.find(c => c.id === s.cliente_id)
+    const nome  = s.cliente_nome || cl?.nome_dentista || cl?.nome_lab || 'Cliente'
+    const numero = cl?.numero_sequencial || '—'
+    const saida = s.data_saida ? new Date(s.data_saida+'T12:00:00') : null
+    const venc  = !s.pago && saida && saida < hoje
+    const valor = (s.valor||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})
+    const dEnt  = s.data_entrada ? new Date(s.data_entrada+'T12:00:00').toLocaleDateString('pt-BR') : '—'
+    const dSai  = saida ? saida.toLocaleDateString('pt-BR') : '—'
+    const bCls  = s.pago ? 'badge-pago' : venc ? 'badge-vencido' : 'badge-pendente'
+    const bTxt  = s.pago ? '✓ Pago'    : venc ? '⚠ Vencido'    : '⏳ Pendente'
+    const iCls  = s.pago ? 'pago'       : venc ? 'venc'          : ''
+    
+    return `<div class="list-item ${iCls}">
+      <div class="item-header">
+        <div style="flex:1;min-width:0">
+          <div class="item-name"><span class="seq-num">#${numero}</span> ${nome}</div>
+          <div class="item-sub">${s.tipo_servico||'—'} · ${valor}</div>
+          <div class="item-sub">📅 Entrada: ${dEnt} · Saída: ${dSai}</div>
+          ${s.descricao?`<div class="item-sub" style="color:var(--gray-600);margin-top:4px">${s.descricao}</div>`:''}
+          <div style="margin-top:8px"><span class="badge ${bCls}">${bTxt}</span></div>
+          
+          <!-- BOTÕES DE EXPORTAÇÃO -->
+          <div class="export-buttons">
+            <button class="export-btn whatsapp" onclick="compartilharWhatsApp(${s.id})" title="Enviar via WhatsApp">
+              💬 WhatsApp
+            </button>
+            <button class="export-btn imprimir" onclick="imprimirServico(${s.id})" title="Imprimir">
+              🖨️ Imprimir
+            </button>
+          </div>
+        </div>
+        <div class="item-actions" style="flex-direction:column;gap:6px">
+          <button class="icon-btn edit" onclick="editarServico(${s.id})">✏️</button>
+          <button class="icon-btn delete" onclick="apagarServico(${s.id})">🗑️</button>
+        </div>
       </div>
     </div>`
   }).join('')
 }
 
 function popularSelects() {
-  const selCli = document.getElementById('form-cliente')
-  selCli.innerHTML = '<option value="">— Selecione o consultório —</option>'
-  clientes.forEach(c => {
-    const nome = c.tipo_cliente === 'Dentista' ? c.nome_dentista : c.nome_lab
-    const seq = c.numero_sequencial ? ` [${c.numero_sequencial}]` : ''
-    selCli.innerHTML += `<option value="${c.id}">${nome}${seq}</option>`
-  })
-
-  const selTipo = document.getElementById('form-tipo')
-  selTipo.innerHTML = '<option value="">— Selecione o tipo —</option>'
-  tipos.forEach(t => {
-    selTipo.innerHTML += `<option value="${t.nome}">${t.nome}</option>`
-  })
-}
-
-// ── NOVO/EDITAR SERVIÇO ──
-function novoServico() {
-  servicoEmEdicao = null
-  document.getElementById('form-srv-id').value = ''
-  document.getElementById('form-cliente').value = ''
-  document.getElementById('form-paciente').value = ''
-  document.getElementById('form-entrada').value = new Date().toISOString().split('T')[0]
-  document.getElementById('form-tipo').value = ''
-  document.getElementById('form-valor').value = ''
-  document.getElementById('form-desc').value = ''
-  document.getElementById('form-saida').value = ''
-  document.getElementById('form-itens-json').value = '[]'
-  itensTemp = []
-  
-  document.getElementById('form-titulo').textContent = '➕ Novo Serviço'
-  
-  renderizarItens()
-  irPara('form-servico')
-  window.scrollTo(0, 0)
-}
-
-function editarServico(id) {
-  servicoEmEdicao = servicos.find(s => s.id === id)
-  if (!servicoEmEdicao) return
-
-  document.getElementById('form-srv-id').value = id
-  document.getElementById('form-cliente').value = servicoEmEdicao.cliente_id
-  document.getElementById('form-paciente').value = servicoEmEdicao.paciente || ''
-  document.getElementById('form-entrada').value = servicoEmEdicao.data_entrada
-  document.getElementById('form-saida').value = servicoEmEdicao.data_saida || ''
-  
-  // Carregar itens
-  try {
-    itensTemp = servicoEmEdicao.itens_json ? JSON.parse(servicoEmEdicao.itens_json) : []
-  } catch(e) {
-    itensTemp = []
+  // Selects antigos (se ainda existirem)
+  const selCli = document.getElementById('srv-cliente')
+  if (selCli) {
+    selCli.innerHTML = '<option value="">— Selecione o cliente —</option>'
+    clientes.forEach(c => {
+      const nome = c.tipo_cliente === 'Dentista' ? c.nome_dentista : c.nome_lab
+      const seq  = c.numero_sequencial ? ` [${c.numero_sequencial}]` : ''
+      selCli.innerHTML += `<option value="${c.id}">${nome}${seq}</option>`
+    })
   }
   
-  document.getElementById('form-itens-json').value = JSON.stringify(itensTemp)
-  document.getElementById('form-titulo').textContent = '✏️ Editar Serviço'
+  const selTipoTemp = document.getElementById('srv-tipo-temp')
+  if (selTipoTemp) {
+    selTipoTemp.innerHTML = '<option value="">— Selecione o tipo —</option>'
+    tipos.forEach(t => selTipoTemp.innerHTML += `<option value="${t.nome}">${t.nome}</option>`)
+  }
   
-  renderizarItens()
-  irPara('form-servico')
-  window.scrollTo(0, 0)
+  // NOVOS Selects da página de formulário
+  const selFormCli = document.getElementById('srv-form-cliente')
+  if (selFormCli) {
+    selFormCli.innerHTML = '<option value="">— Selecione o cliente —</option>'
+    clientes.forEach(c => {
+      const nome = c.tipo_cliente === 'Dentista' ? c.nome_dentista : c.nome_lab
+      const seq  = c.numero_sequencial ? ` [${c.numero_sequencial}]` : ''
+      selFormCli.innerHTML += `<option value="${c.id}">${nome}${seq}</option>`
+    })
+  }
+  
+  const selFormTipo = document.getElementById('srv-form-tipo')
+  if (selFormTipo) {
+    selFormTipo.innerHTML = '<option value="">— Selecione o tipo —</option>'
+    tipos.forEach(t => selFormTipo.innerHTML += `<option value="${t.nome}">${t.nome}</option>`)
+  }
 }
 
-function voltarServicos() {
+function abrirServico(id=null) {
+  const hoje = new Date().toISOString().split('T')[0]
+  
+  console.log('📂 abrirServico chamado com ID:', id)
+  
+  // Se id foi passado e não é null/undefined/vazio
+  const ehEdicao = id && id !== null && id !== '' && id !== 'undefined'
+  console.log('É edição?', ehEdicao)
+  
+  // IR PARA A PÁGINA PRIMEIRO
+  irPara('servico-form')
+  window.scrollTo(0, 0)
+  
+  // Verificar se elementos existem antes de acessar
+  const srvFormId = document.getElementById('srv-form-id')
+  const srvFormCliente = document.getElementById('srv-form-cliente')
+  const srvFormPaciente = document.getElementById('srv-form-paciente')
+  const srvFormEntrada = document.getElementById('srv-form-entrada')
+  const srvFormItensJson = document.getElementById('srv-form-itens-json')
+  const tituloFormSrv = document.getElementById('titulo-form-srv')
+  
+  // Se algum elemento não existe, retornar
+  if (!srvFormId || !srvFormCliente || !srvFormEntrada) {
+    console.error('Elementos do formulário não encontrados')
+    return
+  }
+  
+  // Limpar tudo para novo serviço
+  srvFormId.value = ''
+  srvFormCliente.value = ''
+  if (srvFormPaciente) srvFormPaciente.value = ''
+  srvFormEntrada.value = hoje
+  if (srvFormItensJson) srvFormItensJson.value = '[]'
+  
+  if (tituloFormSrv) tituloFormSrv.textContent = 'Novo Serviço'
+  
+  // Se está editando um serviço existente
+  if (id) {
+    const s = servicos.find(x => x.id === id)
+    if (!s) {
+      console.error('❌ Serviço não encontrado com ID:', id, 'Serviços disponíveis:', servicos.map(srv => srv.id))
+      return
+    }
+    
+    console.log('✅ Editando serviço:', s)
+    
+    srvFormId.value = id
+    srvFormCliente.value = s.cliente_id || ''
+    if (srvFormPaciente) srvFormPaciente.value = s.paciente || ''
+    srvFormEntrada.value = s.data_entrada || hoje
+    document.getElementById('srv-form-saida').value = s.data_saida || ''
+    if (tituloFormSrv) tituloFormSrv.textContent = 'Editar Serviço'
+    
+    // ✨ CARREGAR ITENS DO SERVIÇO
+    // Tentar carregar do campo itens_json primeiro (novos serviços)
+    // Se não existir, reconstruir do tipo_servico (serviços antigos)
+    if (s.itens_json) {
+      try {
+        const itensCarregados = JSON.parse(s.itens_json)
+        if (srvFormItensJson) srvFormItensJson.value = JSON.stringify(itensCarregados)
+        console.log('✅ Itens carregados do itens_json:', itensCarregados.length)
+      } catch(e) {
+        console.error('Erro ao parsear itens_json:', e)
+      }
+    } else if (s.tipo_servico && s.tipo_servico.trim()) {
+      // Fallback para serviços antigos: reconstruir do tipo_servico
+      const tipos = s.tipo_servico.split(' + ').map(t => t.trim())
+      const itensReconstruidos = tipos.map((tipo, idx) => ({
+        tipo: tipo,
+        valor: 0,
+        desc: '',
+        id: Date.now() + idx
+      }))
+      if (srvFormItensJson) srvFormItensJson.value = JSON.stringify(itensReconstruidos)
+      console.log('⚠️ Itens reconstruídos do tipo_servico:', itensReconstruidos.length)
+    }
+  }
+  
+  renderizarItensForm()
+}
+
+function editarServico(id) { 
+  console.log('🔧 Editando serviço ID:', id, 'Tipo:', typeof id)
+  abrirServico(id) 
+}
+
+function adicionarItem() {
+  const tipo = document.getElementById('srv-tipo-temp').value.trim()
+  const valor = parseFloat(document.getElementById('srv-valor-temp').value)
+  const desc = document.getElementById('srv-desc-temp').value.trim()
+  
+  if (!tipo) { alerta('Selecione o tipo de serviço', 'warning'); return }
+  if (isNaN(valor) || valor <= 0) { alerta('Informe um valor válido', 'warning'); return }
+  
+  let itens = JSON.parse(document.getElementById('itens-json').value)
+  itens.push({
+    tipo: tipo,
+    valor: valor,
+    desc: desc,
+    id: Date.now()
+  })
+  
+  document.getElementById('itens-json').value = JSON.stringify(itens)
+  
+  // Limpar campos
+  document.getElementById('srv-tipo-temp').value = ''
+  document.getElementById('srv-valor-temp').value = ''
+  document.getElementById('srv-desc-temp').value = ''
+  
+  renderizarItens()
+  alerta('✅ Serviço adicionado!', 'success')
+}
+
+function removerItem(itemId) {
+  let itens = JSON.parse(document.getElementById('itens-json').value)
+  itens = itens.filter(i => i.id !== itemId)
+  document.getElementById('itens-json').value = JSON.stringify(itens)
+  renderizarItens()
+  alerta('⚠️ Serviço removido', 'warning')
+}
+
+function renderizarItens() {
+  const itens = JSON.parse(document.getElementById('itens-json').value)
+  const listaEl = document.getElementById('lista-itens-srv')
+  
+  if (itens.length === 0) {
+    listaEl.innerHTML = '<div style="color:var(--gray-400); font-size:13px; text-align:center;">Nenhum item adicionado</div>'
+  } else {
+    listaEl.innerHTML = itens.map(item => `
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:var(--gray-100); border-radius:8px; margin-bottom:8px;">
+        <div>
+          <div style="font-weight:700; color:var(--gray-800); font-size:13px;">${item.tipo}</div>
+          <div style="font-size:12px; color:var(--gray-400); margin-top:2px;">R$ ${item.valor.toFixed(2).replace('.', ',')}</div>
+          ${item.desc ? `<div style="font-size:11px; color:var(--gray-600); margin-top:2px;">${item.desc}</div>` : ''}
+        </div>
+        <button class="icon-btn delete" onclick="removerItem(${item.id})" style="margin:0;">❌</button>
+      </div>
+    `).join('')
+  }
+  
+  // Calcular total
+  const total = itens.reduce((sum, i) => sum + i.valor, 0)
+  const qtd = itens.length
+  
+  document.getElementById('srv-total-display').textContent = `Total: R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
+  document.getElementById('srv-qtd-display').textContent = `${qtd} item${qtd !== 1 ? 's' : ''}`
+  
+  // Calcular data de saída
+  if (qtd > 0) {
+    const entrada = document.getElementById('srv-entrada').value
+    if (entrada) {
+      let d = new Date(entrada+'T12:00:00'), dias = 0
+      while (dias < 5) { d.setDate(d.getDate()+1); if (d.getDay() !== 0 && d.getDay() !== 6) dias++ }
+      const dataSaida = d.toISOString().split('T')[0]
+      document.getElementById('srv-saida').value = dataSaida
+      document.getElementById('srv-saida-display').textContent = `Saída: ${new Date(dataSaida+'T12:00:00').toLocaleDateString('pt-BR')}`
+    }
+  }
+}
+
+function calcularSaida() {
+  renderizarItens()
+}
+
+function voltarParaServicos() {
   irPara('servicos')
   window.scrollTo(0, 0)
 }
 
-// ── ITENS ──
-function adicionarItem() {
-  const tipo = document.getElementById('form-tipo').value.trim()
-  const valor = parseFloat(document.getElementById('form-valor').value)
-  const desc = document.getElementById('form-desc').value.trim()
-
-  if (!tipo) { alerta('Selecione o tipo de serviço', 'warning'); return }
-  if (isNaN(valor) || valor <= 0) { alerta('Informe um valor válido', 'warning'); return }
-
-  itensTemp.push({
-    id: Date.now(),
-    tipo: tipo,
-    valor: valor,
-    desc: desc
-  })
-
-  document.getElementById('form-tipo').value = ''
-  document.getElementById('form-valor').value = ''
-  document.getElementById('form-desc').value = ''
-  document.getElementById('form-itens-json').value = JSON.stringify(itensTemp)
-  
-  renderizarItens()
-  alerta('✅ Item adicionado!', 'success')
-}
-
-function removerItem(id) {
-  itensTemp = itensTemp.filter(i => i.id !== id)
-  document.getElementById('form-itens-json').value = JSON.stringify(itensTemp)
-  renderizarItens()
-}
-
-function renderizarItens() {
-  const el = document.getElementById('form-items-list')
-  
-  if (!itensTemp.length) {
-    el.innerHTML = '<div class="empty"><p>Nenhum item adicionado</p></div>'
-  } else {
-    el.innerHTML = itensTemp.map(item => `
-      <div class="item-row">
-        <div class="item-info">
-          <div class="item-name">${item.tipo}</div>
-          <div class="item-valor">R$ ${item.valor.toFixed(2).replace('.', ',')}</div>
-          ${item.desc ? `<div class="item-desc">${item.desc}</div>` : ''}
-        </div>
-        <button class="btn-remove" onclick="removerItem(${item.id})">❌ Remover</button>
-      </div>
-    `).join('')
-  }
-
-  // Atualizar resumo
-  const total = itensTemp.reduce((sum, i) => sum + i.valor, 0)
-  const qtd = itensTemp.length
-  
-  document.getElementById('form-total').textContent = `Total: R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-  document.getElementById('form-qtd-items').textContent = `${qtd} item${qtd !== 1 ? 's' : ''}`
-  
-  // Calcular saída
-  if (qtd > 0) {
-    const entrada = document.getElementById('form-entrada').value
-    if (entrada) {
-      let d = new Date(entrada + 'T12:00:00')
-      let dias = 0
-      while (dias < 5) {
-        d.setDate(d.getDate() + 1)
-        if (d.getDay() !== 0 && d.getDay() !== 6) dias++
-      }
-      const dataSaida = d.toISOString().split('T')[0]
-      document.getElementById('form-saida').value = dataSaida
-      const saidaDisplay = new Date(dataSaida + 'T12:00:00').toLocaleDateString('pt-BR')
-      document.getElementById('form-saida-info').textContent = `Saída: ${saidaDisplay}`
-    }
-  }
-}
-
-// ── SALVAR ──
-async function salvarServico() {
-  if (!conectado) { alerta('Sem conexão', 'danger'); return }
-
-  const cliId = document.getElementById('form-cliente').value
-  const paciente = document.getElementById('form-paciente').value.trim()
-  const entrada = document.getElementById('form-entrada').value
-  const saida = document.getElementById('form-saida').value
-
-  if (!cliId) { alerta('Selecione o consultório', 'warning'); return }
-  if (!paciente) { alerta('Informe o nome do paciente', 'warning'); return }
-  if (!itensTemp.length) { alerta('Adicione pelo menos um item', 'warning'); return }
-  if (!entrada) { alerta('Informe a data de entrada', 'warning'); return }
-
-  const cli = clientes.find(c => c.id == cliId)
-  const total = itensTemp.reduce((sum, i) => sum + i.valor, 0)
-  const tipos_str = itensTemp.map(i => i.tipo).join(' + ')
-
-  const dados = {
-    cliente_id: parseInt(cliId),
-    cliente_nome: cli.nome_dentista || cli.nome_lab,
-    paciente: paciente,
-    tipo_servico: tipos_str,
-    valor: total,
-    data_entrada: entrada,
-    data_saida: saida || null,
-    descricao: itensTemp.length + ' item(s) - ' + itensTemp.map(i => i.tipo).join(', '),
-    itens_json: JSON.stringify(itensTemp),
-    quantidade_itens: itensTemp.length
-  }
-
+function adicionarItemForm() {
   try {
-    if (servicoEmEdicao) {
-      await api('PATCH', 'servicos', dados, `?id=eq.${servicoEmEdicao.id}`)
-      alerta('✅ Serviço atualizado!', 'success')
+    const tipo = document.getElementById('srv-form-tipo').value.trim()
+    const valor = parseFloat(document.getElementById('srv-form-valor').value)
+    const desc = document.getElementById('srv-form-desc').value.trim()
+    
+    if (!tipo) { alerta('Selecione o tipo de serviço', 'warning'); return }
+    if (isNaN(valor) || valor <= 0) { alerta('Informe um valor válido', 'warning'); return }
+    
+    let itens = JSON.parse(document.getElementById('srv-form-itens-json').value)
+    itens.push({
+      tipo: tipo,
+      valor: valor,
+      desc: desc,
+      id: Date.now()
+    })
+    
+    document.getElementById('srv-form-itens-json').value = JSON.stringify(itens)
+    
+    // Limpar campos
+    document.getElementById('srv-form-tipo').value = ''
+    document.getElementById('srv-form-valor').value = ''
+    document.getElementById('srv-form-desc').value = ''
+    
+    renderizarItensForm()
+    alerta('✅ Serviço adicionado!', 'success')
+  } catch(e) {
+    console.error('Erro em adicionarItemForm:', e)
+    alerta('Erro ao adicionar serviço', 'danger')
+  }
+}
+
+function removerItemForm(itemId) {
+  try {
+    let itens = JSON.parse(document.getElementById('srv-form-itens-json').value)
+    itens = itens.filter(i => i.id !== itemId)
+    document.getElementById('srv-form-itens-json').value = JSON.stringify(itens)
+    renderizarItensForm()
+    alerta('⚠️ Serviço removido', 'warning')
+  } catch(e) {
+    console.error('Erro em removerItemForm:', e)
+    alerta('Erro ao remover serviço', 'danger')
+  }
+}
+
+function renderizarItensForm() {
+  try {
+    const itensJson = document.getElementById('srv-form-itens-json').value || '[]'
+    const itens = JSON.parse(itensJson)
+    const listaEl = document.getElementById('lista-itens-form')
+    
+    if (!listaEl) return
+    
+    if (itens.length === 0) {
+      listaEl.innerHTML = '<div style="color:var(--gray-400); font-size:13px; text-align:center;">Nenhum item adicionado</div>'
+    } else {
+      listaEl.innerHTML = itens.map(item => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; background:white; border-radius:8px; margin-bottom:8px;">
+          <div>
+            <div style="font-weight:700; color:var(--gray-800); font-size:13px;">${item.tipo}</div>
+            <div style="font-size:12px; color:var(--gray-400); margin-top:2px;">R$ ${item.valor.toFixed(2).replace('.', ',')}</div>
+            ${item.desc ? `<div style="font-size:11px; color:var(--gray-600); margin-top:2px;">${item.desc}</div>` : ''}
+          </div>
+          <button class="icon-btn delete" onclick="removerItemForm(${item.id})" style="margin:0;">❌</button>
+        </div>
+      `).join('')
+    }
+    
+    // Calcular total
+    const total = itens.reduce((sum, i) => sum + (i.valor || 0), 0)
+    const qtd = itens.length
+    
+    const totalEl = document.getElementById('srv-form-total-display')
+    const qtdEl = document.getElementById('srv-form-qtd-display')
+    const saidaEl = document.getElementById('srv-form-saida-display')
+    
+    if (totalEl) totalEl.textContent = `Total: R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
+    if (qtdEl) qtdEl.textContent = `${qtd} item${qtd !== 1 ? 's' : ''}`
+    
+    // Calcular data de saída
+    if (qtd > 0) {
+      const entrada = document.getElementById('srv-form-entrada').value
+      if (entrada) {
+        let d = new Date(entrada+'T12:00:00'), dias = 0
+        while (dias < 5) { d.setDate(d.getDate()+1); if (d.getDay() !== 0 && d.getDay() !== 6) dias++ }
+        const dataSaida = d.toISOString().split('T')[0]
+        document.getElementById('srv-form-saida').value = dataSaida
+        if (saidaEl) saidaEl.textContent = `Saída: ${new Date(dataSaida+'T12:00:00').toLocaleDateString('pt-BR')}`
+      }
+    }
+  } catch(e) {
+    console.error('Erro em renderizarItensForm:', e)
+  }
+}
+
+async function salvarServicoForm() {
+  if (!conectado) { alerta('Sem conexão com Supabase', 'danger'); return }
+  
+  const editId  = document.getElementById('srv-form-id').value
+  const cliId   = document.getElementById('srv-form-cliente').value
+  const paciente = document.getElementById('srv-form-paciente').value.trim()
+  const entrada = document.getElementById('srv-form-entrada').value
+  const saida   = document.getElementById('srv-form-saida').value
+  const itens   = JSON.parse(document.getElementById('srv-form-itens-json').value)
+
+  if (!cliId)   { alerta('Selecione o cliente','warning');       return }
+  if (itens.length === 0) { alerta('Adicione pelo menos um serviço','warning'); return }
+  if (!entrada) { alerta('Informe a data de entrada','warning');  return }
+
+  // Calcular total
+  const valor = itens.reduce((sum, i) => sum + i.valor, 0)
+  const tipo_servico = itens.map(i => i.tipo).join(' + ')
+  
+  const cl = clientes.find(c => c.id == cliId)
+  const dados = {
+    cliente_id:    parseInt(cliId),
+    cliente_nome:  cl ? (cl.nome_dentista || cl.nome_lab) : '',
+    paciente:      paciente || '',
+    tipo_servico:  tipo_servico,
+    valor:         valor,
+    data_entrada:  entrada,
+    data_saida:    saida || null,
+    descricao:     `${itens.length} item(s) - ` + itens.map(i => i.tipo).join(', '),
+    // ✨ NOVO: Armazenar itens em JSON para recuperar depois!
+    itens_json:    JSON.stringify(itens),
+    quantidade_itens: itens.length
+  }
+
+  document.getElementById('btn-salvar-servico-form').disabled = true
+  setSync('loading')
+  
+  try {
+    if (editId) {
+      await api('PATCH','servicos',dados,`?id=eq.${editId}`)
+      alerta('✅ Serviço atualizado!','success')
     } else {
       dados.status = 'pendente'
       dados.pago = false
-      await api('POST', 'servicos', dados)
-      alerta('✅ Serviço criado!', 'success')
+      const result = await api('POST','servicos',dados)
+      if (!result || !Array.isArray(result)) throw new Error('Erro ao salvar serviço')
+      alerta(`✅ Serviço criado com ${itens.length} item(s)!`,'success')
     }
-    voltarServicos()
+    voltarParaServicos()
     await carregar()
-  } catch(e) {
-    alerta('❌ Erro: ' + e.message, 'danger')
+  } catch(e) { 
+    setSync('error')
+    alerta('Erro: '+e.message,'danger') 
+  } finally {
+    document.getElementById('btn-salvar-servico-form').disabled = false
   }
 }
 
-// ── EXPORTAR ──
-function exportarWhatsApp(id) {
-  const s = servicos.find(srv => srv.id === id)
-  if (!s) return
+async function salvarServico() {
+  if (!conectado) { alerta('Sem conexão com Supabase', 'danger'); return }
+  
+  const editId  = document.getElementById('srv-id').value
+  const cliId   = document.getElementById('srv-cliente').value
+  const entrada = document.getElementById('srv-entrada').value
+  const saida   = document.getElementById('srv-saida').value
+  const itens   = JSON.parse(document.getElementById('itens-json').value)
 
-  const cli = clientes.find(c => c.id === s.cliente_id)
-  const nomeCli = s.cliente_nome || cli?.nome_dentista || cli?.nome_lab || 'Cliente'
-  const numCli = cli?.numero_sequencial || '—'
+  if (!cliId)   { alerta('Selecione o cliente','warning');       return }
+  if (itens.length === 0) { alerta('Adicione pelo menos um serviço','warning'); return }
+  if (!entrada) { alerta('Informe a data de entrada','warning');  return }
 
-  let itens_list = ''
-  try {
-    const itens = JSON.parse(s.itens_json || '[]')
-    itens_list = itens.map((item, idx) => {
-      let line = `  ${idx + 1}. ${item.tipo} - R$ ${item.valor.toFixed(2)}`
-      if (item.desc) line += ` (${item.desc})`
-      return line
-    }).join('\n')
-  } catch(e) {
-    itens_list = s.tipo_servico || ''
+  // Calcular total
+  const valor = itens.reduce((sum, i) => sum + i.valor, 0)
+  const tipo_servico = itens.map(i => i.tipo).join(' + ')
+  
+  const cl = clientes.find(c => c.id == cliId)
+  const dados = {
+    cliente_id:    parseInt(cliId),
+    cliente_nome:  cl ? (cl.nome_dentista || cl.nome_lab) : '',
+    tipo_servico:  tipo_servico,
+    valor:         valor,
+    data_entrada:  entrada,
+    data_saida:    saida || null,
+    descricao:     `${itens.length} item(s) - ` + itens.map(i => i.tipo).join(', '),
+    quantidade_itens: itens.length
   }
 
-  const msg = `*SERVIÇO - LABORATÓRIO CAMINI*\n\n` +
-    `🔢 Cliente #${numCli}\n` +
-    `👤 Consultório: ${nomeCli}\n` +
-    `🧑 Paciente: ${s.paciente}\n` +
-    `📋 Serviços:\n${itens_list}\n\n` +
-    `💰 TOTAL: R$ ${(s.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}\n` +
-    `📅 Entrada: ${new Date(s.data_entrada + 'T12:00:00').toLocaleDateString('pt-BR')}\n` +
-    `📅 Saída: ${s.data_saida ? new Date(s.data_saida + 'T12:00:00').toLocaleDateString('pt-BR') : '—'}\n` +
-    `✓ Status: ${s.pago ? 'Pago' : 'Pendente'}\n\n` +
-    `Laboratório de Prótese Dentária Camini`
-
-  const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`
-  window.open(url, '_blank')
+  document.getElementById('btn-salvar-servico').disabled = true
+  setSync('loading')
+  
+  try {
+    if (editId) {
+      await api('PATCH','servicos',dados,`?id=eq.${editId}`)
+      alerta('Serviço atualizado!','success')
+    } else {
+      dados.status = 'pendente'
+      dados.pago = false
+      const result = await api('POST','servicos',dados)
+      if (!result || !Array.isArray(result)) throw new Error('Erro ao salvar serviço')
+      alerta(`✅ Serviço criado com ${itens.length} item(s)!`,'success')
+    }
+    fechar('ov-servico')
+    await carregar()
+  } catch(e) { 
+    setSync('error')
+    alerta('Erro: '+e.message,'danger') 
+  } finally {
+    document.getElementById('btn-salvar-servico').disabled = false
+  }
 }
 
-function imprimirServico(id) {
-  const s = servicos.find(srv => srv.id === id)
-  if (!s) return
-
-  const cli = clientes.find(c => c.id === s.cliente_id)
-  const nomeCli = s.cliente_nome || cli?.nome_dentista || cli?.nome_lab || 'Cliente'
-  const numCli = cli?.numero_sequencial || '—'
-
-  let itens_html = ''
+async function apagarServico(id) {
+  if (!confirm('Apagar este serviço?')) return
+  setSync('loading')
   try {
-    const itens = JSON.parse(s.itens_json || '[]')
-    itens_html = itens.map((item, idx) => {
+    await api('DELETE','servicos',null,`?id=eq.${id}`)
+    alerta('Serviço apagado.','warning')
+    await carregar()
+  } catch(e) { setSync('error'); alerta('Erro: '+e.message,'danger') }
+}
+
+// ── TIPOS ──
+function renderTipos() {
+  const el = document.getElementById('lista-tipos')
+  if (!el) return
+  
+  if (!tipos.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">⚙️</div><p>Nenhum tipo</p></div>'; return }
+  el.innerHTML = tipos.map(t => `<div class="list-item">
+    <div class="item-header">
+      <div>
+        <div class="item-name">${t.nome}</div>
+        <div class="item-sub">${t.descricao||''}</div>
+      </div>
+      <div class="item-actions">
+        <button class="icon-btn edit" onclick="abrirEdicaoTipo(${t.id})">✏️</button>
+        <button class="icon-btn delete" onclick="apagarTipo(${t.id},'${(t.nome||'').replace(/'/g,"\\'")}')">🗑️</button>
+      </div>
+    </div>
+  </div>`).join('')
+}
+
+async function salvarTipo() {
+  if (!conectado) { alerta('Sem conexão com Supabase', 'danger'); return }
+  
+  const nome = document.getElementById('cfg-nome').value.trim()
+  const desc = document.getElementById('cfg-desc').value.trim()
+  if (!nome) { alerta('Informe o nome do tipo','warning'); return }
+  
+  setSync('loading')
+  try {
+    const result = await api('POST','tipos_servico',{nome, descricao:desc||null})
+    if (!result || !Array.isArray(result)) throw new Error('Erro ao salvar tipo')
+    alerta(`Tipo "${nome}" adicionado!`,'success')
+    document.getElementById('cfg-nome').value = ''
+    document.getElementById('cfg-desc').value = ''
+    await carregar()
+  } catch(e) { setSync('error'); alerta('Erro: '+e.message,'danger') }
+}
+
+function abrirEdicaoTipo(id) {
+  const t = tipos.find(x => x.id === id); if (!t) return
+  document.getElementById('et-id').value   = id
+  document.getElementById('et-nome').value = t.nome || ''
+  document.getElementById('et-desc').value = t.descricao || ''
+  abrir('ov-tipo')
+}
+
+async function salvarEdicaoTipo() {
+  if (!conectado) { alerta('Sem conexão com Supabase', 'danger'); return }
+  
+  const id   = document.getElementById('et-id').value
+  const nome = document.getElementById('et-nome').value.trim()
+  const desc = document.getElementById('et-desc').value.trim()
+  if (!nome) { alerta('Informe o nome','warning'); return }
+  
+  setSync('loading')
+  try {
+    await api('PATCH','tipos_servico',{nome, descricao:desc||null},`?id=eq.${id}`)
+    alerta('Tipo atualizado!','success')
+    fechar('ov-tipo')
+    await carregar()
+  } catch(e) { setSync('error'); alerta('Erro: '+e.message,'danger') }
+}
+
+async function apagarTipo(id, nome) {
+  if (!confirm(`Apagar o tipo "${nome}"?`)) return
+  setSync('loading')
+  try {
+    await api('DELETE','tipos_servico',null,`?id=eq.${id}`)
+    alerta('Tipo apagado.','warning')
+    await carregar()
+  } catch(e) { setSync('error'); alerta('Erro: '+e.message,'danger') }
+}
+
+// ── EXPORTAÇÃO DE SERVIÇOS ──
+function gerarHTMLServico(id) {
+  const s = servicos.find(srv => srv.id === id)
+  if (!s) return ''
+  
+  const cl = clientes.find(c => c.id === s.cliente_id)
+  const nome = s.cliente_nome || cl?.nome_dentista || cl?.nome_lab || 'Cliente'
+  const paciente = s.paciente || '—'
+  const numero = cl?.numero_sequencial || '—'
+  const valor = (s.valor||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})
+  const dEnt = s.data_entrada ? new Date(s.data_entrada+'T12:00:00').toLocaleDateString('pt-BR') : '—'
+  const dSai = s.data_saida ? new Date(s.data_saida+'T12:00:00').toLocaleDateString('pt-BR') : '—'
+  const status = s.pago ? '✓ Pago' : '⏳ Pendente'
+  
+  // Tentar carregar itens do JSON
+  let itensHTML = ''
+  try {
+    const itens = s.itens_json ? JSON.parse(s.itens_json) : []
+    itensHTML = itens.map((item, idx) => {
       return `<tr style="border-bottom:1px solid #eee;">
-        <td style="padding:10px; text-align:left;">${idx + 1}. ${item.tipo}</td>
-        <td style="padding:10px; text-align:right;">R$ ${item.valor.toFixed(2)}</td>
-        <td style="padding:10px; text-align:left; font-size:11px; color:#666;">${item.desc || ''}</td>
+        <td style="padding:8px; color:#666;">${idx + 1}. ${item.tipo} - R$ ${item.valor.toFixed(2)}</td>
+        ${item.desc ? `<td style="padding:8px; color:#999; font-size:11px;">${item.desc}</td>` : '<td></td>'}
       </tr>`
     }).join('')
   } catch(e) {
-    itens_html = `<tr><td colspan="3" style="padding:10px;">${s.tipo_servico}</td></tr>`
+    // Fallback: usar tipo_servico
+    const tipos = s.tipo_servico ? s.tipo_servico.split(' + ') : []
+    itensHTML = tipos.map((tipo, idx) => `
+      <tr style="border-bottom:1px solid #eee;">
+        <td style="padding:8px; color:#666;">${idx + 1}. ${tipo.trim()}</td>
+        <td></td>
+      </tr>
+    `).join('')
   }
+  
+  return `
+    <div style="font-family:Arial,sans-serif; padding:20px; max-width:600px;">
+      <h2 style="text-align:center; color:#1a6fa8; border-bottom:3px solid #1a6fa8; padding-bottom:10px;">
+        Laboratório Camini - Serviço
+      </h2>
+      <table style="width:100%; margin-top:20px; border-collapse:collapse;">
+        <tr style="border-bottom:1px solid #ccc;">
+          <td style="padding:10px; font-weight:bold; color:#333;">Número Cliente:</td>
+          <td style="padding:10px; color:#1a6fa8; font-weight:bold; font-size:16px;">${numero}</td>
+        </tr>
+        <tr style="border-bottom:1px solid #ccc;">
+          <td style="padding:10px; font-weight:bold; color:#333;">Cliente:</td>
+          <td style="padding:10px; color:#666;">${nome}</td>
+        </tr>
+        <tr style="border-bottom:1px solid #ccc;">
+          <td style="padding:10px; font-weight:bold; color:#333;">Paciente:</td>
+          <td style="padding:10px; color:#666;">${paciente}</td>
+        </tr>
+        <tr style="border-bottom:1px solid #ccc;">
+          <td style="padding:10px; font-weight:bold; color:#333; vertical-align:top;">Serviços:</td>
+          <td style="padding:10px; color:#666;">
+            <table style="width:100%; border-collapse:collapse;">
+              ${itensHTML}
+            </table>
+          </td>
+        </tr>
+        <tr style="border-bottom:1px solid #ccc;">
+          <td style="padding:10px; font-weight:bold; color:#333;">Valor Total:</td>
+          <td style="padding:10px; color:#1e9e5e; font-weight:bold; font-size:16px;">${valor}</td>
+        </tr>
+        <tr style="border-bottom:1px solid #ccc;">
+          <td style="padding:10px; font-weight:bold; color:#333;">Data de Entrada:</td>
+          <td style="padding:10px; color:#666;">${dEnt}</td>
+        </tr>
+        <tr style="border-bottom:1px solid #ccc;">
+          <td style="padding:10px; font-weight:bold; color:#333;">Saída Prevista:</td>
+          <td style="padding:10px; color:#666;">${dSai}</td>
+        </tr>
+        <tr style="background-color:#f0f2f5;">
+          <td style="padding:10px; font-weight:bold; color:#333;">Status:</td>
+          <td style="padding:10px; color:#1a6fa8; font-weight:bold;">${status}</td>
+        </tr>
+      </table>
+      <div style="margin-top:30px; text-align:center; color:#999; font-size:12px;">
+        <p>Gerado em: ${new Date().toLocaleString('pt-BR')}</p>
+        <p>Laboratório de Prótese Dentária Camini</p>
+      </div>
+    </div>
+  `
+}
 
-  const html = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; color: #333 }
-    h2 { text-align: center; color: #1a6fa8; border-bottom: 3px solid #1a6fa8; padding-bottom: 10px }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px }
-    th { background: #f5f5f5; padding: 10px; text-align: left; font-weight: bold; border-bottom: 2px solid #ccc }
-    td { padding: 10px; border-bottom: 1px solid #eee }
-    .footer { text-align: center; margin-top: 30px; color: #999; font-size: 12px }
-  </style>
-</head>
-<body>
-  <h2>Laboratório Camini - Serviço</h2>
-  <table>
-    <tr>
-      <th style="width: 40%">Consultório</th>
-      <th style="width: 60%">${nomeCli} (#${numCli})</th>
-    </tr>
-    <tr>
-      <th>Paciente</th>
-      <th>${s.paciente}</th>
-    </tr>
-    <tr>
-      <th colspan="2" style="background: #f5f5f5">Serviços</th>
-    </tr>
-    ${itens_html}
-    <tr style="background: #f5f5f5">
-      <th colspan="2" style="text-align: right">TOTAL: R$ ${(s.valor || 0).toFixed(2)}</th>
-    </tr>
-    <tr>
-      <th>Data de Entrada</th>
-      <th>${new Date(s.data_entrada + 'T12:00:00').toLocaleDateString('pt-BR')}</th>
-    </tr>
-    <tr>
-      <th>Saída Prevista</th>
-      <th>${s.data_saida ? new Date(s.data_saida + 'T12:00:00').toLocaleDateString('pt-BR') : '—'}</th>
-    </tr>
-    <tr>
-      <th>Status</th>
-      <th>${s.pago ? '✓ Pago' : '⏳ Pendente'}</th>
-    </tr>
-  </table>
-  <div class="footer">
-    <p>Gerado em: ${new Date().toLocaleString('pt-BR')}</p>
-    <p>Laboratório de Prótese Dentária Camini</p>
-  </div>
-</body>
-</html>`
+async function salvarComoFoto(id) {
+  const html = gerarHTMLServico(id)
+  const element = document.createElement('div')
+  element.innerHTML = html
+  element.style.position = 'fixed'
+  element.style.left = '-9999px'
+  element.style.top = '-9999px'
+  document.body.appendChild(element)
+  
+  try {
+    const canvas = await html2canvas(element, {
+      backgroundColor: '#ffffff',
+      scale: 2,
+      logging: false
+    })
+    
+    const link = document.createElement('a')
+    const s = servicos.find(srv => srv.id === id)
+    const cl = clientes.find(c => c.id === s.cliente_id)
+    const nome = s.cliente_nome || cl?.nome_dentista || cl?.nome_lab || 'servico'
+    const timestamp = new Date().toISOString().slice(0, 10)
+    
+    link.href = canvas.toDataURL('image/png')
+    link.download = `servico_${nome.replace(/\s+/g, '_')}_${timestamp}.png`
+    link.click()
+    
+    document.body.removeChild(element)
+    alerta('✓ Foto salva com sucesso!', 'success')
+  } catch(e) {
+    document.body.removeChild(element)
+    alerta('Erro ao salvar foto: '+e.message, 'danger')
+  }
+}
 
-  const win = window.open('', '', 'width=800,height=600')
-  win.document.write(html)
-  win.document.close()
-  setTimeout(() => win.print(), 500)
+function compartilharWhatsApp(id) {
+  const s = servicos.find(srv => srv.id === id)
+  if (!s) return
+  
+  const cl = clientes.find(c => c.id === s.cliente_id)
+  const nome = s.cliente_nome || cl?.nome_dentista || cl?.nome_lab || 'Cliente'
+  const paciente = s.paciente || '—'
+  const numero = cl?.numero_sequencial || '—'
+  const valor = (s.valor||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})
+  const dEnt = s.data_entrada ? new Date(s.data_entrada+'T12:00:00').toLocaleDateString('pt-BR') : '—'
+  const dSai = s.data_saida ? new Date(s.data_saida+'T12:00:00').toLocaleDateString('pt-BR') : '—'
+  const status = s.pago ? '✓ Pago' : '⏳ Pendente'
+  
+  // Tentar carregar itens do JSON
+  let itensText = ''
+  try {
+    const itens = s.itens_json ? JSON.parse(s.itens_json) : []
+    itensText = itens.map((item, i) => {
+      let linha = `  ${i+1}. ${item.tipo} - R$ ${item.valor.toFixed(2)}`
+      if (item.desc) linha += ` (${item.desc})`
+      return linha
+    }).join('\n')
+  } catch(e) {
+    // Fallback: usar tipo_servico
+    const tipos = s.tipo_servico ? s.tipo_servico.split(' + ') : []
+    itensText = tipos.map((t, i) => `  ${i+1}. ${t.trim()}`).join('\n')
+  }
+  
+  const mensagem = `*SERVIÇO - LABORATÓRIO CAMINI*\n\n` +
+    `🔢 Cliente #${numero}\n` +
+    `👤 Consultório: ${nome}\n` +
+    `🧑 Paciente: ${paciente}\n` +
+    `📋 Serviços:\n${itensText}\n` +
+    `💰 TOTAL: ${valor}\n` +
+    `📅 Entrada: ${dEnt}\n` +
+    `📅 Saída: ${dSai}\n` +
+    `✓ Status: ${status}\n\n` +
+    `Laboratório de Prótese Dentária Camini`
+  
+  const whatsappURL = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensagem)}`
+  window.open(whatsappURL, '_blank')
+  alerta('✓ Abrindo WhatsApp...', 'success')
+}
+
+function imprimirServico(id) {
+  const html = gerarHTMLServico(id)
+  const janela = window.open('', '', 'width=800,height=600')
+  
+  let docHTML = '<!DOCTYPE html><html lang="pt-BR"><head>'
+  docHTML += '<meta charset="UTF-8">'
+  docHTML += '<title>Imprimir Serviço</title>'
+  docHTML += '<style>'
+  docHTML += 'body { font-family:Arial,sans-serif; margin:0; padding:20px; }'
+  docHTML += '@media print { body { margin:0; padding:0; } }'
+  docHTML += '</style>'
+  docHTML += '</head><body>'
+  docHTML += html
+  docHTML += '<script>window.print(); window.onafterprint = function() { window.close(); }' + '<' + '/script>'
+  docHTML += '</body></html>'
+  
+  janela.document.write(docHTML)
+  janela.document.close()
 }
 
 // ── INICIAR ──
 window.addEventListener('DOMContentLoaded', carregar)
 </script>
-
 </body>
 </html>
