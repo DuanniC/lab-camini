@@ -377,13 +377,7 @@ textarea.form-control { min-height:90px; resize:vertical; }
     <div style="font-size:13px; color:var(--gray-400); font-weight:600; line-height:1.5;" id="monthlyDetails"></div>
   </div>
 
-  <!-- LISTA DE PAGAMENTOS -->
-  <div class="card">
-    <div class="card-title">💳 Pagamentos <span id="pagCount" style="font-size:14px;color:var(--gray-400)">(0)</span></div>
-    <div id="lista-pagamentos">
-      <div class="empty"><div class="empty-icon">💳</div><p>Nenhum serviço</p></div>
-    </div>
-  </div>
+
 </div>
 
 <!-- ══ CLIENTES ══ -->
@@ -627,24 +621,7 @@ textarea.form-control { min-height:90px; resize:vertical; }
     
 
 <!-- SHEET: PAGAMENTO -->
-<div class="overlay" id="ov-pagamento" onclick="fechar('ov-pagamento')">
-  <div class="sheet" onclick="if(event) event.stopPropagation()">
-    <div class="sheet-header">
-      <div class="sheet-title" id="pag-titulo">Registrar Pagamento</div>
-      <button class="sheet-close" onclick="fechar('ov-pagamento')">✕</button>
-    </div>
-    <input type="hidden" id="pag-srv-id">
-    <div class="form-group" id="pag-data-group">
-      <label class="form-label">Data do Pagamento <span class="req">*</span></label>
-      <input type="date" class="form-control" id="pag-data" value="">
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-ghost" onclick="if(event) event.stopPropagation(); fechar('ov-pagamento')">Cancelar</button>
-      <button class="btn btn-primary" id="pag-btn-confirmar" type="button" onclick="(async function(){try{const srvId=parseInt(document.getElementById('pag-srv-id').value);const dataPagamento=document.getElementById('pag-data').value;if(!dataPagamento){alerta('Data vazia','warning');return}const response=await api('PATCH','servicos',{pago:true,data_pagamento:dataPagamento},`?id=eq.${srvId}`);fechar('ov-pagamento');await carregar();alerta('✓ Pago!','success')}catch(e){alerta('Erro: '+e.message,'danger')}})()">Confirmar Pagamento</button>
-      <button class="btn btn-ghost" id="pag-btn-desmarcar" style="display:none; background:#ffebee; color:var(--red)" type="button" onclick="(async function(){const srvId=parseInt(document.getElementById('pag-srv-id').value);if(!confirm('Desmarcar?'))return;try{const response=await api('PATCH','servicos',{pago:false,data_pagamento:null},`?id=eq.${srvId}`);fechar('ov-pagamento');await carregar();alerta('⏳ Não pago!','success')}catch(e){alerta('Erro: '+e.message,'danger')}})()">Desmarcar Pagamento</button>
-    </div>
-  </div>
-</div>
+
 
 <!-- SHEET: EDITAR TIPO -->
 <div class="overlay" id="ov-tipo" onclick="fechar('ov-tipo')">
@@ -829,7 +806,6 @@ function renderTudo() {
     // Renderizar cada parte com try-catch individual
     try { renderStats() } catch(e) { console.error('Erro renderStats:', e) }
     try { renderMensal() } catch(e) { console.error('Erro renderMensal:', e) }
-    try { renderPagamentos() } catch(e) { console.error('Erro renderPagamentos:', e) }
     try { renderClientes() } catch(e) { console.error('Erro renderClientes:', e) }
     try { renderServicos() } catch(e) { console.error('Erro renderServicos:', e) }
     try { renderTipos() } catch(e) { console.error('Erro renderTipos:', e) }
@@ -1352,8 +1328,12 @@ function renderServicosList(lista) {
           ${s.descricao?`<div class="item-sub" style="color:var(--gray-600);margin-top:4px">${s.descricao}</div>`:''}
           <div style="margin-top:8px"><span class="badge ${bCls}">${bTxt}</span></div>
           
-          <!-- BOTÕES DE EXPORTAÇÃO -->
-          <div class="export-buttons">
+          <!-- BOTÕES DE AÇÃO -->
+          <div class="export-buttons" style="margin-top:10px">
+            ${s.pago ? 
+              `<button class="export-btn" style="background:#ffebee;color:var(--red)" onclick="marcarComoPago(${s.id}, false)" title="Desmarcar como pago">⏳ Desmarcar</button>` :
+              `<button class="export-btn" style="background:#e8f5e9;color:var(--green)" onclick="marcarComoPago(${s.id}, true)" title="Marcar como pago">✓ Marcar Pago</button>`
+            }
             <button class="export-btn whatsapp" onclick="compartilharWhatsApp(${s.id})" title="Enviar via WhatsApp">
               💬 WhatsApp
             </button>
@@ -1846,6 +1826,24 @@ async function salvarServico() {
     alerta('Erro: '+e.message,'danger') 
   } finally {
     document.getElementById('btn-salvar-servico').disabled = false
+  }
+}
+
+// ── MARCAR COMO PAGO/NÃO PAGO ──
+async function marcarComoPago(id, pago) {
+  setSync('loading')
+  try {
+    const dataPagamento = pago ? new Date().toISOString().split('T')[0] : null
+    await api('PATCH','servicos',{
+      pago: pago,
+      data_pagamento: dataPagamento
+    }, `?id=eq.${id}`)
+    
+    alerta(pago ? '✓ Marcado como pago!' : '⏳ Marcado como não pago!', 'success')
+    await carregar()
+  } catch(e) { 
+    setSync('error')
+    alerta('Erro: '+e.message,'danger') 
   }
 }
 
