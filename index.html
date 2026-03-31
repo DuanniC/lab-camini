@@ -1352,22 +1352,27 @@ function abrirServico(id=null) {
     if (tituloFormSrv) tituloFormSrv.textContent = 'Editar Serviço'
     
     // ✨ CARREGAR ITENS DO SERVIÇO
-    // Os itens estão concatenados em tipo_servico como "Coroa + Solda + Glayze"
-    // Vamos separar e reconstruir o array de itens
-    if (s.tipo_servico && s.tipo_servico.trim()) {
+    // Tentar carregar do campo itens_json primeiro (novos serviços)
+    // Se não existir, reconstruir do tipo_servico (serviços antigos)
+    if (s.itens_json) {
+      try {
+        const itensCarregados = JSON.parse(s.itens_json)
+        if (srvFormItensJson) srvFormItensJson.value = JSON.stringify(itensCarregados)
+        console.log('✅ Itens carregados do itens_json:', itensCarregados.length)
+      } catch(e) {
+        console.error('Erro ao parsear itens_json:', e)
+      }
+    } else if (s.tipo_servico && s.tipo_servico.trim()) {
+      // Fallback para serviços antigos: reconstruir do tipo_servico
       const tipos = s.tipo_servico.split(' + ').map(t => t.trim())
-      
-      // Reconstruir itens (sem valores específicos, pois não estão armazenados)
-      // Para uma solução melhor, precisaríamos de uma tabela separada
       const itensReconstruidos = tipos.map((tipo, idx) => ({
         tipo: tipo,
-        valor: 0, // Não temos o valor individual
+        valor: 0,
         desc: '',
         id: Date.now() + idx
       }))
-      
       if (srvFormItensJson) srvFormItensJson.value = JSON.stringify(itensReconstruidos)
-      console.log('✅ Itens carregados:', itensReconstruidos.length)
+      console.log('⚠️ Itens reconstruídos do tipo_servico:', itensReconstruidos.length)
     }
   }
   
@@ -1585,6 +1590,8 @@ async function salvarServicoForm() {
     data_entrada:  entrada,
     data_saida:    saida || null,
     descricao:     `${itens.length} item(s) - ` + itens.map(i => i.tipo).join(', '),
+    // ✨ NOVO: Armazenar itens em JSON para recuperar depois!
+    itens_json:    JSON.stringify(itens),
     quantidade_itens: itens.length
   }
 
