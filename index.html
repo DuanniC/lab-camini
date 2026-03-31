@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -12,53 +11,53 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-–blue:        #1a6fa8;
-–blue-dark:   #134f7a;
-–blue-light:  #e8f4fd;
-–green:       #1e9e5e;
-–green-light: #e6f7ef;
-–red:         #d9363e;
-–red-light:   #fdecea;
-–orange:      #e07b00;
-–orange-light:#fff4e0;
-–gray-100:    #f0f2f5;
-–gray-200:    #e0e4ea;
-–gray-400:    #9ba5b4;
-–gray-600:    #4b5563;
-–gray-800:    #1f2937;
-–white:       #ffffff;
-–radius:      14px;
-–shadow:      0 2px 12px rgba(0,0,0,0.08);
+  --blue:        #1a6fa8;
+  --blue-dark:   #134f7a;
+  --blue-light:  #e8f4fd;
+  --green:       #1e9e5e;
+  --green-light: #e6f7ef;
+  --red:         #d9363e;
+  --red-light:   #fdecea;
+  --orange:      #e07b00;
+  --orange-light:#fff4e0;
+  --gray-100:    #f0f2f5;
+  --gray-200:    #e0e4ea;
+  --gray-400:    #9ba5b4;
+  --gray-600:    #4b5563;
+  --gray-800:    #1f2937;
+  --white:       #ffffff;
+  --radius:      14px;
+  --shadow:      0 2px 12px rgba(0,0,0,0.08);
 }
 
 body {
-font-family: ‘Nunito’, sans-serif;
-background: var(–gray-100);
-color: var(–gray-800);
-min-height: 100vh;
-padding-bottom: 80px;
+  font-family: 'Nunito', sans-serif;
+  background: var(--gray-100);
+  color: var(--gray-800);
+  min-height: 100vh;
+  padding-bottom: 80px;
 }
 
 .header {
-background: var(–blue);
-padding: 16px 20px;
-display: flex;
-align-items: center;
-justify-content: space-between;
-position: sticky;
-top: 0;
-z-index: 100;
-box-shadow: 0 3px 16px rgba(26,111,168,0.3);
+  background: var(--blue);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 3px 16px rgba(26,111,168,0.3);
 }
 .logo { display:flex; align-items:center; gap:10px; }
 .logo-icon { font-size:26px; }
 .logo h1 { font-size:19px; font-weight:800; color:white; line-height:1; }
 .logo p  { font-size:11px; color:rgba(255,255,255,0.7); font-weight:600; text-transform:uppercase; letter-spacing:.5px; }
 .sync-pill {
-display:flex; align-items:center; gap:7px;
-background:rgba(255,255,255,0.15);
-padding:6px 12px; border-radius:20px;
-font-size:12px; color:white; font-weight:700;
+  display:flex; align-items:center; gap:7px;
+  background:rgba(255,255,255,0.15);
+  padding:6px 12px; border-radius:20px;
+  font-size:12px; color:white; font-weight:700;
 }
 .dot { width:8px; height:8px; border-radius:50%; background:#4ade80; flex-shrink:0; }
 .dot.loading { background:#fbbf24; animation:blink .8s infinite; }
@@ -66,209 +65,209 @@ font-size:12px; color:white; font-weight:700;
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
 .bottom-nav {
-position:fixed; bottom:0; left:0; right:0;
-background:white; display:flex;
-border-top:2px solid var(–gray-200);
-box-shadow:0 -4px 16px rgba(0,0,0,.08);
-z-index:100;
+  position:fixed; bottom:0; left:0; right:0;
+  background:white; display:flex;
+  border-top:2px solid var(--gray-200);
+  box-shadow:0 -4px 16px rgba(0,0,0,.08);
+  z-index:100;
 }
 .nav-btn {
-flex:1; display:flex; flex-direction:column;
-align-items:center; justify-content:center; gap:3px;
-padding:10px 4px; border:none; background:none;
-cursor:pointer; color:var(–gray-400);
-font-family:‘Nunito’,sans-serif;
-font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.3px;
-transition:color .2s; -webkit-tap-highlight-color:transparent;
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:3px;
+  padding:10px 4px; border:none; background:none;
+  cursor:pointer; color:var(--gray-400);
+  font-family:'Nunito',sans-serif;
+  font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.3px;
+  transition:color .2s; -webkit-tap-highlight-color:transparent;
 }
 .nav-icon { font-size:22px; line-height:1; transition:transform .2s; }
-.nav-btn.active { color:var(–blue); }
+.nav-btn.active { color:var(--blue); }
 .nav-btn.active .nav-icon { transform:translateY(-2px); }
 
 .page { display:none; padding:18px 16px; max-width:680px; margin:0 auto; }
 .page.active { display:block; }
-.page-title { font-size:22px; font-weight:800; color:var(–gray-800); margin-bottom:16px; }
+.page-title { font-size:22px; font-weight:800; color:var(--gray-800); margin-bottom:16px; }
 
-.card { background:white; border-radius:var(–radius); box-shadow:var(–shadow); padding:20px; margin-bottom:14px; }
-.card-title { font-size:16px; font-weight:800; color:var(–blue); margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid var(–gray-100); }
+.card { background:white; border-radius:var(--radius); box-shadow:var(--shadow); padding:20px; margin-bottom:14px; }
+.card-title { font-size:16px; font-weight:800; color:var(--blue); margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid var(--gray-100); }
 
 .stats-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:14px; }
 .stat-card {
-background:white; border-radius:var(–radius); box-shadow:var(–shadow);
-padding:18px 14px; text-align:center; border-top:4px solid var(–blue);
-cursor:pointer; transition:all .2s;
+  background:white; border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:18px 14px; text-align:center; border-top:4px solid var(--blue);
+  cursor:pointer; transition:all .2s;
 }
 .stat-card:hover { transform:translateY(-2px); box-shadow:0 4px 16px rgba(0,0,0,0.12); }
-.stat-card.green  { border-top-color:var(–green); }
-.stat-card.red    { border-top-color:var(–red); }
-.stat-card.orange { border-top-color:var(–orange); }
-.stat-label { font-size:12px; font-weight:700; color:var(–gray-400); text-transform:uppercase; letter-spacing:.3px; margin-bottom:6px; }
-.stat-num   { font-size:38px; font-weight:800; color:var(–gray-800); line-height:1; }
+.stat-card.green  { border-top-color:var(--green); }
+.stat-card.red    { border-top-color:var(--red); }
+.stat-card.orange { border-top-color:var(--orange); }
+.stat-label { font-size:12px; font-weight:700; color:var(--gray-400); text-transform:uppercase; letter-spacing:.3px; margin-bottom:6px; }
+.stat-num   { font-size:38px; font-weight:800; color:var(--gray-800); line-height:1; }
 
 .search-box {
-background:white; border-radius:var(–radius); box-shadow:var(–shadow);
-padding:12px 16px; margin-bottom:14px;
+  background:white; border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:12px 16px; margin-bottom:14px;
 }
 .search-box input {
-width:100%; padding:10px 12px; border:2px solid var(–gray-200);
-border-radius:8px; font-size:14px; font-family:‘Nunito’,sans-serif;
-transition:border-color .2s;
+  width:100%; padding:10px 12px; border:2px solid var(--gray-200);
+  border-radius:8px; font-size:14px; font-family:'Nunito',sans-serif;
+  transition:border-color .2s;
 }
 .search-box input:focus {
-outline:none; border-color:var(–blue); box-shadow:0 0 0 4px rgba(26,111,168,.1);
+  outline:none; border-color:var(--blue); box-shadow:0 0 0 4px rgba(26,111,168,.1);
 }
 
 .monthly-section {
-background:white; border-radius:var(–radius); box-shadow:var(–shadow);
-padding:20px; margin-bottom:14px;
+  background:white; border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:20px; margin-bottom:14px;
 }
 .monthly-header {
-display:flex; align-items:center; justify-content:space-between;
-margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid var(–gray-100);
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid var(--gray-100);
 }
-.monthly-title { font-size:16px; font-weight:800; color:var(–blue); }
+.monthly-title { font-size:16px; font-weight:800; color:var(--blue); }
 .month-nav {
-display:flex; gap:8px; align-items:center;
+  display:flex; gap:8px; align-items:center;
 }
 .month-btn {
-width:36px; height:36px; border:2px solid var(–gray-200); border-radius:50%;
-background:white; cursor:pointer; font-weight:700; font-size:14px;
-display:flex; align-items:center; justify-content:center;
-transition:all .2s; -webkit-tap-highlight-color:transparent;
+  width:36px; height:36px; border:2px solid var(--gray-200); border-radius:50%;
+  background:white; cursor:pointer; font-weight:700; font-size:14px;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .2s; -webkit-tap-highlight-color:transparent;
 }
-.month-btn:hover { border-color:var(–blue); color:var(–blue); }
-.month-display { font-size:14px; font-weight:700; color:var(–gray-600); min-width:120px; text-align:center; }
+.month-btn:hover { border-color:var(--blue); color:var(--blue); }
+.month-display { font-size:14px; font-weight:700; color:var(--gray-600); min-width:120px; text-align:center; }
 .monthly-stats {
-display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;
-margin-bottom:12px;
+  display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;
+  margin-bottom:12px;
 }
 .mstat {
-background:var(–gray-100); border-radius:10px; padding:12px 10px; text-align:center;
+  background:var(--gray-100); border-radius:10px; padding:12px 10px; text-align:center;
 }
-.mstat-label { font-size:12px; font-weight:700; color:var(–gray-400); margin-bottom:4px; }
-.mstat-valor { font-size:18px; font-weight:800; color:var(–gray-800); }
+.mstat-label { font-size:12px; font-weight:700; color:var(--gray-400); margin-bottom:4px; }
+.mstat-valor { font-size:18px; font-weight:800; color:var(--gray-800); }
 
 .form-group { margin-bottom:14px; }
-.form-label { display:block; font-size:14px; font-weight:700; color:var(–gray-600); margin-bottom:7px; }
-.form-label .req { color:var(–red); }
+.form-label { display:block; font-size:14px; font-weight:700; color:var(--gray-600); margin-bottom:7px; }
+.form-label .req { color:var(--red); }
 .form-control {
-width:100%; padding:14px 16px;
-border:2px solid var(–gray-200); border-radius:10px;
-font-size:16px; font-family:‘Nunito’,sans-serif; font-weight:600;
-color:var(–gray-800); background:white; appearance:none;
-transition:border-color .2s;
+  width:100%; padding:14px 16px;
+  border:2px solid var(--gray-200); border-radius:10px;
+  font-size:16px; font-family:'Nunito',sans-serif; font-weight:600;
+  color:var(--gray-800); background:white; appearance:none;
+  transition:border-color .2s;
 }
-.form-control:focus { outline:none; border-color:var(–blue); box-shadow:0 0 0 4px rgba(26,111,168,.1); }
+.form-control:focus { outline:none; border-color:var(--blue); box-shadow:0 0 0 4px rgba(26,111,168,.1); }
 textarea.form-control { min-height:90px; resize:vertical; }
 
 .tipo-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
 .tipo-opt {
-border:3px solid var(–gray-200); border-radius:12px;
-padding:16px 10px; text-align:center; cursor:pointer;
-transition:all .2s; background:white; font-family:‘Nunito’,sans-serif;
--webkit-tap-highlight-color:transparent;
+  border:3px solid var(--gray-200); border-radius:12px;
+  padding:16px 10px; text-align:center; cursor:pointer;
+  transition:all .2s; background:white; font-family:'Nunito',sans-serif;
+  -webkit-tap-highlight-color:transparent;
 }
-.tipo-opt:hover { border-color:var(–blue); }
-.tipo-opt.sel   { border-color:var(–blue); background:var(–blue-light); }
+.tipo-opt:hover { border-color:var(--blue); }
+.tipo-opt.sel   { border-color:var(--blue); background:var(--blue-light); }
 .tipo-emoji { font-size:30px; display:block; margin-bottom:6px; }
-.tipo-name  { font-size:15px; font-weight:800; color:var(–gray-800); }
-.tipo-hint  { font-size:12px; color:var(–gray-400); font-weight:600; margin-top:3px; }
+.tipo-name  { font-size:15px; font-weight:800; color:var(--gray-800); }
+.tipo-hint  { font-size:12px; color:var(--gray-400); font-weight:600; margin-top:3px; }
 
 .btn {
-display:inline-flex; align-items:center; justify-content:center; gap:8px;
-padding:14px 22px; border:none; border-radius:10px;
-font-size:15px; font-family:‘Nunito’,sans-serif; font-weight:800;
-cursor:pointer; transition:all .2s; -webkit-tap-highlight-color:transparent;
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:14px 22px; border:none; border-radius:10px;
+  font-size:15px; font-family:'Nunito',sans-serif; font-weight:800;
+  cursor:pointer; transition:all .2s; -webkit-tap-highlight-color:transparent;
 }
 .btn-block { width:100%; }
-.btn-primary { background:var(–blue); color:white; }
-.btn-primary:hover  { background:var(–blue-dark); }
+.btn-primary { background:var(--blue); color:white; }
+.btn-primary:hover  { background:var(--blue-dark); }
 .btn-primary:active { transform:scale(.98); }
-.btn-primary:disabled { background:var(–gray-400); cursor:not-allowed; }
-.btn-ghost   { background:var(–gray-100); color:var(–gray-600); }
-.btn-danger  { background:var(–red); color:white; }
+.btn-primary:disabled { background:var(--gray-400); cursor:not-allowed; }
+.btn-ghost   { background:var(--gray-100); color:var(--gray-600); }
+.btn-danger  { background:var(--red); color:white; }
 .btn-row { display:flex; gap:10px; margin-top:6px; }
 .btn-row .btn { flex:1; }
 
 #alertBox {
-position:fixed; top:76px; left:50%;
-transform:translateX(-50%);
-z-index:200; width:calc(100% - 32px);
-max-width:500px; pointer-events:none;
+  position:fixed; top:76px; left:50%;
+  transform:translateX(-50%);
+  z-index:200; width:calc(100% - 32px);
+  max-width:500px; pointer-events:none;
 }
 .alert {
-padding:14px 18px; border-radius:10px;
-font-size:15px; font-weight:700; margin-bottom:8px;
-opacity:0; transform:translateY(-10px);
-transition:all .3s; pointer-events:auto;
+  padding:14px 18px; border-radius:10px;
+  font-size:15px; font-weight:700; margin-bottom:8px;
+  opacity:0; transform:translateY(-10px);
+  transition:all .3s; pointer-events:auto;
 }
 .alert.show { opacity:1; transform:translateY(0); }
-.alert-success { background:var(–green-light); color:var(–green); border-left:4px solid var(–green); }
-.alert-danger  { background:var(–red-light);   color:var(–red);   border-left:4px solid var(–red);   }
-.alert-warning { background:var(–orange-light); color:var(–orange); border-left:4px solid var(–orange); }
+.alert-success { background:var(--green-light); color:var(--green); border-left:4px solid var(--green); }
+.alert-danger  { background:var(--red-light);   color:var(--red);   border-left:4px solid var(--red);   }
+.alert-warning { background:var(--orange-light); color:var(--orange); border-left:4px solid var(--orange); }
 
 .list-item {
-background:white; border-radius:var(–radius); padding:16px;
-margin-bottom:10px; box-shadow:var(–shadow);
-border-left:5px solid var(–blue);
+  background:white; border-radius:var(--radius); padding:16px;
+  margin-bottom:10px; box-shadow:var(--shadow);
+  border-left:5px solid var(--blue);
 }
 .list-item.lab  { border-left-color:#7c3aed; }
-.list-item.pago { border-left-color:var(–green); }
-.list-item.venc { border-left-color:var(–red); }
+.list-item.pago { border-left-color:var(--green); }
+.list-item.venc { border-left-color:var(--red); }
 .item-header { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
-.item-name { font-size:16px; font-weight:800; color:var(–gray-800); line-height:1.2; }
-.item-sub  { font-size:13px; color:var(–gray-400); font-weight:600; margin-top:4px; }
+.item-name { font-size:16px; font-weight:800; color:var(--gray-800); line-height:1.2; }
+.item-sub  { font-size:13px; color:var(--gray-400); font-weight:600; margin-top:4px; }
 .item-actions { display:flex; gap:8px; flex-shrink:0; }
 
 .icon-btn {
-width:36px; height:36px; border-radius:8px; border:none;
-cursor:pointer; display:flex; align-items:center; justify-content:center;
-font-size:16px; transition:all .2s; -webkit-tap-highlight-color:transparent;
+  width:36px; height:36px; border-radius:8px; border:none;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  font-size:16px; transition:all .2s; -webkit-tap-highlight-color:transparent;
 }
-.icon-btn.edit   { background:var(–blue-light); }
-.icon-btn.delete { background:var(–red-light); }
+.icon-btn.edit   { background:var(--blue-light); }
+.icon-btn.delete { background:var(--red-light); }
 
 .badge {
-display:inline-block; padding:4px 10px; border-radius:20px;
-font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.3px;
+  display:inline-block; padding:4px 10px; border-radius:20px;
+  font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.3px;
 }
 .badge-dentista { background:#dbeafe; color:#1e40af; }
 .badge-lab      { background:#ede9fe; color:#5b21b6; }
-.badge-pago     { background:var(–green-light); color:var(–green); }
-.badge-pendente { background:var(–orange-light); color:var(–orange); }
-.badge-vencido  { background:var(–red-light); color:var(–red); }
+.badge-pago     { background:var(--green-light); color:var(--green); }
+.badge-pendente { background:var(--orange-light); color:var(--orange); }
+.badge-vencido  { background:var(--red-light); color:var(--red); }
 
 .seq-num {
-display:inline-block; background:var(–blue); color:white;
-font-size:11px; font-weight:800; padding:2px 8px;
-border-radius:12px; font-family:monospace;
+  display:inline-block; background:var(--blue); color:white;
+  font-size:11px; font-weight:800; padding:2px 8px;
+  border-radius:12px; font-family:monospace;
 }
 
 .pag-item {
-background:white; border-radius:var(–radius); padding:16px;
-margin-bottom:10px; box-shadow:var(–shadow);
-display:flex; align-items:center; gap:14px;
+  background:white; border-radius:var(--radius); padding:16px;
+  margin-bottom:10px; box-shadow:var(--shadow);
+  display:flex; align-items:center; gap:14px;
 }
 .pag-btn {
-padding:10px 16px; border-radius:8px; border:none;
-cursor:pointer; font-family:‘Nunito’,sans-serif; font-weight:700;
-transition:all .2s; white-space:nowrap; -webkit-tap-highlight-color:transparent;
+  padding:10px 16px; border-radius:8px; border:none;
+  cursor:pointer; font-family:'Nunito',sans-serif; font-weight:700;
+  transition:all .2s; white-space:nowrap; -webkit-tap-highlight-color:transparent;
 }
-.pag-btn.pago { background:var(–green); color:white; }
-.pag-btn.pendente { background:var(–orange); color:white; }
+.pag-btn.pago { background:var(--green); color:white; }
+.pag-btn.pendente { background:var(--orange); color:white; }
 .pag-info { flex:1; min-width:0; }
-.pag-nome  { font-size:15px; font-weight:800; color:var(–gray-800); }
-.pag-det   { font-size:13px; color:var(–gray-400); font-weight:600; margin-top:3px; }
-.pag-valor { font-size:17px; font-weight:800; color:var(–gray-800); text-align:right; }
+.pag-nome  { font-size:15px; font-weight:800; color:var(--gray-800); }
+.pag-det   { font-size:13px; color:var(--gray-400); font-weight:600; margin-top:3px; }
+.pag-valor { font-size:17px; font-weight:800; color:var(--gray-800); text-align:right; }
 
 .export-buttons {
-display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;
+  display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;
 }
 .export-btn {
-padding:8px 14px; border-radius:8px; border:none;
-cursor:pointer; font-family:‘Nunito’,sans-serif; font-weight:700;
-font-size:12px; transition:all .2s; -webkit-tap-highlight-color:transparent;
-display:flex; align-items:center; gap:4px;
+  padding:8px 14px; border-radius:8px; border:none;
+  cursor:pointer; font-family:'Nunito',sans-serif; font-weight:700;
+  font-size:12px; transition:all .2s; -webkit-tap-highlight-color:transparent;
+  display:flex; align-items:center; gap:4px;
 }
 .export-btn.foto { background:#fef3c7; color:#92400e; }
 .export-btn.foto:hover { background:#fcd34d; }
@@ -277,41 +276,40 @@ display:flex; align-items:center; gap:4px;
 .export-btn.imprimir { background:#dbeafe; color:#1e40af; }
 .export-btn.imprimir:hover { background:#bfdbfe; }
 
-.empty { text-align:center; padding:40px 20px; color:var(–gray-400); }
+.empty { text-align:center; padding:40px 20px; color:var(--gray-400); }
 .empty-icon { font-size:48px; margin-bottom:12px; }
 .empty p { font-size:15px; font-weight:600; }
 
 .overlay {
-position:fixed; inset:0; background:rgba(0,0,0,.45);
-z-index:300; display:none; align-items:flex-end;
+  position:fixed; inset:0; background:rgba(0,0,0,.45);
+  z-index:300; display:none; align-items:flex-end;
 }
 .overlay.open { display:flex; }
 .sheet {
-background:white; border-radius:20px 20px 0 0;
-padding:24px 20px 44px; width:100%;
-max-height:92vh; overflow-y:auto;
+  background:white; border-radius:20px 20px 0 0;
+  padding:24px 20px 44px; width:100%;
+  max-height:92vh; overflow-y:auto;
 }
 .sheet-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
-.sheet-title  { font-size:20px; font-weight:800; color:var(–gray-800); }
+.sheet-title  { font-size:20px; font-weight:800; color:var(--gray-800); }
 .sheet-close  {
-background:var(–gray-100); border:none; border-radius:50%;
-width:34px; height:34px; font-size:18px; cursor:pointer; line-height:1;
-display:flex; align-items:center; justify-content:center;
+  background:var(--gray-100); border:none; border-radius:50%;
+  width:34px; height:34px; font-size:18px; cursor:pointer; line-height:1;
+  display:flex; align-items:center; justify-content:center;
 }
 
 .filter-badge {
-display:inline-block; background:var(–blue); color:white;
-padding:8px 14px; border-radius:20px; font-size:13px; font-weight:700;
-margin-bottom:14px;
+  display:inline-block; background:var(--blue); color:white;
+  padding:8px 14px; border-radius:20px; font-size:13px; font-weight:700;
+  margin-bottom:14px;
 }
 .filter-close { margin-left:8px; cursor:pointer; font-weight:900; }
 
 @media (min-width:600px) {
-.page { padding:24px 20px; }
-.stats-grid { grid-template-columns:repeat(3,1fr); }
+  .page { padding:24px 20px; }
+  .stats-grid { grid-template-columns:repeat(3,1fr); }
 }
 </style>
-
 </head>
 <body>
 
@@ -332,10 +330,9 @@ margin-bottom:14px;
 <div id="alertBox"></div>
 
 <!-- ══ INÍCIO ══ -->
-
 <div class="page active" id="page-dash">
   <p class="page-title">Início</p>
-
+  
   <div class="stats-grid">
     <div class="stat-card" onclick="filtrarPor('pendentes')" title="Clique para filtrar">
       <div class="stat-label">Pendentes</div>
@@ -352,7 +349,6 @@ margin-bottom:14px;
   </div>
 
   <!-- SEÇÃO FINANCEIRA MENSAL -->
-
   <div class="monthly-section">
     <div class="monthly-header">
       <div class="monthly-title">💰 Resumo Mensal</div>
@@ -382,7 +378,6 @@ margin-bottom:14px;
   </div>
 
   <!-- LISTA DE PAGAMENTOS -->
-
   <div class="card">
     <div class="card-title">💳 Pagamentos <span id="pagCount" style="font-size:14px;color:var(--gray-400)">(0)</span></div>
     <div id="lista-pagamentos">
@@ -392,20 +387,18 @@ margin-bottom:14px;
 </div>
 
 <!-- ══ CLIENTES ══ -->
-
 <div class="page" id="page-clientes">
   <p class="page-title">Clientes</p>
   <button class="btn btn-primary btn-block" style="margin-bottom:16px" onclick="abrirCliente()">＋ Novo Cliente</button>
-
+  
   <div class="search-box">
     <input type="text" id="search-clientes" placeholder="🔍 Buscar por nome..." onkeyup="filtrarClientes()">
   </div>
-
+  
   <div id="lista-clientes"><div class="empty"><div class="empty-icon">👤</div><p>Nenhum cliente</p></div></div>
 </div>
 
 <!-- ══ SERVIÇOS ══ -->
-
 <div class="page" id="page-servicos">
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
     <p class="page-title" style="margin:0">Serviços - <span id="servicos-mes-titulo">Março</span></p>
@@ -414,99 +407,87 @@ margin-bottom:14px;
       <button class="month-btn" onclick="mudarMesServicos(1)" title="Próximo mês">›</button>
     </div>
   </div>
-
-<button class="btn btn-primary btn-block" style="margin-bottom:16px" onclick="abrirServico()">＋ Novo Serviço</button>
-
+  
+  <button class="btn btn-primary btn-block" style="margin-bottom:16px" onclick="abrirServico()">＋ Novo Serviço</button>
+  
   <div class="search-box">
     <input type="text" id="search-servicos" placeholder="🔍 Buscar por cliente ou serviço..." onkeyup="filtrarServicos()">
   </div>
-
+  
   <div id="lista-servicos"><div class="empty"><div class="empty-icon">🔧</div><p>Nenhum serviço</p></div></div>
 </div>
 
 <!-- ══ NOVO/EDITAR SERVIÇO (PÁGINA EXCLUSIVA) ══ -->
-
 <div class="page" id="page-servico-form">
   <div style="margin-bottom:24px;">
     <button class="btn btn-ghost" onclick="voltarParaServicos()" style="margin-bottom:12px;">← Voltar</button>
     <p class="page-title" id="titulo-form-srv">Novo Serviço</p>
   </div>
-
+  
   <input type="hidden" id="srv-form-id">
-
+  
   <!-- DADOS BÁSICOS -->
-
   <div class="card">
     <div class="card-title">📋 Dados do Serviço</div>
-
-```
-<div class="form-group">
-  <label class="form-label">Cliente (Consultório) <span class="req">*</span></label>
-  <select class="form-control" id="srv-form-cliente"></select>
-</div>
-
-<div class="form-group">
-  <label class="form-label">Data de Entrada <span class="req">*</span></label>
-  <input type="date" class="form-control" id="srv-form-entrada">
-</div>
-```
-
+    
+    <div class="form-group">
+      <label class="form-label">Cliente (Consultório) <span class="req">*</span></label>
+      <select class="form-control" id="srv-form-cliente"></select>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Data de Entrada <span class="req">*</span></label>
+      <input type="date" class="form-control" id="srv-form-entrada">
+    </div>
   </div>
-
+  
   <!-- ADICIONAR ITENS -->
-
   <div class="card" style="background:var(--blue-light); border:2px solid var(--blue);">
     <div class="card-title" style="color:var(--blue);">➕ Adicionar Serviços</div>
-
-```
-<div class="form-group">
-  <label class="form-label">Tipo de Serviço <span class="req">*</span></label>
-  <select class="form-control" id="srv-form-tipo"></select>
-</div>
-
-<div class="form-group" id="srv-form-item-paciente-group" style="display: none">
-  <label class="form-label">Paciente</label>
-  <input type="text" class="form-control" id="srv-form-item-paciente" placeholder="Nome do paciente">
-</div>
-
-<div class="form-group">
-  <label class="form-label">Valor (R$)</label>
-  <input type="number" class="form-control" id="srv-form-valor" placeholder="0,00" step="0.01" min="0">
-</div>
-
-<div class="form-group">
-  <label class="form-label">Descrição (opcional)</label>
-  <textarea class="form-control" id="srv-form-desc" placeholder="Observações..." style="min-height:80px;"></textarea>
-</div>
-
-<button class="btn btn-primary btn-block" onclick="adicionarItemForm()">➕ Adicionar Serviço</button>
-```
-
+    
+    <div class="form-group">
+      <label class="form-label">Tipo de Serviço <span class="req">*</span></label>
+      <select class="form-control" id="srv-form-tipo"></select>
+    </div>
+    
+    <div class="form-group" id="srv-form-item-paciente-group" style="display: none">
+      <label class="form-label">Paciente</label>
+      <input type="text" class="form-control" id="srv-form-item-paciente" placeholder="Nome do paciente">
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Valor (R$)</label>
+      <input type="number" class="form-control" id="srv-form-valor" placeholder="0,00" step="0.01" min="0">
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Descrição (opcional)</label>
+      <textarea class="form-control" id="srv-form-desc" placeholder="Observações..." style="min-height:80px;"></textarea>
+    </div>
+    
+    <button class="btn btn-primary btn-block" onclick="adicionarItemForm()">➕ Adicionar Serviço</button>
   </div>
-
+  
   <!-- LISTA DE ITENS -->
-
   <div class="card">
     <div class="card-title">📋 Itens Adicionados</div>
     <div id="lista-itens-form" style="background:var(--gray-100); border-radius:10px; padding:12px;">
       <div style="color:var(--gray-400); font-size:13px; text-align:center;">Nenhum item adicionado</div>
     </div>
   </div>
-
+  
   <!-- RESUMO -->
-
   <div class="card" style="background:var(--green-light); border:2px solid var(--green);">
     <div style="font-size:12px; color:var(--gray-400); font-weight:700; margin-bottom:8px;">RESUMO DO SERVIÇO</div>
     <div style="font-size:24px; font-weight:800; color:var(--green); margin-bottom:8px;" id="srv-form-total-display">Total: R$ 0,00</div>
     <div style="font-size:13px; color:var(--gray-600); font-weight:600; margin-bottom:6px;" id="srv-form-qtd-display">0 itens</div>
     <div style="font-size:13px; color:var(--gray-600); font-weight:600;" id="srv-form-saida-display">Saída: —</div>
   </div>
-
+  
   <input type="hidden" id="srv-form-saida">
   <input type="hidden" id="srv-form-itens-json" value="[]">
-
+  
   <!-- BOTÕES -->
-
   <div style="display:flex; gap:12px; margin-top:24px; margin-bottom:24px;">
     <button class="btn btn-ghost btn-block" onclick="voltarParaServicos()">Cancelar</button>
     <button class="btn btn-primary btn-block" id="btn-salvar-servico-form" onclick="salvarServicoForm()">💾 Salvar Serviço</button>
@@ -516,7 +497,6 @@ margin-bottom:14px;
 <! ──────────────────────────────────────────────────
 
 <!-- ══ TIPOS ══ -->
-
 <div class="page" id="page-config">
   <p class="page-title">Tipos de Serviço</p>
   <div class="card">
@@ -535,7 +515,6 @@ margin-bottom:14px;
 </div>
 
 <!-- BOTTOM NAV -->
-
 <nav class="bottom-nav">
   <button class="nav-btn active" id="nav-dash"     onclick="irPara('dash')">    <span class="nav-icon">🏠</span>Início</button>
   <button class="nav-btn"        id="nav-clientes" onclick="irPara('clientes')"><span class="nav-icon">👤</span>Clientes</button>
@@ -544,7 +523,6 @@ margin-bottom:14px;
 </nav>
 
 <!-- SHEET: CLIENTE -->
-
 <div class="overlay" id="ov-cliente" onclick="fechar('ov-cliente')">
   <div class="sheet" onclick="event.stopPropagation()">
     <div class="sheet-header">
@@ -591,7 +569,6 @@ margin-bottom:14px;
 </div>
 
 <!-- SHEET: SERVIÇO -->
-
 <div class="overlay" id="ov-servico" onclick="fechar('ov-servico')">
   <div class="sheet" onclick="event.stopPropagation()">
     <div class="sheet-header">
@@ -599,59 +576,57 @@ margin-bottom:14px;
       <button class="sheet-close" onclick="fechar('ov-servico')">✕</button>
     </div>
     <input type="hidden" id="srv-id">
-
-```
-<!-- DADOS BÁSICOS -->
-<div class="form-group">
-  <label class="form-label">Cliente <span class="req">*</span></label>
-  <select class="form-control" id="srv-cliente"></select>
-</div>
-<div class="form-group">
-  <label class="form-label">Data de Entrada <span class="req">*</span></label>
-  <input type="date" class="form-control" id="srv-entrada">
-</div>
-
-<!-- ADICIONAR ITENS -->
-<div style="background:var(--blue-light); border-radius:10px; padding:16px; margin-bottom:16px;">
-  <div style="font-weight:800; color:var(--blue); margin-bottom:12px;">➕ ADICIONAR SERVIÇOS</div>
-  
-  <div class="form-group" style="margin-bottom:10px;">
-    <label class="form-label">Tipo de Serviço <span class="req">*</span></label>
-    <select class="form-control" id="srv-tipo-temp" style="margin-bottom:8px;"></select>
-  </div>
-  
-  <div class="form-group" style="margin-bottom:10px;">
-    <label class="form-label">Valor (R$)</label>
-    <input type="number" class="form-control" id="srv-valor-temp" placeholder="0,00" step="0.01" min="0" style="margin-bottom:8px;">
-  </div>
-  
-  <div class="form-group">
-    <label class="form-label">Descrição (opcional)</label>
-    <textarea class="form-control" id="srv-desc-temp" placeholder="..." style="min-height:60px; margin-bottom:10px;"></textarea>
-  </div>
-  
-  <button class="btn btn-primary btn-block" onclick="adicionarItem()">➕ Adicionar Serviço</button>
-</div>
-
-<!-- LISTA DE ITENS -->
-<div style="margin-bottom:16px;">
-  <div style="font-weight:800; color:var(--gray-800); margin-bottom:10px;">📋 ITENS ADICIONADOS</div>
-  <div id="lista-itens-srv" style="background:white; border-radius:10px; padding:12px;">
-    <div style="color:var(--gray-400); font-size:13px; text-align:center;">Nenhum item adicionado</div>
-  </div>
-</div>
-
-<!-- RESUMO -->
-<div style="background:var(--green-light); border-radius:10px; padding:14px; margin-bottom:16px;">
-  <div style="font-size:12px; color:var(--gray-400); font-weight:700; margin-bottom:4px;">RESUMO</div>
-  <div style="font-size:18px; font-weight:800; color:var(--green); margin-bottom:8px;" id="srv-total-display">Total: R$ 0,00</div>
-  <div style="font-size:12px; color:var(--gray-600); font-weight:600;" id="srv-qtd-display">0 itens</div>
-  <div style="font-size:12px; color:var(--gray-600); font-weight:600; margin-top:6px;" id="srv-saida-display">Saída: —</div>
-</div>
-```
+    
+    <!-- DADOS BÁSICOS -->
+    <div class="form-group">
+      <label class="form-label">Cliente <span class="req">*</span></label>
+      <select class="form-control" id="srv-cliente"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Data de Entrada <span class="req">*</span></label>
+      <input type="date" class="form-control" id="srv-entrada">
+    </div>
+    
+    <!-- ADICIONAR ITENS -->
+    <div style="background:var(--blue-light); border-radius:10px; padding:16px; margin-bottom:16px;">
+      <div style="font-weight:800; color:var(--blue); margin-bottom:12px;">➕ ADICIONAR SERVIÇOS</div>
+      
+      <div class="form-group" style="margin-bottom:10px;">
+        <label class="form-label">Tipo de Serviço <span class="req">*</span></label>
+        <select class="form-control" id="srv-tipo-temp" style="margin-bottom:8px;"></select>
+      </div>
+      
+      <div class="form-group" style="margin-bottom:10px;">
+        <label class="form-label">Valor (R$)</label>
+        <input type="number" class="form-control" id="srv-valor-temp" placeholder="0,00" step="0.01" min="0" style="margin-bottom:8px;">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Descrição (opcional)</label>
+        <textarea class="form-control" id="srv-desc-temp" placeholder="..." style="min-height:60px; margin-bottom:10px;"></textarea>
+      </div>
+      
+      <button class="btn btn-primary btn-block" onclick="adicionarItem()">➕ Adicionar Serviço</button>
+    </div>
+    
+    <!-- LISTA DE ITENS -->
+    <div style="margin-bottom:16px;">
+      <div style="font-weight:800; color:var(--gray-800); margin-bottom:10px;">📋 ITENS ADICIONADOS</div>
+      <div id="lista-itens-srv" style="background:white; border-radius:10px; padding:12px;">
+        <div style="color:var(--gray-400); font-size:13px; text-align:center;">Nenhum item adicionado</div>
+      </div>
+    </div>
+    
+    <!-- RESUMO -->
+    <div style="background:var(--green-light); border-radius:10px; padding:14px; margin-bottom:16px;">
+      <div style="font-size:12px; color:var(--gray-400); font-weight:700; margin-bottom:4px;">RESUMO</div>
+      <div style="font-size:18px; font-weight:800; color:var(--green); margin-bottom:8px;" id="srv-total-display">Total: R$ 0,00</div>
+      <div style="font-size:12px; color:var(--gray-600); font-weight:600;" id="srv-qtd-display">0 itens</div>
+      <div style="font-size:12px; color:var(--gray-600); font-weight:600; margin-top:6px;" id="srv-saida-display">Saída: —</div>
+    </div>
+    
 
 <!-- SHEET: PAGAMENTO -->
-
 <div class="overlay" id="ov-pagamento" onclick="fechar('ov-pagamento')">
   <div class="sheet" onclick="event.stopPropagation()">
     <div class="sheet-header">
@@ -664,15 +639,14 @@ margin-bottom:14px;
       <input type="date" class="form-control" id="pag-data" value="">
     </div>
     <div class="btn-row">
-      <button class="btn btn-ghost" onclick="fechar('ov-pagamento')">Cancelar</button>
-      <button class="btn btn-primary" id="pag-btn-confirmar" onclick="confirmarPagamento()">Confirmar Pagamento</button>
-      <button class="btn btn-ghost" id="pag-btn-desmarcar" style="display:none; background:#ffebee; color:var(--red)" onclick="desmarcarPagamento()">Desmarcar Pagamento</button>
+      <button class="btn btn-ghost" onclick="event.stopPropagation(); fechar('ov-pagamento')">Cancelar</button>
+      <button class="btn btn-primary" id="pag-btn-confirmar" onclick="event.stopPropagation(); confirmarPagamentoWrapper()">Confirmar Pagamento</button>
+      <button class="btn btn-ghost" id="pag-btn-desmarcar" style="display:none; background:#ffebee; color:var(--red)" onclick="event.stopPropagation(); desmarcarPagamentoWrapper()">Desmarcar Pagamento</button>
     </div>
   </div>
 </div>
 
 <!-- SHEET: EDITAR TIPO -->
-
 <div class="overlay" id="ov-tipo" onclick="fechar('ov-tipo')">
   <div class="sheet" onclick="event.stopPropagation()">
     <div class="sheet-header">
@@ -705,6 +679,25 @@ let filtroAtivo = null
 let mesExibicao = 0
 let mesServicos = 0  // NOVO: filtro de mês para serviços
 let conectado = false
+
+// ── CALCULAR MÊS ATUAL EM OFFSET (maio 2026 = 0) ──
+function calcularMesAtual() {
+  const hoje = new Date()
+  const ano = hoje.getFullYear()
+  const mes = hoje.getMonth() // 0-11
+  const mesAno = ano * 12 + mes // Converter para número absoluto
+  
+  // Definir qual mês considerar como "ano atual"
+  // Maio de 2026 = ano 2026, mês 4 (0-indexed)
+  const anoReferencia = 2026
+  const mesReferencia = 4 // Maio (0-indexed)
+  const mesAnoReferencia = anoReferencia * 12 + mesReferencia
+  
+  const offset = mesAno - mesAnoReferencia
+  console.log(`📅 Mês Atual: ${hoje.toLocaleDateString('pt-BR')} | Offset: ${offset}`)
+  
+  return offset
+}
 
 // ── NAV ──
 function irPara(p) {
@@ -757,6 +750,7 @@ async function api(metodo, tabela, dados=null, params='') {
   try {
     const url = `${URL_SB}/rest/v1/${tabela}${params}`
     console.log(`API: ${metodo} ${url}`)
+    if (dados) console.log('Dados:', dados)
     
     r = await fetch(url, {
       method: metodo,
@@ -764,7 +758,7 @@ async function api(metodo, tabela, dados=null, params='') {
         'Content-Type': 'application/json',
         'apikey': KEY_SB,
         'Authorization': `Bearer ${KEY_SB}`,
-        'Prefer': metodo === 'POST' ? 'return=representation' : ''
+        'Prefer': 'return=representation' // Sempre retorna representação
       },
       body: dados ? JSON.stringify(dados) : undefined
     })
@@ -795,9 +789,9 @@ async function carregar() {
   console.log('URL:', URL_SB)
   console.log('API Key:', KEY_SB.substring(0, 20) + '...')
   
-  // RESET: voltar para o mês atual
-  mesServicos = 0
-  mesExibicao = 0
+  // RESET: voltar para o mês atual (maio 2026)
+  mesServicos = calcularMesAtual()
+  mesExibicao = calcularMesAtual()
   
   setSync('loading')
   try {
@@ -868,12 +862,16 @@ function renderStats() {
 }
 
 function obterMesOffsetDatas(offset) {
-  const agora = new Date()
-  agora.setMonth(agora.getMonth() + offset)
-  const ano = agora.getFullYear()
-  const mes = agora.getMonth()
+  // Começar do maio de 2026 como referência
+  const mesReferencia = new Date(2026, 4, 1) // Maio de 2026 (mês 4)
+  const dataAlvo = new Date(mesReferencia)
+  dataAlvo.setMonth(dataAlvo.getMonth() + offset)
+  
+  const ano = dataAlvo.getFullYear()
+  const mes = dataAlvo.getMonth()
   const primeiroDia = new Date(ano, mes, 1)
   const ultimoDia = new Date(ano, mes + 1, 0)
+  
   return {
     inicio: primeiroDia.toISOString().split('T')[0],
     fim: ultimoDia.toISOString().split('T')[0],
@@ -893,11 +891,16 @@ function renderMensal() {
     }
     
     const periodo = obterMesOffsetDatas(mesExibicao)
+    console.log('📊 renderMensal: mesExibicao=' + mesExibicao + ', período=' + periodo.display)
+    console.log('   Datas: ' + periodo.inicio + ' a ' + periodo.fim)
+    
     monthDisplay.textContent = periodo.display.charAt(0).toUpperCase() + periodo.display.slice(1)
 
     const servicosMes = servicos.filter(s =>
       s.data_entrada && s.data_entrada >= periodo.inicio && s.data_entrada <= periodo.fim
     )
+    
+    console.log('   Serviços encontrados:', servicosMes.length)
 
     const total = servicosMes.reduce((sum, s) => sum + (s.valor || 0), 0)
     const pago = servicosMes.filter(s => s.pago).reduce((sum, s) => sum + (s.valor || 0), 0)
@@ -924,9 +927,10 @@ function renderMensal() {
 
 function mudarMes(delta) {
   mesExibicao += delta
-  // Limita a ±5 meses
-  if (mesExibicao > 5) mesExibicao = 5
-  if (mesExibicao < -5) mesExibicao = -5
+  // Limita a ±12 meses (1 ano inteiro antes e depois)
+  if (mesExibicao > 12) mesExibicao = 12
+  if (mesExibicao < -12) mesExibicao = -12
+  console.log('📅 mudarMes: delta=' + delta + ', mesExibicao=' + mesExibicao)
   renderMensal()
 }
 
@@ -974,7 +978,7 @@ function renderPagamentos() {
     let btnText = s.pago ? '✓ Pago' : '⏳ Não pago'
     
     return `<div class="pag-item">
-      <button class="${btnClass}" onclick="abrirPagamento(${s.id})">${btnText}</button>
+      <button class="${btnClass}" onclick="event.stopPropagation(); abrirPagamento(${s.id})">${btnText}</button>
       <div class="pag-info">
         <div class="pag-nome"><span class="seq-num">#${numero}</span> ${nome}</div>
         <div class="pag-det">${qtdItens} item${qtdItens !== 1 ? 's' : ''} · Saída: ${dataSaida}${venc?' · <strong style="color:var(--red)">VENCIDO</strong>':''}${s.pago&&s.data_pagamento?' · Pago em '+new Date(s.data_pagamento).toLocaleDateString('pt-BR'):''}</div>
@@ -985,21 +989,31 @@ function renderPagamentos() {
 }
 
 function abrirPagamento(id) {
-  if (!conectado) { alerta('Sem conexão com Supabase', 'danger'); return }
+  event.stopPropagation()
+  event.preventDefault()
+  
+  console.log('🔘 abrirPagamento chamada com id:', id, '| conectado:', conectado)
   
   const servico = servicos.find(s => s.id === id)
-  if (!servico) return
+  console.log('📋 Serviço encontrado:', servico)
+  
+  if (!servico) {
+    console.error('❌ Serviço não encontrado')
+    return
+  }
   
   document.getElementById('pag-srv-id').value = id
   
   // Mudar layout baseado se está pago ou não
   if (servico.pago) {
+    console.log('✓ Serviço já PAGO')
     document.getElementById('pag-titulo').textContent = 'Pagamento Registrado ✓'
     document.getElementById('pag-data-group').style.display = 'none'
     document.getElementById('pag-btn-confirmar').style.display = 'none'
     document.getElementById('pag-btn-desmarcar').style.display = 'block'
     document.getElementById('pag-data').value = servico.data_pagamento || ''
   } else {
+    console.log('⏳ Serviço PENDENTE')
     document.getElementById('pag-titulo').textContent = 'Registrar Pagamento'
     document.getElementById('pag-data-group').style.display = 'block'
     document.getElementById('pag-btn-confirmar').style.display = 'block'
@@ -1012,48 +1026,152 @@ function abrirPagamento(id) {
     }
   }
   
+  console.log('🎯 Abrindo overlay de pagamento')
   abrir('ov-pagamento')
 }
 
-async function confirmarPagamento() {
-  const srvId = parseInt(document.getElementById('pag-srv-id').value)
-  const dataPagamento = document.getElementById('pag-data').value
+// ── CONFIRMAR PAGAMENTO (wrapper) ──
+function confirmarPagamentoWrapper() {
+  console.log('🎬 Wrapper chamado!')
+  confirmarPagamentoAsync()
+}
+
+async function confirmarPagamentoAsync() {
+  console.log('═══════════════════════════════════════')
+  console.log('🎯 CONFIRMAR PAGAMENTO INICIADO!')
+  console.log('═══════════════════════════════════════')
   
-  if (!dataPagamento) { alerta('Informe a data do pagamento', 'warning'); return }
-  
-  setSync('loading')
   try {
-    await api('PATCH','servicos',{
+    const srvIdEl = document.getElementById('pag-srv-id')
+    const dataEl = document.getElementById('pag-data')
+    
+    console.log('✅ Elementos encontrados:')
+    console.log('   pag-srv-id:', srvIdEl, '| valor:', srvIdEl.value)
+    console.log('   pag-data:', dataEl, '| valor:', dataEl.value)
+    
+    const srvId = parseInt(srvIdEl.value)
+    const dataPagamento = dataEl.value
+    
+    console.log('💾 Confirmando pagamento:')
+    console.log('   srvId:', srvId)
+    console.log('   dataPagamento:', dataPagamento)
+    console.log('   conectado:', conectado)
+    
+    if (!dataPagamento) { 
+      console.error('❌ Data vazia!')
+      alerta('Informe a data do pagamento', 'warning')
+      return 
+    }
+    
+    if (!conectado) { 
+      console.error('❌ Sem conexão!')
+      alerta('Sem conexão com Supabase', 'danger')
+      return 
+    }
+    
+    console.log('🎬 Validação OK, iniciando salva...')
+    setSync('loading')
+    
+    console.log('📤 Enviando PATCH:')
+    console.log('   Tabela: servicos')
+    console.log('   Query: ?id=eq.' + srvId)
+    console.log('   Dados:', {pago: true, data_pagamento: dataPagamento})
+    
+    const response = await api('PATCH','servicos',{
       pago: true,
       data_pagamento: dataPagamento
     }, `?id=eq.${srvId}`)
     
+    console.log('✅ Resposta recebida!')
+    console.log('   Status:', response?.length || 'Array vazio')
+    console.log('   Dados:', response)
+    
+    console.log('🚪 Fechando overlay...')
     fechar('ov-pagamento')
+    
+    console.log('🔄 Recarregando dados...')
+    setSync('loading')
     await carregar()
+    
+    setSync('ok')
+    console.log('═══════════════════════════════════════')
+    console.log('✅ SUCESSO! Pagamento registrado!')
+    console.log('═══════════════════════════════════════')
     alerta('✓ Pagamento registrado!', 'success')
+    
   } catch(e) {
+    console.log('═══════════════════════════════════════')
+    console.error('❌ ERRO!')
+    console.error('   Mensagem:', e.message)
+    console.error('   Stack:', e.stack)
+    console.error('   Objeto completo:', e)
+    console.log('═══════════════════════════════════════')
+    
     setSync('error')
     alerta('Erro: '+e.message, 'danger')
   }
 }
 
-// ── DESMARCAR PAGAMENTO ──
-async function desmarcarPagamento() {
-  const srvId = parseInt(document.getElementById('pag-srv-id').value)
+// ── DESMARCAR PAGAMENTO (wrapper) ──
+function desmarcarPagamentoWrapper() {
+  console.log('🎬 Wrapper desmarcar chamado!')
+  desmarcarPagamentoAsync()
+}
+
+async function desmarcarPagamentoAsync() {
+  console.log('═══════════════════════════════════════')
+  console.log('🎯 DESMARCAR PAGAMENTO INICIADO!')
+  console.log('═══════════════════════════════════════')
   
-  if (!confirm('Desmarcar este serviço como pago?')) return
-  
-  setSync('loading')
   try {
-    await api('PATCH','servicos',{
+    const srvIdEl = document.getElementById('pag-srv-id')
+    const srvId = parseInt(srvIdEl.value)
+    
+    console.log('🎯 srvId:', srvId)
+    console.log('🔌 conectado:', conectado)
+    
+    if (!confirm('Desmarcar este serviço como pago?')) {
+      console.log('❌ Usuário cancelou')
+      return
+    }
+    
+    if (!conectado) { 
+      console.error('❌ Sem conexão!')
+      alerta('Sem conexão com Supabase', 'danger')
+      return 
+    }
+    
+    console.log('🎬 Validação OK, iniciando...')
+    setSync('loading')
+    
+    console.log('📤 Enviando PATCH:')
+    const response = await api('PATCH','servicos',{
       pago: false,
       data_pagamento: null
     }, `?id=eq.${srvId}`)
     
+    console.log('✅ Resposta recebida:', response)
+    
+    console.log('🚪 Fechando overlay...')
     fechar('ov-pagamento')
+    
+    console.log('🔄 Recarregando dados...')
+    setSync('loading')
     await carregar()
+    
+    setSync('ok')
+    console.log('═══════════════════════════════════════')
+    console.log('✅ SUCESSO! Pagamento desmarcado!')
+    console.log('═══════════════════════════════════════')
     alerta('⏳ Serviço marcado como NÃO pago', 'success')
+    
   } catch(e) {
+    console.log('═══════════════════════════════════════')
+    console.error('❌ ERRO!')
+    console.error('   Mensagem:', e.message)
+    console.error('   Stack:', e.stack)
+    console.log('═══════════════════════════════════════')
+    
     setSync('error')
     alerta('Erro: '+e.message, 'danger')
   }
@@ -1245,8 +1363,9 @@ function filtrarServicos() {
 
 function mudarMesServicos(delta) {
   mesServicos += delta
-  if (mesServicos > 5) mesServicos = 5
-  if (mesServicos < -5) mesServicos = -5
+  // Limita a ±12 meses (1 ano inteiro antes e depois)
+  if (mesServicos > 12) mesServicos = 12
+  if (mesServicos < -12) mesServicos = -12
   
   const periodo = obterMesOffsetDatas(mesServicos)
   const display = periodo.display.charAt(0).toUpperCase() + periodo.display.slice(1)
@@ -2024,19 +2143,17 @@ function imprimirServico(id) {
   docHTML += 'body { font-family:Arial,sans-serif; margin:0; padding:20px; }'
   docHTML += '@media print { body { margin:0; padding:0; } }'
   docHTML += '</style>'
-
-docHTML += ‘</head><body>’
-docHTML += html
-docHTML += ‘<script>window.print(); window.onafterprint = function() { window.close(); }’ + ‘<’ + ‘/script>’
-docHTML += ‘</body></html>’
-
-janela.document.write(docHTML)
-janela.document.close()
+  docHTML += '</head><body>'
+  docHTML += html
+  docHTML += '<script>window.print(); window.onafterprint = function() { window.close(); }' + '<' + '/script>'
+  docHTML += '</body></html>'
+  
+  janela.document.write(docHTML)
+  janela.document.close()
 }
 
 // ── INICIAR ──
-window.addEventListener(‘DOMContentLoaded’, carregar)
+window.addEventListener('DOMContentLoaded', carregar)
 </script>
-
 </body>
 </html>
