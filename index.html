@@ -628,7 +628,7 @@ textarea.form-control { min-height:90px; resize:vertical; }
 
 <!-- SHEET: PAGAMENTO -->
 <div class="overlay" id="ov-pagamento" onclick="fechar('ov-pagamento')">
-  <div class="sheet" onclick="event.stopPropagation()">
+  <div class="sheet" onclick="if(event) event.stopPropagation()">
     <div class="sheet-header">
       <div class="sheet-title" id="pag-titulo">Registrar Pagamento</div>
       <button class="sheet-close" onclick="fechar('ov-pagamento')">✕</button>
@@ -639,7 +639,7 @@ textarea.form-control { min-height:90px; resize:vertical; }
       <input type="date" class="form-control" id="pag-data" value="">
     </div>
     <div class="btn-row">
-      <button class="btn btn-ghost" onclick="event.stopPropagation(); fechar('ov-pagamento')">Cancelar</button>
+      <button class="btn btn-ghost" onclick="if(event) event.stopPropagation(); fechar('ov-pagamento')">Cancelar</button>
       <button class="btn btn-primary" id="pag-btn-confirmar" type="button">Confirmar Pagamento</button>
       <button class="btn btn-ghost" id="pag-btn-desmarcar" style="display:none; background:#ffebee; color:var(--red)" type="button">Desmarcar Pagamento</button>
     </div>
@@ -1032,131 +1032,75 @@ function abrirPagamento(id) {
 
 // ── CONFIRMAR PAGAMENTO (wrapper) ──
 function confirmarPagamentoWrapper() {
-  alert('🚨 WRAPPER CHAMADA!')
-  console.log('🚨🚨🚨 WRAPPER CHAMADA 🚨🚨🚨')
-  
-  try {
-    console.log('Iniciando confirmarPagamentoAsync...')
-    confirmarPagamentoAsync()
-    console.log('confirmarPagamentoAsync iniciada!')
-  } catch(e) {
-    alert('❌ ERRO NA WRAPPER: ' + e.message)
-    console.error('Erro:', e)
-  }
+  console.log('🚀 confirmarPagamentoWrapper chamada!')
+  confirmarPagamentoAsync()
 }
 
 async function confirmarPagamentoAsync() {
-  alert('🎯 ASYNC INICIADA!')
-  console.log('═══════════════════════════════════════')
-  console.log('🎯 CONFIRMAR PAGAMENTO ASYNC INICIADA!')
-  console.log('═══════════════════════════════════════')
-  
   try {
-    alert('1️⃣ Pegando elementos...')
-    const srvIdEl = document.getElementById('pag-srv-id')
-    const dataEl = document.getElementById('pag-data')
+    const srvId = parseInt(document.getElementById('pag-srv-id').value)
+    const dataPagamento = document.getElementById('pag-data').value
     
-    alert('2️⃣ Elementos: ' + srvIdEl.value + ' | ' + dataEl.value)
-    
-    const srvId = parseInt(srvIdEl.value)
-    const dataPagamento = dataEl.value
-    
-    alert('3️⃣ IDs extraídos: ' + srvId + ' | ' + dataPagamento)
+    console.log('📝 Confirmando pagamento:', {srvId, dataPagamento})
     
     if (!dataPagamento) { 
-      alert('❌ Data vazia!')
+      alerta('Informe a data do pagamento', 'warning')
       return 
     }
     
-    // Log ao invés de return
-    if (!conectado) {
-      console.warn('⚠️ Sem conexão, tentando mesmo assim...')
-    }
-    
-    alert('4️⃣ Enviando PATCH...')
-    console.log('Enviando PATCH para servicos id=' + srvId)
+    console.log('📤 Enviando PATCH...')
     
     const response = await api('PATCH','servicos',{
       pago: true,
       data_pagamento: dataPagamento
     }, `?id=eq.${srvId}`)
     
-    alert('5️⃣ Resposta recebida!')
-    console.log('Resposta:', response)
+    console.log('✅ PATCH enviado com sucesso!')
     
-    alert('6️⃣ Fechando overlay...')
     fechar('ov-pagamento')
-    
-    alert('7️⃣ Recarregando...')
     await carregar()
     
-    alert('✅ SUCESSO! Pagamento registrado!')
     alerta('✓ Pagamento registrado!', 'success')
     
   } catch(e) {
-    alert('❌ ERRO: ' + e.message)
-    console.error('Erro completo:', e)
+    console.error('❌ Erro:', e.message)
+    alerta('Erro: '+e.message, 'danger')
   }
 }
 
 // ── DESMARCAR PAGAMENTO (wrapper) ──
 function desmarcarPagamentoWrapper() {
-  alert('🚨 WRAPPER DESMARCAR CHAMADA!')
-  console.log('🚨🚨🚨 WRAPPER DESMARCAR CHAMADA 🚨🚨🚨')
-  
-  try {
-    console.log('Iniciando desmarcarPagamentoAsync...')
-    desmarcarPagamentoAsync()
-    console.log('desmarcarPagamentoAsync iniciada!')
-  } catch(e) {
-    alert('❌ ERRO NA WRAPPER: ' + e.message)
-    console.error('Erro:', e)
-  }
+  console.log('🚀 desmarcarPagamentoWrapper chamada!')
+  desmarcarPagamentoAsync()
 }
 
 async function desmarcarPagamentoAsync() {
-  alert('🎯 DESMARCAR ASYNC INICIADA!')
-  console.log('═══════════════════════════════════════')
-  console.log('🎯 DESMARCAR PAGAMENTO ASYNC INICIADA!')
-  console.log('═══════════════════════════════════════')
-  
   try {
-    alert('1️⃣ Pegando srvId...')
-    const srvIdEl = document.getElementById('pag-srv-id')
-    const srvId = parseInt(srvIdEl.value)
+    const srvId = parseInt(document.getElementById('pag-srv-id').value)
     
-    alert('2️⃣ srvId extraído: ' + srvId)
+    console.log('📝 Desmarcando pagamento:', {srvId})
     
     if (!confirm('Desmarcar este serviço como pago?')) {
-      alert('Cancelado pelo usuário')
       return
     }
     
-    // Log ao invés de return
-    if (!conectado) {
-      console.warn('⚠️ Sem conexão, tentando mesmo assim...')
-    }
+    console.log('📤 Enviando PATCH...')
     
-    alert('3️⃣ Enviando PATCH...')
     const response = await api('PATCH','servicos',{
       pago: false,
       data_pagamento: null
     }, `?id=eq.${srvId}`)
     
-    alert('4️⃣ Resposta recebida!')
+    console.log('✅ PATCH enviado com sucesso!')
     
-    alert('5️⃣ Fechando overlay...')
     fechar('ov-pagamento')
-    
-    alert('6️⃣ Recarregando...')
     await carregar()
     
-    alert('✅ SUCESSO! Pagamento desmarcado!')
     alerta('⏳ Serviço marcado como NÃO pago', 'success')
     
   } catch(e) {
-    alert('❌ ERRO: ' + e.message)
-    console.error('Erro completo:', e)
+    console.error('❌ Erro:', e.message)
+    alerta('Erro: '+e.message, 'danger')
   }
 }
 
@@ -2142,29 +2086,29 @@ window.addEventListener('DOMContentLoaded', () => {
   // Botão confirmar pagamento
   const btnConfirmar = document.getElementById('pag-btn-confirmar')
   if (btnConfirmar) {
-    console.log('✅ Botão confirmar encontrado, adicionando listener')
+    console.log('✅ Botão confirmar encontrado')
     btnConfirmar.addEventListener('click', (e) => {
-      console.log('🎯 Botão confirmar clicado!')
-      e.preventDefault()
-      e.stopPropagation()
+      console.log('🎯 CLIQUE NO BOTÃO CONFIRMAR!')
+      if (e) {
+        e.preventDefault()
+        e.stopPropagation()
+      }
       confirmarPagamentoWrapper()
     })
-  } else {
-    console.error('❌ Botão confirmar NÃO encontrado!')
   }
   
   // Botão desmarcar pagamento
   const btnDesmarcar = document.getElementById('pag-btn-desmarcar')
   if (btnDesmarcar) {
-    console.log('✅ Botão desmarcar encontrado, adicionando listener')
+    console.log('✅ Botão desmarcar encontrado')
     btnDesmarcar.addEventListener('click', (e) => {
-      console.log('🎯 Botão desmarcar clicado!')
-      e.preventDefault()
-      e.stopPropagation()
+      console.log('🎯 CLIQUE NO BOTÃO DESMARCAR!')
+      if (e) {
+        e.preventDefault()
+        e.stopPropagation()
+      }
       desmarcarPagamentoWrapper()
     })
-  } else {
-    console.error('❌ Botão desmarcar NÃO encontrado!')
   }
   
   // Carregar dados
