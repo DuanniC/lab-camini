@@ -1563,8 +1563,6 @@ function renderizarItensForm() {
 }
 
 async function salvarServicoForm() {
-  if (!conectado) { alerta('Sem conexão com Supabase', 'danger'); return }
-  
   const editId  = document.getElementById('srv-form-id').value
   const cliId   = document.getElementById('srv-form-cliente').value
   const paciente = document.getElementById('srv-form-paciente').value.trim()
@@ -1590,12 +1588,12 @@ async function salvarServicoForm() {
     data_entrada:  entrada,
     data_saida:    saida || null,
     descricao:     `${itens.length} item(s) - ` + itens.map(i => i.tipo).join(', '),
-    // ✨ NOVO: Armazenar itens em JSON para recuperar depois!
     itens_json:    JSON.stringify(itens),
     quantidade_itens: itens.length
   }
 
-  document.getElementById('btn-salvar-servico-form').disabled = true
+  const btnSalvar = document.getElementById('btn-salvar-servico-form')
+  if (btnSalvar) btnSalvar.disabled = true
   setSync('loading')
   
   try {
@@ -1606,24 +1604,23 @@ async function salvarServicoForm() {
       dados.status = 'pendente'
       dados.pago = false
       const result = await api('POST','servicos',dados)
-      if (!result || !Array.isArray(result)) throw new Error('Erro ao salvar serviço')
       alerta(`✅ Serviço criado com ${itens.length} item(s)!`,'success')
     }
     voltarParaServicos()
     await carregar()
   } catch(e) { 
     setSync('error')
-    alerta('Erro: '+e.message,'danger') 
+    alerta('❌ Erro: '+e.message,'danger')
+    console.error('Erro ao salvar:', e)
   } finally {
-    document.getElementById('btn-salvar-servico-form').disabled = false
+    if (btnSalvar) btnSalvar.disabled = false
   }
 }
 
 async function salvarServico() {
-  if (!conectado) { alerta('Sem conexão com Supabase', 'danger'); return }
-  
   const editId  = document.getElementById('srv-id').value
   const cliId   = document.getElementById('srv-cliente').value
+  const paciente = document.getElementById('srv-paciente') ? document.getElementById('srv-paciente').value.trim() : ''
   const entrada = document.getElementById('srv-entrada').value
   const saida   = document.getElementById('srv-saida').value
   const itens   = JSON.parse(document.getElementById('itens-json').value)
@@ -1640,11 +1637,13 @@ async function salvarServico() {
   const dados = {
     cliente_id:    parseInt(cliId),
     cliente_nome:  cl ? (cl.nome_dentista || cl.nome_lab) : '',
+    paciente:      paciente || '',
     tipo_servico:  tipo_servico,
     valor:         valor,
     data_entrada:  entrada,
     data_saida:    saida || null,
     descricao:     `${itens.length} item(s) - ` + itens.map(i => i.tipo).join(', '),
+    itens_json:    JSON.stringify(itens),
     quantidade_itens: itens.length
   }
 
