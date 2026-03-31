@@ -642,6 +642,7 @@ textarea.form-control { min-height:90px; resize:vertical; }
       <button class="btn btn-ghost" onclick="fechar('ov-pagamento')">Cancelar</button>
       <button class="btn btn-primary" id="pag-btn-confirmar" type="button">Confirmar Pagamento</button>
       <button class="btn btn-ghost" id="pag-btn-desmarcar" style="display:none; background:#ffebee; color:var(--red)" type="button">Desmarcar Pagamento</button>
+      <button class="btn btn-warning" style="font-size:10px; padding:4px 8px;" onclick="console.log('🧪 TESTE CLICADO'); console.log('srvId:', document.getElementById('pag-srv-id').value); console.log('data:', document.getElementById('pag-data').value)">🧪 Teste</button>
     </div>
   </div>
 </div>
@@ -1032,7 +1033,8 @@ function abrirPagamento(id) {
 
 // ── CONFIRMAR PAGAMENTO (wrapper) ──
 function confirmarPagamentoWrapper() {
-  console.log('🎬 Wrapper chamado!')
+  console.log('🚨🚨🚨 WRAPPER CONFIRMAR PAGAMENTO CHAMADA 🚨🚨🚨')
+  console.log('Stack:', new Error().stack)
   confirmarPagamentoAsync()
 }
 
