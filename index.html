@@ -1124,12 +1124,11 @@ function popularSelects() {
     tipos.forEach(t => selTipoTemp.innerHTML += `<option value="${t.nome}">${t.nome}</option>`)
   }
 }
-}
 
 function abrirServico(id=null) {
   const hoje = new Date().toISOString().split('T')[0]
   
-  // Limpar tudo
+  // Limpar tudo para novo serviço
   document.getElementById('srv-id').value = ''
   document.getElementById('srv-cliente').value = ''
   document.getElementById('srv-entrada').value = hoje
@@ -1138,17 +1137,26 @@ function abrirServico(id=null) {
   document.getElementById('srv-desc-temp').value = ''
   document.getElementById('itens-json').value = '[]'
   
-  document.getElementById('titulo-servico').textContent = id ? 'Editar Serviço' : 'Novo Serviço'
+  document.getElementById('titulo-servico').textContent = 'Novo Serviço'
   
+  // Se está editando um serviço existente
   if (id) {
     const s = servicos.find(x => x.id === id)
     if (!s) return
+    
     document.getElementById('srv-id').value = id
     document.getElementById('srv-cliente').value = s.cliente_id || ''
     document.getElementById('srv-entrada').value = s.data_entrada || hoje
     document.getElementById('srv-saida').value = s.data_saida || ''
+    document.getElementById('titulo-servico').textContent = 'Editar Serviço'
     
-    // TODO: Carregar itens do serviço (se houver banco de dados)
+    // TODO: Carregar itens do serviço do banco de dados
+    // Por enquanto, mostra o tipo_servico como placeholder
+    if (s.tipo_servico) {
+      const tipos = s.tipo_servico.split(' + ')
+      // Poderia carregar os valores reais do banco
+      console.log('Serviço com itens:', tipos)
+    }
   }
   
   renderizarItens()
