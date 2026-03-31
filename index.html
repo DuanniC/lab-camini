@@ -640,9 +640,8 @@ textarea.form-control { min-height:90px; resize:vertical; }
     </div>
     <div class="btn-row">
       <button class="btn btn-ghost" onclick="event.stopPropagation(); fechar('ov-pagamento')">Cancelar</button>
-      <button class="btn btn-primary" id="pag-btn-confirmar" type="button" onclick="event.stopPropagation(); event.preventDefault(); console.log('🎯 BOTÃO CONFIRMAR CLICADO!'); confirmarPagamentoWrapper(); return false;">Confirmar Pagamento</button>
-      <button class="btn btn-ghost" id="pag-btn-desmarcar" style="display:none; background:#ffebee; color:var(--red)" type="button" onclick="event.stopPropagation(); event.preventDefault(); console.log('🎯 BOTÃO DESMARCAR CLICADO!'); desmarcarPagamentoWrapper(); return false;">Desmarcar Pagamento</button>
-      <button class="btn btn-warning" style="font-size:10px; padding:4px 8px;" onclick="event.stopPropagation(); console.log('🧪 TESTE CLICADO'); console.log('srvId:', document.getElementById('pag-srv-id').value); console.log('data:', document.getElementById('pag-data').value); return false;">🧪 Teste</button>
+      <button class="btn btn-primary" id="pag-btn-confirmar" type="button" onclick="event.stopPropagation(); event.preventDefault(); alert('🎯 BOTÃO CLICADO!'); console.log('🎯 BOTÃO CONFIRMAR CLICADO!'); confirmarPagamentoWrapper(); return false;">Confirmar Pagamento</button>
+      <button class="btn btn-ghost" id="pag-btn-desmarcar" style="display:none; background:#ffebee; color:var(--red)" type="button" onclick="event.stopPropagation(); event.preventDefault(); alert('🎯 DESMARCAR CLICADO!'); console.log('🎯 BOTÃO DESMARCAR CLICADO!'); desmarcarPagamentoWrapper(); return false;">Desmarcar Pagamento</button>
     </div>
   </div>
 </div>
@@ -1033,149 +1032,131 @@ function abrirPagamento(id) {
 
 // ── CONFIRMAR PAGAMENTO (wrapper) ──
 function confirmarPagamentoWrapper() {
-  console.log('🚨🚨🚨 WRAPPER CONFIRMAR PAGAMENTO CHAMADA 🚨🚨🚨')
-  console.log('Stack:', new Error().stack)
-  confirmarPagamentoAsync()
+  alert('🚨 WRAPPER CHAMADA!')
+  console.log('🚨🚨🚨 WRAPPER CHAMADA 🚨🚨🚨')
+  
+  try {
+    console.log('Iniciando confirmarPagamentoAsync...')
+    confirmarPagamentoAsync()
+    console.log('confirmarPagamentoAsync iniciada!')
+  } catch(e) {
+    alert('❌ ERRO NA WRAPPER: ' + e.message)
+    console.error('Erro:', e)
+  }
 }
 
 async function confirmarPagamentoAsync() {
+  alert('🎯 ASYNC INICIADA!')
   console.log('═══════════════════════════════════════')
-  console.log('🎯 CONFIRMAR PAGAMENTO INICIADO!')
+  console.log('🎯 CONFIRMAR PAGAMENTO ASYNC INICIADA!')
   console.log('═══════════════════════════════════════')
   
   try {
+    alert('1️⃣ Pegando elementos...')
     const srvIdEl = document.getElementById('pag-srv-id')
     const dataEl = document.getElementById('pag-data')
     
-    console.log('✅ Elementos encontrados:')
-    console.log('   pag-srv-id:', srvIdEl, '| valor:', srvIdEl.value)
-    console.log('   pag-data:', dataEl, '| valor:', dataEl.value)
+    alert('2️⃣ Elementos: ' + srvIdEl.value + ' | ' + dataEl.value)
     
     const srvId = parseInt(srvIdEl.value)
     const dataPagamento = dataEl.value
     
-    console.log('💾 Confirmando pagamento:')
-    console.log('   srvId:', srvId)
-    console.log('   dataPagamento:', dataPagamento)
-    console.log('   conectado:', conectado)
+    alert('3️⃣ IDs extraídos: ' + srvId + ' | ' + dataPagamento)
     
     if (!dataPagamento) { 
-      console.error('❌ Data vazia!')
-      alerta('Informe a data do pagamento', 'warning')
+      alert('❌ Data vazia!')
       return 
     }
     
     if (!conectado) { 
-      console.error('❌ Sem conexão!')
-      alerta('Sem conexão com Supabase', 'danger')
+      alert('❌ Sem conexão! conectado=' + conectado)
       return 
     }
     
-    console.log('🎬 Validação OK, iniciando salva...')
-    setSync('loading')
-    
-    console.log('📤 Enviando PATCH:')
-    console.log('   Tabela: servicos')
-    console.log('   Query: ?id=eq.' + srvId)
-    console.log('   Dados:', {pago: true, data_pagamento: dataPagamento})
+    alert('4️⃣ Validações OK, enviando PATCH...')
+    console.log('Enviando PATCH para servicos id=' + srvId)
     
     const response = await api('PATCH','servicos',{
       pago: true,
       data_pagamento: dataPagamento
     }, `?id=eq.${srvId}`)
     
-    console.log('✅ Resposta recebida!')
-    console.log('   Status:', response?.length || 'Array vazio')
-    console.log('   Dados:', response)
+    alert('5️⃣ Resposta recebida!')
+    console.log('Resposta:', response)
     
-    console.log('🚪 Fechando overlay...')
+    alert('6️⃣ Fechando overlay...')
     fechar('ov-pagamento')
     
-    console.log('🔄 Recarregando dados...')
-    setSync('loading')
+    alert('7️⃣ Recarregando...')
     await carregar()
     
-    setSync('ok')
-    console.log('═══════════════════════════════════════')
-    console.log('✅ SUCESSO! Pagamento registrado!')
-    console.log('═══════════════════════════════════════')
+    alert('✅ SUCESSO! Pagamento registrado!')
     alerta('✓ Pagamento registrado!', 'success')
     
   } catch(e) {
-    console.log('═══════════════════════════════════════')
-    console.error('❌ ERRO!')
-    console.error('   Mensagem:', e.message)
-    console.error('   Stack:', e.stack)
-    console.error('   Objeto completo:', e)
-    console.log('═══════════════════════════════════════')
-    
-    setSync('error')
-    alerta('Erro: '+e.message, 'danger')
+    alert('❌ ERRO: ' + e.message)
+    console.error('Erro completo:', e)
   }
 }
 
 // ── DESMARCAR PAGAMENTO (wrapper) ──
 function desmarcarPagamentoWrapper() {
-  console.log('🎬 Wrapper desmarcar chamado!')
-  desmarcarPagamentoAsync()
+  alert('🚨 WRAPPER DESMARCAR CHAMADA!')
+  console.log('🚨🚨🚨 WRAPPER DESMARCAR CHAMADA 🚨🚨🚨')
+  
+  try {
+    console.log('Iniciando desmarcarPagamentoAsync...')
+    desmarcarPagamentoAsync()
+    console.log('desmarcarPagamentoAsync iniciada!')
+  } catch(e) {
+    alert('❌ ERRO NA WRAPPER: ' + e.message)
+    console.error('Erro:', e)
+  }
 }
 
 async function desmarcarPagamentoAsync() {
+  alert('🎯 DESMARCAR ASYNC INICIADA!')
   console.log('═══════════════════════════════════════')
-  console.log('🎯 DESMARCAR PAGAMENTO INICIADO!')
+  console.log('🎯 DESMARCAR PAGAMENTO ASYNC INICIADA!')
   console.log('═══════════════════════════════════════')
   
   try {
+    alert('1️⃣ Pegando srvId...')
     const srvIdEl = document.getElementById('pag-srv-id')
     const srvId = parseInt(srvIdEl.value)
     
-    console.log('🎯 srvId:', srvId)
-    console.log('🔌 conectado:', conectado)
+    alert('2️⃣ srvId extraído: ' + srvId)
     
     if (!confirm('Desmarcar este serviço como pago?')) {
-      console.log('❌ Usuário cancelou')
+      alert('Cancelado pelo usuário')
       return
     }
     
     if (!conectado) { 
-      console.error('❌ Sem conexão!')
-      alerta('Sem conexão com Supabase', 'danger')
+      alert('❌ Sem conexão!')
       return 
     }
     
-    console.log('🎬 Validação OK, iniciando...')
-    setSync('loading')
-    
-    console.log('📤 Enviando PATCH:')
+    alert('3️⃣ Enviando PATCH...')
     const response = await api('PATCH','servicos',{
       pago: false,
       data_pagamento: null
     }, `?id=eq.${srvId}`)
     
-    console.log('✅ Resposta recebida:', response)
+    alert('4️⃣ Resposta recebida!')
     
-    console.log('🚪 Fechando overlay...')
+    alert('5️⃣ Fechando overlay...')
     fechar('ov-pagamento')
     
-    console.log('🔄 Recarregando dados...')
-    setSync('loading')
+    alert('6️⃣ Recarregando...')
     await carregar()
     
-    setSync('ok')
-    console.log('═══════════════════════════════════════')
-    console.log('✅ SUCESSO! Pagamento desmarcado!')
-    console.log('═══════════════════════════════════════')
+    alert('✅ SUCESSO! Pagamento desmarcado!')
     alerta('⏳ Serviço marcado como NÃO pago', 'success')
     
   } catch(e) {
-    console.log('═══════════════════════════════════════')
-    console.error('❌ ERRO!')
-    console.error('   Mensagem:', e.message)
-    console.error('   Stack:', e.stack)
-    console.log('═══════════════════════════════════════')
-    
-    setSync('error')
-    alerta('Erro: '+e.message, 'danger')
+    alert('❌ ERRO: ' + e.message)
+    console.error('Erro completo:', e)
   }
 }
 
