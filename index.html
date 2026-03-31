@@ -639,9 +639,9 @@ textarea.form-control { min-height:90px; resize:vertical; }
       <input type="date" class="form-control" id="pag-data" value="">
     </div>
     <div class="btn-row">
-      <button class="btn btn-ghost" onclick="event.stopPropagation(); fechar('ov-pagamento')">Cancelar</button>
-      <button class="btn btn-primary" id="pag-btn-confirmar" onclick="event.stopPropagation(); confirmarPagamentoWrapper()">Confirmar Pagamento</button>
-      <button class="btn btn-ghost" id="pag-btn-desmarcar" style="display:none; background:#ffebee; color:var(--red)" onclick="event.stopPropagation(); desmarcarPagamentoWrapper()">Desmarcar Pagamento</button>
+      <button class="btn btn-ghost" onclick="fechar('ov-pagamento')">Cancelar</button>
+      <button class="btn btn-primary" id="pag-btn-confirmar" type="button">Confirmar Pagamento</button>
+      <button class="btn btn-ghost" id="pag-btn-desmarcar" style="display:none; background:#ffebee; color:var(--red)" type="button">Desmarcar Pagamento</button>
     </div>
   </div>
 </div>
@@ -2153,7 +2153,40 @@ function imprimirServico(id) {
 }
 
 // ── INICIAR ──
-window.addEventListener('DOMContentLoaded', carregar)
+window.addEventListener('DOMContentLoaded', () => {
+  console.log('🔧 Inicializando event listeners...')
+  
+  // Botão confirmar pagamento
+  const btnConfirmar = document.getElementById('pag-btn-confirmar')
+  if (btnConfirmar) {
+    console.log('✅ Botão confirmar encontrado, adicionando listener')
+    btnConfirmar.addEventListener('click', (e) => {
+      console.log('🎯 Botão confirmar clicado!')
+      e.preventDefault()
+      e.stopPropagation()
+      confirmarPagamentoWrapper()
+    })
+  } else {
+    console.error('❌ Botão confirmar NÃO encontrado!')
+  }
+  
+  // Botão desmarcar pagamento
+  const btnDesmarcar = document.getElementById('pag-btn-desmarcar')
+  if (btnDesmarcar) {
+    console.log('✅ Botão desmarcar encontrado, adicionando listener')
+    btnDesmarcar.addEventListener('click', (e) => {
+      console.log('🎯 Botão desmarcar clicado!')
+      e.preventDefault()
+      e.stopPropagation()
+      desmarcarPagamentoWrapper()
+    })
+  } else {
+    console.error('❌ Botão desmarcar NÃO encontrado!')
+  }
+  
+  // Carregar dados
+  carregar()
+})
 </script>
 </body>
 </html>
