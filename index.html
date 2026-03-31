@@ -1182,9 +1182,6 @@ function renderServicosList(lista) {
           
           <!-- BOTÕES DE EXPORTAÇÃO -->
           <div class="export-buttons">
-            <button class="export-btn foto" onclick="salvarComoFoto(${s.id})" title="Salvar como imagem">
-              📸 Foto
-            </button>
             <button class="export-btn whatsapp" onclick="compartilharWhatsApp(${s.id})" title="Enviar via WhatsApp">
               💬 WhatsApp
             </button>
@@ -1243,34 +1240,50 @@ function abrirServico(id=null) {
   
   // Ir para a página de formulário
   irPara('servico-form')
+  window.scrollTo(0, 0)
+  
+  // Verificar se elementos existem antes de acessar
+  const srvFormId = document.getElementById('srv-form-id')
+  const srvFormCliente = document.getElementById('srv-form-cliente')
+  const srvFormEntrada = document.getElementById('srv-form-entrada')
+  const srvFormTipo = document.getElementById('srv-form-tipo')
+  const srvFormValor = document.getElementById('srv-form-valor')
+  const srvFormDesc = document.getElementById('srv-form-desc')
+  const srvFormItensJson = document.getElementById('srv-form-itens-json')
+  const tituloFormSrv = document.getElementById('titulo-form-srv')
+  
+  // Se algum elemento não existe, retornar
+  if (!srvFormId || !srvFormCliente || !srvFormEntrada) {
+    console.error('Elementos do formulário não encontrados')
+    return
+  }
   
   // Limpar tudo para novo serviço
-  document.getElementById('srv-form-id').value = ''
-  document.getElementById('srv-form-cliente').value = ''
-  document.getElementById('srv-form-entrada').value = hoje
-  document.getElementById('srv-form-tipo').value = ''
-  document.getElementById('srv-form-valor').value = ''
-  document.getElementById('srv-form-desc').value = ''
-  document.getElementById('srv-form-itens-json').value = '[]'
+  srvFormId.value = ''
+  srvFormCliente.value = ''
+  srvFormEntrada.value = hoje
+  if (srvFormTipo) srvFormTipo.value = ''
+  if (srvFormValor) srvFormValor.value = ''
+  if (srvFormDesc) srvFormDesc.value = ''
+  if (srvFormItensJson) srvFormItensJson.value = '[]'
   
-  document.getElementById('titulo-form-srv').textContent = 'Novo Serviço'
+  if (tituloFormSrv) tituloFormSrv.textContent = 'Novo Serviço'
   
   // Se está editando um serviço existente
   if (id) {
     const s = servicos.find(x => x.id === id)
     if (!s) return
     
-    document.getElementById('srv-form-id').value = id
-    document.getElementById('srv-form-cliente').value = s.cliente_id || ''
-    document.getElementById('srv-form-entrada').value = s.data_entrada || hoje
+    srvFormId.value = id
+    srvFormCliente.value = s.cliente_id || ''
+    srvFormEntrada.value = s.data_entrada || hoje
     document.getElementById('srv-form-saida').value = s.data_saida || ''
-    document.getElementById('titulo-form-srv').textContent = 'Editar Serviço'
+    if (tituloFormSrv) tituloFormSrv.textContent = 'Editar Serviço'
     
     console.log('Carregando serviço para editar:', s)
   }
   
   renderizarItensForm()
-  window.scrollTo(0, 0)
 }
 
 function editarServico(id) { abrirServico(id) }
