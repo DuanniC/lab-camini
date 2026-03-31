@@ -414,8 +414,81 @@ textarea.form-control { min-height:90px; resize:vertical; }
     <input type="text" id="search-servicos" placeholder="🔍 Buscar por cliente ou serviço..." onkeyup="filtrarServicos()">
   </div>
   
-  <div id="lista-servicos"><div class="empty"><div class="empty-icon">🔧</div><p>Nenhum serviço</p></div></div>
 </div>
+
+<!-- ══ NOVO/EDITAR SERVIÇO (PÁGINA EXCLUSIVA) ══ -->
+<div class="page" id="page-servico-form">
+  <div style="margin-bottom:24px;">
+    <button class="btn btn-ghost" onclick="voltarParaServicos()" style="margin-bottom:12px;">← Voltar</button>
+    <p class="page-title" id="titulo-form-srv">Novo Serviço</p>
+  </div>
+  
+  <input type="hidden" id="srv-form-id">
+  
+  <!-- DADOS BÁSICOS -->
+  <div class="card">
+    <div class="card-title">📋 Dados do Serviço</div>
+    
+    <div class="form-group">
+      <label class="form-label">Cliente <span class="req">*</span></label>
+      <select class="form-control" id="srv-form-cliente"></select>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Data de Entrada <span class="req">*</span></label>
+      <input type="date" class="form-control" id="srv-form-entrada">
+    </div>
+  </div>
+  
+  <!-- ADICIONAR ITENS -->
+  <div class="card" style="background:var(--blue-light); border:2px solid var(--blue);">
+    <div class="card-title" style="color:var(--blue);">➕ Adicionar Serviços</div>
+    
+    <div class="form-group">
+      <label class="form-label">Tipo de Serviço <span class="req">*</span></label>
+      <select class="form-control" id="srv-form-tipo"></select>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Valor (R$)</label>
+      <input type="number" class="form-control" id="srv-form-valor" placeholder="0,00" step="0.01" min="0">
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Descrição (opcional)</label>
+      <textarea class="form-control" id="srv-form-desc" placeholder="Observações..." style="min-height:80px;"></textarea>
+    </div>
+    
+    <button class="btn btn-primary btn-block" onclick="adicionarItemForm()">➕ Adicionar Serviço</button>
+  </div>
+  
+  <!-- LISTA DE ITENS -->
+  <div class="card">
+    <div class="card-title">📋 Itens Adicionados</div>
+    <div id="lista-itens-form" style="background:var(--gray-100); border-radius:10px; padding:12px;">
+      <div style="color:var(--gray-400); font-size:13px; text-align:center;">Nenhum item adicionado</div>
+    </div>
+  </div>
+  
+  <!-- RESUMO -->
+  <div class="card" style="background:var(--green-light); border:2px solid var(--green);">
+    <div style="font-size:12px; color:var(--gray-400); font-weight:700; margin-bottom:8px;">RESUMO DO SERVIÇO</div>
+    <div style="font-size:24px; font-weight:800; color:var(--green); margin-bottom:8px;" id="srv-form-total-display">Total: R$ 0,00</div>
+    <div style="font-size:13px; color:var(--gray-600); font-weight:600; margin-bottom:6px;" id="srv-form-qtd-display">0 itens</div>
+    <div style="font-size:13px; color:var(--gray-600); font-weight:600;" id="srv-form-saida-display">Saída: —</div>
+  </div>
+  
+  <input type="hidden" id="srv-form-saida">
+  <input type="hidden" id="srv-form-itens-json" value="[]">
+  
+  <!-- BOTÕES -->
+  <div style="display:flex; gap:12px; margin-top:24px; margin-bottom:24px;">
+    <button class="btn btn-ghost btn-block" onclick="voltarParaServicos()">Cancelar</button>
+    <button class="btn btn-primary btn-block" id="btn-salvar-servico-form" onclick="salvarServicoForm()">💾 Salvar Serviço</button>
+  </div>
+</div>
+
+<! ──────────────────────────────────────────────────
 
 <!-- ══ TIPOS ══ -->
 <div class="page" id="page-config">
@@ -546,15 +619,6 @@ textarea.form-control { min-height:90px; resize:vertical; }
       <div style="font-size:12px; color:var(--gray-600); font-weight:600; margin-top:6px;" id="srv-saida-display">Saída: —</div>
     </div>
     
-    <input type="hidden" id="srv-saida">
-    <input type="hidden" id="itens-json" value="[]">
-    
-    <div class="btn-row">
-      <button class="btn btn-ghost" onclick="fechar('ov-servico')">Cancelar</button>
-      <button class="btn btn-primary" id="btn-salvar-servico" onclick="salvarServico()">Salvar Serviço</button>
-    </div>
-  </div>
-</div>
 
 <!-- SHEET: PAGAMENTO -->
 <div class="overlay" id="ov-pagamento" onclick="fechar('ov-pagamento')">
@@ -1109,58 +1173,74 @@ function renderServicosList(lista) {
 }
 
 function popularSelects() {
+  // Selects antigos (se ainda existirem)
   const selCli = document.getElementById('srv-cliente')
-  selCli.innerHTML = '<option value="">— Selecione o cliente —</option>'
-  clientes.forEach(c => {
-    const nome = c.tipo_cliente === 'Dentista' ? c.nome_dentista : c.nome_lab
-    const seq  = c.numero_sequencial ? ` [${c.numero_sequencial}]` : ''
-    selCli.innerHTML += `<option value="${c.id}">${nome}${seq}</option>`
-  })
+  if (selCli) {
+    selCli.innerHTML = '<option value="">— Selecione o cliente —</option>'
+    clientes.forEach(c => {
+      const nome = c.tipo_cliente === 'Dentista' ? c.nome_dentista : c.nome_lab
+      const seq  = c.numero_sequencial ? ` [${c.numero_sequencial}]` : ''
+      selCli.innerHTML += `<option value="${c.id}">${nome}${seq}</option>`
+    })
+  }
   
-  // Também popular o select temporário
   const selTipoTemp = document.getElementById('srv-tipo-temp')
   if (selTipoTemp) {
     selTipoTemp.innerHTML = '<option value="">— Selecione o tipo —</option>'
     tipos.forEach(t => selTipoTemp.innerHTML += `<option value="${t.nome}">${t.nome}</option>`)
+  }
+  
+  // NOVOS Selects da página de formulário
+  const selFormCli = document.getElementById('srv-form-cliente')
+  if (selFormCli) {
+    selFormCli.innerHTML = '<option value="">— Selecione o cliente —</option>'
+    clientes.forEach(c => {
+      const nome = c.tipo_cliente === 'Dentista' ? c.nome_dentista : c.nome_lab
+      const seq  = c.numero_sequencial ? ` [${c.numero_sequencial}]` : ''
+      selFormCli.innerHTML += `<option value="${c.id}">${nome}${seq}</option>`
+    })
+  }
+  
+  const selFormTipo = document.getElementById('srv-form-tipo')
+  if (selFormTipo) {
+    selFormTipo.innerHTML = '<option value="">— Selecione o tipo —</option>'
+    tipos.forEach(t => selFormTipo.innerHTML += `<option value="${t.nome}">${t.nome}</option>`)
   }
 }
 
 function abrirServico(id=null) {
   const hoje = new Date().toISOString().split('T')[0]
   
-  // Limpar tudo para novo serviço
-  document.getElementById('srv-id').value = ''
-  document.getElementById('srv-cliente').value = ''
-  document.getElementById('srv-entrada').value = hoje
-  document.getElementById('srv-tipo-temp').value = ''
-  document.getElementById('srv-valor-temp').value = ''
-  document.getElementById('srv-desc-temp').value = ''
-  document.getElementById('itens-json').value = '[]'
+  // Ir para a página de formulário
+  irPara('servico-form')
   
-  document.getElementById('titulo-servico').textContent = 'Novo Serviço'
+  // Limpar tudo para novo serviço
+  document.getElementById('srv-form-id').value = ''
+  document.getElementById('srv-form-cliente').value = ''
+  document.getElementById('srv-form-entrada').value = hoje
+  document.getElementById('srv-form-tipo').value = ''
+  document.getElementById('srv-form-valor').value = ''
+  document.getElementById('srv-form-desc').value = ''
+  document.getElementById('srv-form-itens-json').value = '[]'
+  
+  document.getElementById('titulo-form-srv').textContent = 'Novo Serviço'
   
   // Se está editando um serviço existente
   if (id) {
     const s = servicos.find(x => x.id === id)
     if (!s) return
     
-    document.getElementById('srv-id').value = id
-    document.getElementById('srv-cliente').value = s.cliente_id || ''
-    document.getElementById('srv-entrada').value = s.data_entrada || hoje
-    document.getElementById('srv-saida').value = s.data_saida || ''
-    document.getElementById('titulo-servico').textContent = 'Editar Serviço'
+    document.getElementById('srv-form-id').value = id
+    document.getElementById('srv-form-cliente').value = s.cliente_id || ''
+    document.getElementById('srv-form-entrada').value = s.data_entrada || hoje
+    document.getElementById('srv-form-saida').value = s.data_saida || ''
+    document.getElementById('titulo-form-srv').textContent = 'Editar Serviço'
     
-    // TODO: Carregar itens do serviço do banco de dados
-    // Por enquanto, mostra o tipo_servico como placeholder
-    if (s.tipo_servico) {
-      const tipos = s.tipo_servico.split(' + ')
-      // Poderia carregar os valores reais do banco
-      console.log('Serviço com itens:', tipos)
-    }
+    console.log('Carregando serviço para editar:', s)
   }
   
-  renderizarItens()
-  abrir('ov-servico')
+  renderizarItensForm()
+  window.scrollTo(0, 0)
 }
 
 function editarServico(id) { abrirServico(id) }
@@ -1241,6 +1321,159 @@ function renderizarItens() {
 
 function calcularSaida() {
   renderizarItens()
+}
+
+function voltarParaServicos() {
+  irPara('servicos')
+  window.scrollTo(0, 0)
+}
+
+function adicionarItemForm() {
+  try {
+    const tipo = document.getElementById('srv-form-tipo').value.trim()
+    const valor = parseFloat(document.getElementById('srv-form-valor').value)
+    const desc = document.getElementById('srv-form-desc').value.trim()
+    
+    if (!tipo) { alerta('Selecione o tipo de serviço', 'warning'); return }
+    if (isNaN(valor) || valor <= 0) { alerta('Informe um valor válido', 'warning'); return }
+    
+    let itens = JSON.parse(document.getElementById('srv-form-itens-json').value)
+    itens.push({
+      tipo: tipo,
+      valor: valor,
+      desc: desc,
+      id: Date.now()
+    })
+    
+    document.getElementById('srv-form-itens-json').value = JSON.stringify(itens)
+    
+    // Limpar campos
+    document.getElementById('srv-form-tipo').value = ''
+    document.getElementById('srv-form-valor').value = ''
+    document.getElementById('srv-form-desc').value = ''
+    
+    renderizarItensForm()
+    alerta('✅ Serviço adicionado!', 'success')
+  } catch(e) {
+    console.error('Erro em adicionarItemForm:', e)
+    alerta('Erro ao adicionar serviço', 'danger')
+  }
+}
+
+function removerItemForm(itemId) {
+  try {
+    let itens = JSON.parse(document.getElementById('srv-form-itens-json').value)
+    itens = itens.filter(i => i.id !== itemId)
+    document.getElementById('srv-form-itens-json').value = JSON.stringify(itens)
+    renderizarItensForm()
+    alerta('⚠️ Serviço removido', 'warning')
+  } catch(e) {
+    console.error('Erro em removerItemForm:', e)
+    alerta('Erro ao remover serviço', 'danger')
+  }
+}
+
+function renderizarItensForm() {
+  try {
+    const itensJson = document.getElementById('srv-form-itens-json').value || '[]'
+    const itens = JSON.parse(itensJson)
+    const listaEl = document.getElementById('lista-itens-form')
+    
+    if (!listaEl) return
+    
+    if (itens.length === 0) {
+      listaEl.innerHTML = '<div style="color:var(--gray-400); font-size:13px; text-align:center;">Nenhum item adicionado</div>'
+    } else {
+      listaEl.innerHTML = itens.map(item => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; background:white; border-radius:8px; margin-bottom:8px;">
+          <div>
+            <div style="font-weight:700; color:var(--gray-800); font-size:13px;">${item.tipo}</div>
+            <div style="font-size:12px; color:var(--gray-400); margin-top:2px;">R$ ${item.valor.toFixed(2).replace('.', ',')}</div>
+            ${item.desc ? `<div style="font-size:11px; color:var(--gray-600); margin-top:2px;">${item.desc}</div>` : ''}
+          </div>
+          <button class="icon-btn delete" onclick="removerItemForm(${item.id})" style="margin:0;">❌</button>
+        </div>
+      `).join('')
+    }
+    
+    // Calcular total
+    const total = itens.reduce((sum, i) => sum + (i.valor || 0), 0)
+    const qtd = itens.length
+    
+    const totalEl = document.getElementById('srv-form-total-display')
+    const qtdEl = document.getElementById('srv-form-qtd-display')
+    const saidaEl = document.getElementById('srv-form-saida-display')
+    
+    if (totalEl) totalEl.textContent = `Total: R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
+    if (qtdEl) qtdEl.textContent = `${qtd} item${qtd !== 1 ? 's' : ''}`
+    
+    // Calcular data de saída
+    if (qtd > 0) {
+      const entrada = document.getElementById('srv-form-entrada').value
+      if (entrada) {
+        let d = new Date(entrada+'T12:00:00'), dias = 0
+        while (dias < 5) { d.setDate(d.getDate()+1); if (d.getDay() !== 0 && d.getDay() !== 6) dias++ }
+        const dataSaida = d.toISOString().split('T')[0]
+        document.getElementById('srv-form-saida').value = dataSaida
+        if (saidaEl) saidaEl.textContent = `Saída: ${new Date(dataSaida+'T12:00:00').toLocaleDateString('pt-BR')}`
+      }
+    }
+  } catch(e) {
+    console.error('Erro em renderizarItensForm:', e)
+  }
+}
+
+async function salvarServicoForm() {
+  if (!conectado) { alerta('Sem conexão com Supabase', 'danger'); return }
+  
+  const editId  = document.getElementById('srv-form-id').value
+  const cliId   = document.getElementById('srv-form-cliente').value
+  const entrada = document.getElementById('srv-form-entrada').value
+  const saida   = document.getElementById('srv-form-saida').value
+  const itens   = JSON.parse(document.getElementById('srv-form-itens-json').value)
+
+  if (!cliId)   { alerta('Selecione o cliente','warning');       return }
+  if (itens.length === 0) { alerta('Adicione pelo menos um serviço','warning'); return }
+  if (!entrada) { alerta('Informe a data de entrada','warning');  return }
+
+  // Calcular total
+  const valor = itens.reduce((sum, i) => sum + i.valor, 0)
+  const tipo_servico = itens.map(i => i.tipo).join(' + ')
+  
+  const cl = clientes.find(c => c.id == cliId)
+  const dados = {
+    cliente_id:    parseInt(cliId),
+    cliente_nome:  cl ? (cl.nome_dentista || cl.nome_lab) : '',
+    tipo_servico:  tipo_servico,
+    valor:         valor,
+    data_entrada:  entrada,
+    data_saida:    saida || null,
+    descricao:     `${itens.length} item(s) - ` + itens.map(i => i.tipo).join(', '),
+    quantidade_itens: itens.length
+  }
+
+  document.getElementById('btn-salvar-servico-form').disabled = true
+  setSync('loading')
+  
+  try {
+    if (editId) {
+      await api('PATCH','servicos',dados,`?id=eq.${editId}`)
+      alerta('✅ Serviço atualizado!','success')
+    } else {
+      dados.status = 'pendente'
+      dados.pago = false
+      const result = await api('POST','servicos',dados)
+      if (!result || !Array.isArray(result)) throw new Error('Erro ao salvar serviço')
+      alerta(`✅ Serviço criado com ${itens.length} item(s)!`,'success')
+    }
+    voltarParaServicos()
+    await carregar()
+  } catch(e) { 
+    setSync('error')
+    alerta('Erro: '+e.message,'danger') 
+  } finally {
+    document.getElementById('btn-salvar-servico-form').disabled = false
+  }
 }
 
 async function salvarServico() {
