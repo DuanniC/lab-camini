@@ -708,7 +708,10 @@ function setSync(s) {
 async function api(metodo, tabela, dados=null, params='') {
   let r
   try {
-    r = await fetch(`${URL_SB}/rest/v1/${tabela}${params}`, {
+    const url = `${URL_SB}/rest/v1/${tabela}${params}`
+    console.log(`API: ${metodo} ${url}`)
+    
+    r = await fetch(url, {
       method: metodo,
       headers: {
         'Content-Type': 'application/json',
@@ -718,32 +721,59 @@ async function api(metodo, tabela, dados=null, params='') {
       },
       body: dados ? JSON.stringify(dados) : undefined
     })
+    
+    console.log(`Resposta: ${r.status}`)
   } catch(netErr) {
-    throw new Error('Sem conexão com Supabase')
+    console.error('Erro de conexão:', netErr)
+    throw new Error('Sem conexão com internet. Verifique sua conexão.')
   }
+  
   if (!r.ok) {
     let msg = `HTTP ${r.status}`
-    try { const e = await r.json(); msg += ': ' + (e.message || e.error || JSON.stringify(e)) } catch {}
+    try { 
+      const e = await r.json()
+      console.error('Erro Supabase:', e)
+      msg += ': ' + (e.message || e.error || e.hint || JSON.stringify(e)) 
+    } catch {}
     throw new Error(msg)
   }
+  
   if (r.status === 204) return []
   return r.json()
 }
 
 // ── CARREGAR ──
 async function carregar() {
+  console.log('🔄 Carregando dados do Supabase...')
+  console.log('URL:', URL_SB)
+  console.log('API Key:', KEY_SB.substring(0, 20) + '...')
+  
   setSync('loading')
   try {
-    [clientes, servicos, tipos] = await Promise.all([
-      api('GET','clientes',null,'?select=*&order=numero_sequencial.asc'),
-      api('GET','servicos',null,'?select=*&order=id.desc'),
-      api('GET','tipos_servico',null,'?select=*&order=nome.asc')
-    ])
+    console.log('📦 Buscando clientes...')
+    const clientesResult = await api('GET','clientes',null,'?select=*&order=numero_sequencial.asc')
+    clientes = clientesResult || []
+    console.log('✅ Clientes carregados:', clientes.length)
+    
+    console.log('📦 Buscando serviços...')
+    const servicosResult = await api('GET','servicos',null,'?select=*&order=id.desc')
+    servicos = servicosResult || []
+    console.log('✅ Serviços carregados:', servicos.length)
+    
+    console.log('📦 Buscando tipos...')
+    const tiposResult = await api('GET','tipos_servico',null,'?select=*&order=nome.asc')
+    tipos = tiposResult || []
+    console.log('✅ Tipos carregados:', tipos.length)
+    
+    console.log('✅ CONEXÃO ESTABELECIDA!')
     renderTudo()
     setSync('ok')
+    conectado = true
   } catch(e) {
+    console.error('❌ ERRO:', e.message)
     setSync('error')
-    alerta('❌ Sem conexão com Supabase. Use apenas online.', 'danger')
+    alerta('❌ Erro: ' + e.message, 'danger')
+    conectado = false
   }
 }
 
