@@ -778,13 +778,22 @@ async function carregar() {
 }
 
 function renderTudo() {
-  renderStats()
-  renderMensal()
-  renderPagamentos()
-  renderClientes()
-  renderServicos()
-  renderTipos()
-  popularSelects()
+  try {
+    console.log('📊 Renderizando tudo...')
+    
+    // Renderizar cada parte com try-catch individual
+    try { renderStats() } catch(e) { console.error('Erro renderStats:', e) }
+    try { renderMensal() } catch(e) { console.error('Erro renderMensal:', e) }
+    try { renderPagamentos() } catch(e) { console.error('Erro renderPagamentos:', e) }
+    try { renderClientes() } catch(e) { console.error('Erro renderClientes:', e) }
+    try { renderServicos() } catch(e) { console.error('Erro renderServicos:', e) }
+    try { renderTipos() } catch(e) { console.error('Erro renderTipos:', e) }
+    try { popularSelects() } catch(e) { console.error('Erro popularSelects:', e) }
+    
+    console.log('✅ Renderização concluída!')
+  } catch(e) {
+    console.error('❌ Erro geral em renderTudo:', e)
+  }
 }
 
 // ── STATS ──
@@ -877,6 +886,8 @@ function filtrarPor(tipo) {
 
 function renderPagamentos() {
   const el = document.getElementById('lista-pagamentos')
+  if (!el) return
+  
   const hoje = new Date(); hoje.setHours(0,0,0,0)
 
   let servicosExibir = servicos.filter(s => s.valor > 0)
@@ -889,7 +900,8 @@ function renderPagamentos() {
     servicosExibir = servicosExibir.filter(s => !s.pago && s.data_saida && new Date(s.data_saida+'T12:00:00') < hoje)
   }
 
-  document.getElementById('pagCount').textContent = `(${servicosExibir.length})`
+  const pagCount = document.getElementById('pagCount')
+  if (pagCount) pagCount.textContent = `(${servicosExibir.length})`
 
   if (!servicosExibir.length) {
     el.innerHTML = '<div class="empty"><div class="empty-icon">💳</div><p>' + (filtroAtivo ? 'Nenhum registro nesta categoria' : 'Nenhum serviço') + '</p></div>'
@@ -984,6 +996,8 @@ function renderClientes() {
 
 function renderClientesList(lista) {
   const el = document.getElementById('lista-clientes')
+  if (!el) return
+  
   if (!lista.length) {
     el.innerHTML = '<div class="empty"><div class="empty-icon">👤</div><p>Nenhum cliente cadastrado</p></div>'
     return
@@ -1176,6 +1190,8 @@ function renderServicos() {
 
 function renderServicosList(lista) {
   const el = document.getElementById('lista-servicos')
+  if (!el) return
+  
   const hoje = new Date(); hoje.setHours(0,0,0,0)
   if (!lista.length) {
     el.innerHTML = '<div class="empty"><div class="empty-icon">🔧</div><p>Nenhum serviço</p></div>'
@@ -1608,6 +1624,8 @@ async function apagarServico(id) {
 // ── TIPOS ──
 function renderTipos() {
   const el = document.getElementById('lista-tipos')
+  if (!el) return
+  
   if (!tipos.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">⚙️</div><p>Nenhum tipo</p></div>'; return }
   el.innerHTML = tipos.map(t => `<div class="list-item">
     <div class="item-header">
