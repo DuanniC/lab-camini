@@ -649,6 +649,26 @@ textarea.form-control { min-height:90px; resize:vertical; }
   </div>
 </div>
 
+<!-- SHEET: PAGAMENTO -->
+<div class="overlay" id="ov-pago" onclick="fechar('ov-pago')" style="z-index:9999">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-header">
+      <div class="sheet-title">Registrar Pagamento</div>
+      <button class="sheet-close" onclick="fechar('ov-pago')">✕</button>
+    </div>
+    <input type="hidden" id="pago-srv-id">
+    <div class="form-group">
+      <label class="form-label">Data de Pagamento <span class="req">*</span></label>
+      <input type="date" class="form-control" id="pago-data" value="">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="fechar('ov-pago')">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmarPagamento()" type="button">Confirmar Pagamento</button>
+      <button class="btn btn-ghost" id="pago-btn-desmarcar" style="display:none; background:#ffebee; color:var(--red)" onclick="desmarcarPagamento()" type="button">Desmarcar Pagamento</button>
+    </div>
+  </div>
+</div>
+
 <!-- SHEET: EDITAR TIPO -->
 <div class="overlay" id="ov-tipo" onclick="fechar('ov-tipo')">
   <div class="sheet" onclick="event.stopPropagation()">
@@ -1414,9 +1434,20 @@ function renderServicosInicio(lista) {
     const valor = (s.valor||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})
     const dEnt  = s.data_entrada ? new Date(s.data_entrada+'T12:00:00').toLocaleDateString('pt-BR') : '—'
     const dSai  = saida ? saida.toLocaleDateString('pt-BR') : '—'
+    const dPago = s.data_pagamento ? new Date(s.data_pagamento+'T12:00:00').toLocaleDateString('pt-BR') : null
+    const dEntrega = s.data_entrega ? new Date(s.data_entrega+'T12:00:00').toLocaleDateString('pt-BR') : null
     const bCls  = s.pago ? 'badge-pago' : venc ? 'badge-vencido' : 'badge-pendente'
     const bTxt  = s.pago ? '✓ Pago'    : venc ? '⚠ Vencido'    : '⏳ Pendente'
     const iCls  = s.pago ? 'pago'       : venc ? 'venc'          : ''
+    
+    // Montar linhas adicionais de pago e entrega
+    let linhasAdicionais = ''
+    if (dPago) {
+      linhasAdicionais += `<div class="item-sub" style="color:var(--green); font-weight:600;">💳 Pago em ${dPago}</div>`
+    }
+    if (s.entregue && dEntrega) {
+      linhasAdicionais += `<div class="item-sub" style="color:#1976d2; font-weight:600;">📦 Entregue em ${dEntrega}</div>`
+    }
     
     // Extrair itens e agrupar
     let itens = []
@@ -1475,6 +1506,7 @@ function renderServicosInicio(lista) {
         <div style="flex:1;min-width:0">
           <div class="item-name"><span class="seq-num">#${numero}</span> ${nome}</div>
           <div class="item-sub">📅 Entrada: ${dEnt} · Saída: ${dSai}</div>
+          ${linhasAdicionais}
           
           <!-- ITENS DETALHADOS -->
           ${itensDetalhesHtml}
@@ -1484,8 +1516,8 @@ function renderServicosInicio(lista) {
           <!-- BOTÕES DE AÇÃO -->
           <div class="export-buttons" style="margin-top:10px">
             ${s.pago ? 
-              `<button class="export-btn" style="background:#ffebee;color:var(--red)" onclick="marcarComoPago(${s.id}, false)" title="Desmarcar como pago">⏳ Desmarcar</button>` :
-              `<button class="export-btn" style="background:#e8f5e9;color:var(--green)" onclick="marcarComoPago(${s.id}, true)" title="Marcar como pago">✓ Marcar Pago</button>`
+              `<button class="export-btn" style="background:#ffebee;color:var(--red)" onclick="marcarComoPago(${s.id})" title="Desmarcar como pago">⏳ Desmarcar</button>` :
+              `<button class="export-btn" style="background:#e8f5e9;color:var(--green)" onclick="marcarComoPago(${s.id})" title="Marcar como pago">✓ Marcar Pago</button>`
             }
             <button class="export-btn" style="background:${s.entregue ? '#e3f2fd' : '#fff3e0'};color:${s.entregue ? '#1976d2' : '#f57c00'}" onclick="abrirEntrega(${s.id})" title="Marcar como entregue">
               ${s.entregue ? '✓ Entregue' : '📦 Não Entregue'}
@@ -1529,9 +1561,20 @@ function renderServicosList(lista) {
     const valor = (s.valor||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})
     const dEnt  = s.data_entrada ? new Date(s.data_entrada+'T12:00:00').toLocaleDateString('pt-BR') : '—'
     const dSai  = saida ? saida.toLocaleDateString('pt-BR') : '—'
+    const dPago = s.data_pagamento ? new Date(s.data_pagamento+'T12:00:00').toLocaleDateString('pt-BR') : null
+    const dEntrega = s.data_entrega ? new Date(s.data_entrega+'T12:00:00').toLocaleDateString('pt-BR') : null
     const bCls  = s.pago ? 'badge-pago' : venc ? 'badge-vencido' : 'badge-pendente'
     const bTxt  = s.pago ? '✓ Pago'    : venc ? '⚠ Vencido'    : '⏳ Pendente'
     const iCls  = s.pago ? 'pago'       : venc ? 'venc'          : ''
+    
+    // Montar linhas adicionais de pago e entrega
+    let linhasAdicionais = ''
+    if (dPago) {
+      linhasAdicionais += `<div class="item-sub" style="color:var(--green); font-weight:600;">💳 Pago em ${dPago}</div>`
+    }
+    if (s.entregue && dEntrega) {
+      linhasAdicionais += `<div class="item-sub" style="color:#1976d2; font-weight:600;">📦 Entregue em ${dEntrega}</div>`
+    }
     
     // Extrair itens e agrupar
     let itens = []
@@ -1590,6 +1633,7 @@ function renderServicosList(lista) {
         <div style="flex:1;min-width:0">
           <div class="item-name"><span class="seq-num">#${numero}</span> ${nome}</div>
           <div class="item-sub">📅 Entrada: ${dEnt} · Saída: ${dSai}</div>
+          ${linhasAdicionais}
           
           <!-- ITENS DETALHADOS -->
           ${itensDetalhesHtml}
@@ -1599,8 +1643,8 @@ function renderServicosList(lista) {
           <!-- BOTÕES DE AÇÃO -->
           <div class="export-buttons" style="margin-top:10px">
             ${s.pago ? 
-              `<button class="export-btn" style="background:#ffebee;color:var(--red)" onclick="marcarComoPago(${s.id}, false)" title="Desmarcar como pago">⏳ Desmarcar</button>` :
-              `<button class="export-btn" style="background:#e8f5e9;color:var(--green)" onclick="marcarComoPago(${s.id}, true)" title="Marcar como pago">✓ Marcar Pago</button>`
+              `<button class="export-btn" style="background:#ffebee;color:var(--red)" onclick="marcarComoPago(${s.id})" title="Desmarcar como pago">⏳ Desmarcar</button>` :
+              `<button class="export-btn" style="background:#e8f5e9;color:var(--green)" onclick="marcarComoPago(${s.id})" title="Marcar como pago">✓ Marcar Pago</button>`
             }
             <button class="export-btn" style="background:${s.entregue ? '#e3f2fd' : '#fff3e0'};color:${s.entregue ? '#1976d2' : '#f57c00'}" onclick="abrirEntrega(${s.id})" title="Marcar como entregue">
               ${s.entregue ? '✓ Entregue' : '📦 Não Entregue'}
@@ -2103,16 +2147,85 @@ async function salvarServico() {
 }
 
 // ── MARCAR COMO PAGO/NÃO PAGO ──
-async function marcarComoPago(id, pago) {
+function marcarComoPago(id, pago) {
+  console.log('🎯 marcarComoPago chamada com id:', id, 'pago:', pago)
+  const s = servicos.find(srv => srv.id === id)
+  if (!s) {
+    console.error('❌ Serviço não encontrado!')
+    return
+  }
+  
+  document.getElementById('pago-srv-id').value = id
+  document.getElementById('pago-data').value = s.data_pagamento || ''
+  
+  console.log('💳 pago:', s.pago)
+  console.log('📅 data_pagamento:', s.data_pagamento)
+  
+  const btnDesmarcar = document.getElementById('pago-btn-desmarcar')
+  if (s.pago) {
+    btnDesmarcar.style.display = 'inline-block'
+  } else {
+    btnDesmarcar.style.display = 'none'
+  }
+  
+  // Pré-popular com hoje se não tiver data
+  if (!document.getElementById('pago-data').value) {
+    document.getElementById('pago-data').value = new Date().toISOString().split('T')[0]
+  }
+  
+  console.log('🚪 Abrindo overlay ov-pago')
+  abrir('ov-pago')
+  console.log('✅ Overlay aberto')
+}
+
+async function confirmarPagamento() {
+  console.log('🎯 confirmarPagamento chamada')
+  const srvId = parseInt(document.getElementById('pago-srv-id').value)
+  const dataPagamento = document.getElementById('pago-data').value
+  
+  console.log('📝 srvId:', srvId)
+  console.log('📅 dataPagamento:', dataPagamento)
+  
+  if (!dataPagamento) {
+    console.warn('⚠️ Data vazia!')
+    alerta('Informe a data de pagamento', 'warning')
+    return
+  }
+  
+  console.log('🔄 setSync loading')
   setSync('loading')
   try {
-    const dataPagamento = pago ? new Date().toISOString().split('T')[0] : null
+    console.log('📤 Enviando PATCH...')
     await api('PATCH','servicos',{
-      pago: pago,
+      pago: true,
       data_pagamento: dataPagamento
-    }, `?id=eq.${id}`)
+    }, `?id=eq.${srvId}`)
     
-    alerta(pago ? '✓ Marcado como pago!' : '⏳ Marcado como não pago!', 'success')
+    console.log('✅ PATCH enviado com sucesso!')
+    fechar('ov-pago')
+    alerta('✓ Pagamento registrado!', 'success')
+    await carregar()
+  } catch(e) { 
+    console.error('❌ Erro:', e)
+    setSync('error')
+    alerta('Erro: '+e.message,'danger') 
+  }
+}
+
+async function desmarcarPagamento() {
+  if (!confirm('Desmarcar como pago?')) return
+  
+  const srvId = parseInt(document.getElementById('pago-srv-id').value)
+  
+  setSync('loading')
+  try {
+    await api('PATCH','servicos',{
+      pago: false,
+      data_pagamento: null
+    }, `?id=eq.${srvId}`)
+    
+    fechar('ov-pago')
+    alerta('⏳ Marcado como não pago', 'success')
     await carregar()
   } catch(e) { 
     setSync('error')
