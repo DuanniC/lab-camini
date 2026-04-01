@@ -623,10 +623,13 @@ textarea.form-control { min-height:90px; resize:vertical; }
       <div style="font-size:12px; color:var(--gray-600); font-weight:600;" id="srv-qtd-display">0 itens</div>
       <div style="font-size:12px; color:var(--gray-600); font-weight:600; margin-top:6px;" id="srv-saida-display">Saída: —</div>
     </div>
-    
 
-<!-- SHEET: PAGAMENTO -->
-
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="fechar('ov-servico')">Cancelar</button>
+      <button class="btn btn-primary" id="btn-salvar-servico" onclick="salvarServico()">Salvar</button>
+    </div>
+  </div>
+</div>
 
 <!-- SHEET: ENTREGA -->
 <div class="overlay" id="ov-entrega" onclick="fechar('ov-entrega')" style="z-index:9999">
