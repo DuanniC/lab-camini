@@ -629,7 +629,7 @@ textarea.form-control { min-height:90px; resize:vertical; }
 
 
 <!-- SHEET: ENTREGA -->
-<div class="overlay" id="ov-entrega" onclick="fechar('ov-entrega')">
+<div class="overlay" id="ov-entrega" onclick="fechar('ov-entrega')" style="z-index:9999">
   <div class="sheet" onclick="event.stopPropagation()">
     <div class="sheet-header">
       <div class="sheet-title">Registrar Entrega</div>
@@ -725,7 +725,20 @@ function irPara(p) {
 }
 
 function fechar(id) { document.getElementById(id).classList.remove('open') }
-function abrir(id)  { document.getElementById(id).classList.add('open') }
+function abrir(id)  { 
+  console.log('🚪 abrir() chamada com id:', id)
+  const el = document.getElementById(id)
+  console.log('🔍 Elemento encontrado:', el)
+  if (el) {
+    el.classList.add('open')
+    console.log('✅ Classe "open" adicionada')
+    console.log('📍 Display:', window.getComputedStyle(el).display)
+    console.log('📍 Z-index:', window.getComputedStyle(el).zIndex)
+    console.log('📍 Visibility:', window.getComputedStyle(el).visibility)
+  } else {
+    console.error('❌ Elemento não encontrado!')
+  }
+}
 
 function alerta(msg, tipo='success') {
   const box = document.getElementById('alertBox')
