@@ -2304,8 +2304,23 @@ function gerarHTMLServico(id) {
   const numero = cl?.numero_sequencial || '—'
   const valor = (s.valor||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})
   const dEnt = s.data_entrada ? new Date(s.data_entrada+'T12:00:00').toLocaleDateString('pt-BR') : '—'
-  const dSai = s.data_saida ? new Date(s.data_saida+'T12:00:00').toLocaleDateString('pt-BR') : '—'
-  const status = s.pago ? '✓ Pago' : '⏳ Pendente'
+  const statusPago = s.pago ? '✓ Pago' : '⏳ Não pago'
+  
+  // Determinar a linha de Saída baseado no status de entrega
+  let linhaEntrega = ''
+  if (s.entregue && s.data_entrega) {
+    const dEntrega = new Date(s.data_entrega+'T12:00:00').toLocaleDateString('pt-BR')
+    linhaEntrega = `<tr style="border-bottom:1px solid #ccc;">
+      <td style="padding:10px; font-weight:bold; color:#333;">Saída:</td>
+      <td style="padding:10px; color:#1e9e5e; font-weight:bold;">✓ Entregue em ${dEntrega}</td>
+    </tr>`
+  } else {
+    const dSai = s.data_saida ? new Date(s.data_saida+'T12:00:00').toLocaleDateString('pt-BR') : '—'
+    linhaEntrega = `<tr style="border-bottom:1px solid #ccc;">
+      <td style="padding:10px; font-weight:bold; color:#333;">Saída Prevista:</td>
+      <td style="padding:10px; color:#666;">${dSai}</td>
+    </tr>`
+  }
   
   // Tentar carregar itens do JSON
   let itensHTML = ''
@@ -2359,13 +2374,10 @@ function gerarHTMLServico(id) {
           <td style="padding:10px; font-weight:bold; color:#333;">Data de Entrada:</td>
           <td style="padding:10px; color:#666;">${dEnt}</td>
         </tr>
-        <tr style="border-bottom:1px solid #ccc;">
-          <td style="padding:10px; font-weight:bold; color:#333;">Saída Prevista:</td>
-          <td style="padding:10px; color:#666;">${dSai}</td>
-        </tr>
+        ${linhaEntrega}
         <tr style="background-color:#f0f2f5;">
-          <td style="padding:10px; font-weight:bold; color:#333;">Status:</td>
-          <td style="padding:10px; color:#1a6fa8; font-weight:bold;">${status}</td>
+          <td style="padding:10px; font-weight:bold; color:#333;">Status Pagamento:</td>
+          <td style="padding:10px; color:#1a6fa8; font-weight:bold;">${statusPago}</td>
         </tr>
       </table>
       <div style="margin-top:30px; text-align:center; color:#999; font-size:12px;">
@@ -2386,8 +2398,17 @@ function compartilharWhatsApp(id) {
   const numero = cl?.numero_sequencial || '—'
   const valor = (s.valor||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})
   const dEnt = s.data_entrada ? new Date(s.data_entrada+'T12:00:00').toLocaleDateString('pt-BR') : '—'
-  const dSai = s.data_saida ? new Date(s.data_saida+'T12:00:00').toLocaleDateString('pt-BR') : '—'
   const statusPago = s.pago ? '✓ Pago' : '⏳ Não pago'
+  
+  // Determinar a linha de Saída baseado no status de entrega
+  let linhaEntrega = ''
+  if (s.entregue && s.data_entrega) {
+    const dEntrega = new Date(s.data_entrega+'T12:00:00').toLocaleDateString('pt-BR')
+    linhaEntrega = `📅 Saída: ✓ Entregue em ${dEntrega}\n`
+  } else {
+    const dSai = s.data_saida ? new Date(s.data_saida+'T12:00:00').toLocaleDateString('pt-BR') : '—'
+    linhaEntrega = `📅 Saída: ${dSai}\n`
+  }
   
   // Tentar carregar itens do JSON
   let itensText = ''
@@ -2405,25 +2426,16 @@ function compartilharWhatsApp(id) {
     itensText = tipos.map((t, i) => `  ${i+1}. ${t.trim()}`).join('\n')
   }
   
-  // Montar mensagem base
+  // Montar mensagem
   let mensagem = `*SERVIÇO - LABORATÓRIO CAMINI*\n\n` +
     `🔢 Cliente #${numero}\n` +
     `👤 Consultório: ${nome}\n` +
     `📋 Serviços:\n${itensText}\n` +
     `💰 TOTAL: ${valor}\n` +
     `📅 Entrada: ${dEnt}\n` +
-    `📅 Saída: ${dSai}\n` +
-    `✓ Status Pagamento: ${statusPago}\n`
-  
-  // Adicionar informações de entrega se estiver entregue
-  if (s.entregue) {
-    const dEntrega = s.data_entrega ? new Date(s.data_entrega+'T12:00:00').toLocaleDateString('pt-BR') : '—'
-    mensagem += `📦 Status Entrega: ✓ Entregue em ${dEntrega}\n`
-  } else {
-    mensagem += `📦 Status Entrega: ⏳ Não entregue\n`
-  }
-  
-  mensagem += `\nLaboratório de Prótese Dentária Camini`
+    linhaEntrega +
+    `✓ Status Pagamento: ${statusPago}\n` +
+    `\nLaboratório de Prótese Dentária Camini`
   
   const whatsappURL = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensagem)}`
   window.open(whatsappURL, '_blank')
