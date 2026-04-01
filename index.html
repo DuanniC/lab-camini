@@ -2108,11 +2108,20 @@ async function marcarComoPago(id, pago) {
 
 // ── ENTREGA ──
 function abrirEntrega(id) {
+  console.log('🎯 abrirEntrega chamada com id:', id)
   const s = servicos.find(srv => srv.id === id)
-  if (!s) return
+  console.log('🔍 Serviço encontrado:', s)
+  
+  if (!s) {
+    console.error('❌ Serviço não encontrado!')
+    return
+  }
   
   document.getElementById('entrega-srv-id').value = id
   document.getElementById('entrega-data').value = s.data_entrega || ''
+  
+  console.log('📦 entregue:', s.entregue)
+  console.log('📅 data_entrega:', s.data_entrega)
   
   const btnDesmarcar = document.getElementById('entrega-btn-desmarcar')
   if (s.entregue) {
@@ -2126,29 +2135,40 @@ function abrirEntrega(id) {
     document.getElementById('entrega-data').value = new Date().toISOString().split('T')[0]
   }
   
+  console.log('🚪 Abrindo overlay ov-entrega')
   abrir('ov-entrega')
+  console.log('✅ Overlay aberto')
 }
 
 async function confirmarEntrega() {
+  console.log('🎯 confirmarEntrega chamada')
   const srvId = parseInt(document.getElementById('entrega-srv-id').value)
   const dataEntrega = document.getElementById('entrega-data').value
   
+  console.log('📝 srvId:', srvId)
+  console.log('📅 dataEntrega:', dataEntrega)
+  
   if (!dataEntrega) {
+    console.warn('⚠️ Data vazia!')
     alerta('Informe a data de entrega', 'warning')
     return
   }
   
+  console.log('🔄 setSync loading')
   setSync('loading')
   try {
+    console.log('📤 Enviando PATCH...')
     await api('PATCH','servicos',{
       entregue: true,
       data_entrega: dataEntrega
     }, `?id=eq.${srvId}`)
     
+    console.log('✅ PATCH enviado com sucesso!')
     fechar('ov-entrega')
     alerta('✓ Entrega registrada!', 'success')
     await carregar()
   } catch(e) { 
+    console.error('❌ Erro:', e)
     setSync('error')
     alerta('Erro: '+e.message,'danger') 
   }
