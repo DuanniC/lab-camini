@@ -628,6 +628,26 @@ textarea.form-control { min-height:90px; resize:vertical; }
 <!-- SHEET: PAGAMENTO -->
 
 
+<!-- SHEET: ENTREGA -->
+<div class="overlay" id="ov-entrega" onclick="fechar('ov-entrega')">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-header">
+      <div class="sheet-title">Registrar Entrega</div>
+      <button class="sheet-close" onclick="fechar('ov-entrega')">✕</button>
+    </div>
+    <input type="hidden" id="entrega-srv-id">
+    <div class="form-group">
+      <label class="form-label">Data de Entrega <span class="req">*</span></label>
+      <input type="date" class="form-control" id="entrega-data" value="">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="fechar('ov-entrega')">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmarEntrega()" type="button">Confirmar Entrega</button>
+      <button class="btn btn-ghost" id="entrega-btn-desmarcar" style="display:none; background:#ffebee; color:var(--red)" onclick="desmarcarEntrega()" type="button">Desmarcar Entrega</button>
+    </div>
+  </div>
+</div>
+
 <!-- SHEET: EDITAR TIPO -->
 <div class="overlay" id="ov-tipo" onclick="fechar('ov-tipo')">
   <div class="sheet" onclick="event.stopPropagation()">
@@ -1453,6 +1473,9 @@ function renderServicosInicio(lista) {
               `<button class="export-btn" style="background:#ffebee;color:var(--red)" onclick="marcarComoPago(${s.id}, false)" title="Desmarcar como pago">⏳ Desmarcar</button>` :
               `<button class="export-btn" style="background:#e8f5e9;color:var(--green)" onclick="marcarComoPago(${s.id}, true)" title="Marcar como pago">✓ Marcar Pago</button>`
             }
+            <button class="export-btn" style="background:${s.entregue ? '#e3f2fd' : '#fff3e0'};color:${s.entregue ? '#1976d2' : '#f57c00'}" onclick="abrirEntrega(${s.id})" title="Marcar como entregue">
+              ${s.entregue ? '✓ Entregue' : '📦 Não Entregue'}
+            </button>
             <button class="export-btn whatsapp" onclick="compartilharWhatsApp(${s.id})" title="Enviar via WhatsApp">
               💬 WhatsApp
             </button>
@@ -1565,6 +1588,9 @@ function renderServicosList(lista) {
               `<button class="export-btn" style="background:#ffebee;color:var(--red)" onclick="marcarComoPago(${s.id}, false)" title="Desmarcar como pago">⏳ Desmarcar</button>` :
               `<button class="export-btn" style="background:#e8f5e9;color:var(--green)" onclick="marcarComoPago(${s.id}, true)" title="Marcar como pago">✓ Marcar Pago</button>`
             }
+            <button class="export-btn" style="background:${s.entregue ? '#e3f2fd' : '#fff3e0'};color:${s.entregue ? '#1976d2' : '#f57c00'}" onclick="abrirEntrega(${s.id})" title="Marcar como entregue">
+              ${s.entregue ? '✓ Entregue' : '📦 Não Entregue'}
+            </button>
             <button class="export-btn whatsapp" onclick="compartilharWhatsApp(${s.id})" title="Enviar via WhatsApp">
               💬 WhatsApp
             </button>
@@ -2073,6 +2099,75 @@ async function marcarComoPago(id, pago) {
     }, `?id=eq.${id}`)
     
     alerta(pago ? '✓ Marcado como pago!' : '⏳ Marcado como não pago!', 'success')
+    await carregar()
+  } catch(e) { 
+    setSync('error')
+    alerta('Erro: '+e.message,'danger') 
+  }
+}
+
+// ── ENTREGA ──
+function abrirEntrega(id) {
+  const s = servicos.find(srv => srv.id === id)
+  if (!s) return
+  
+  document.getElementById('entrega-srv-id').value = id
+  document.getElementById('entrega-data').value = s.data_entrega || ''
+  
+  const btnDesmarcar = document.getElementById('entrega-btn-desmarcar')
+  if (s.entregue) {
+    btnDesmarcar.style.display = 'inline-block'
+  } else {
+    btnDesmarcar.style.display = 'none'
+  }
+  
+  // Pré-popular com hoje se não tiver data
+  if (!document.getElementById('entrega-data').value) {
+    document.getElementById('entrega-data').value = new Date().toISOString().split('T')[0]
+  }
+  
+  abrir('ov-entrega')
+}
+
+async function confirmarEntrega() {
+  const srvId = parseInt(document.getElementById('entrega-srv-id').value)
+  const dataEntrega = document.getElementById('entrega-data').value
+  
+  if (!dataEntrega) {
+    alerta('Informe a data de entrega', 'warning')
+    return
+  }
+  
+  setSync('loading')
+  try {
+    await api('PATCH','servicos',{
+      entregue: true,
+      data_entrega: dataEntrega
+    }, `?id=eq.${srvId}`)
+    
+    fechar('ov-entrega')
+    alerta('✓ Entrega registrada!', 'success')
+    await carregar()
+  } catch(e) { 
+    setSync('error')
+    alerta('Erro: '+e.message,'danger') 
+  }
+}
+
+async function desmarcarEntrega() {
+  if (!confirm('Desmarcar como entregue?')) return
+  
+  const srvId = parseInt(document.getElementById('entrega-srv-id').value)
+  
+  setSync('loading')
+  try {
+    await api('PATCH','servicos',{
+      entregue: false,
+      data_entrega: null
+    }, `?id=eq.${srvId}`)
+    
+    fechar('ov-entrega')
+    alerta('⏳ Marcado como não entregue', 'success')
     await carregar()
   } catch(e) { 
     setSync('error')
