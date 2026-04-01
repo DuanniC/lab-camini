@@ -127,25 +127,25 @@ body {
 }
 .monthly-title { font-size:16px; font-weight:800; color:var(--blue); }
 .month-nav {
-  display:flex; gap:8px; align-items:center;
+  display:flex; gap:12px; align-items:center; justify-content:center; margin-bottom:12px;
 }
 .month-btn {
-  width:36px; height:36px; border:2px solid var(--gray-200); border-radius:50%;
-  background:white; cursor:pointer; font-weight:700; font-size:14px;
+  width:40px; height:40px; border:2px solid var(--gray-200); border-radius:50%;
+  background:white; cursor:pointer; font-weight:700; font-size:16px;
   display:flex; align-items:center; justify-content:center;
   transition:all .2s; -webkit-tap-highlight-color:transparent;
 }
 .month-btn:hover { border-color:var(--blue); color:var(--blue); }
-.month-display { font-size:14px; font-weight:700; color:var(--gray-600); min-width:120px; text-align:center; }
+.month-display { font-size:16px; font-weight:700; color:var(--gray-800); min-width:140px; text-align:center; }
 .monthly-stats {
-  display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;
+  display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;
   margin-bottom:12px;
 }
 .mstat {
-  background:var(--gray-100); border-radius:10px; padding:12px 10px; text-align:center;
+  background:var(--gray-100); border-radius:10px; padding:14px 10px; text-align:center;
 }
-.mstat-label { font-size:12px; font-weight:700; color:var(--gray-400); margin-bottom:4px; }
-.mstat-valor { font-size:18px; font-weight:800; color:var(--gray-800); }
+.mstat-label { font-size:11px; font-weight:700; color:var(--gray-400); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px; }
+.mstat-valor { font-size:18px; font-weight:800; color:var(--gray-800); word-wrap:break-word; }
 
 .form-group { margin-bottom:14px; }
 .form-label { display:block; font-size:14px; font-weight:700; color:var(--gray-600); margin-bottom:7px; }
@@ -353,11 +353,9 @@ textarea.form-control { min-height:90px; resize:vertical; }
     <div class="monthly-header">
       <div class="monthly-title">💰 Resumo Mensal</div>
       <div class="month-nav">
-        <button class="month-btn" onclick="mudarMes(-5)" title="5 meses atrás">«</button>
         <button class="month-btn" onclick="mudarMes(-1)" title="Mês anterior">‹</button>
         <div class="month-display" id="monthDisplay"></div>
         <button class="month-btn" onclick="mudarMes(1)" title="Próximo mês">›</button>
-        <button class="month-btn" onclick="mudarMes(5)" title="5 meses à frente">»</button>
       </div>
     </div>
     <div class="monthly-stats">
@@ -374,7 +372,7 @@ textarea.form-control { min-height:90px; resize:vertical; }
         <div class="mstat-valor" id="mstat-pendente" style="color:var(--orange)">R$ 0</div>
       </div>
     </div>
-    <div style="font-size:13px; color:var(--gray-400); font-weight:600; line-height:1.5;" id="monthlyDetails"></div>
+    <div style="font-size:13px; color:var(--gray-400); font-weight:600; line-height:1.5; text-align:center;" id="monthlyDetails"></div>
   </div>
 
   <!-- SERVIÇOS DO MÊS -->
